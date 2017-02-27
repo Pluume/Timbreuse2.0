@@ -24,6 +24,7 @@
   "dependencies": {
     "express": "^4.14.1",
     "express-session": "^1.15.1",
+    "sqlite-crypto": "^1.1.0",
     "sqlite3": "^3.1.8"
   },
   "devDependencies": {
