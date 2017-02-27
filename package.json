@@ -1,0 +1,32 @@
+{
+  "name": "timbreuse",
+  "version": "2.0.0",
+  "description": "Software meant to follow students activities and hours of work done.",
+  "main": "Main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pluume/Timbreuse2.0.git"
+  },
+  "keywords": [
+    "Timbreuse",
+    "logger",
+    "nodejs"
+  ],
+  "author": "Francis le Roy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pluume/Timbreuse2.0/issues"
+  },
+  "homepage": "https://github.com/Pluume/Timbreuse2.0#readme",
+  "dependencies": {
+    "express": "^4.14.1",
+    "express-session": "^1.15.1",
+    "sqlite3": "^3.1.8"
+  },
+  "devDependencies": {
+    "electron": "^1.4.15"
+  }
+}
