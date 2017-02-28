@@ -11,6 +11,7 @@ module.exports = {
   RANK: RANK,
   init: function() {
       handle = new sqlite.Database("Data.db");
+      global.db = handle;
       handle.serialize(function() {
           handle.run(knex.schema.createTableIfNotExists("users", function(table) { //Users table
             table.increments("id").primary();
@@ -23,7 +24,7 @@ module.exports = {
             table.string("email");
           }).toString());
 
-          handle.run(knex.schema.createTableIfNotExists("student", function(table) {//Student table
+          handle.run(knex.schema.createTableIfNotExists("students", function(table) {//Student table
             table.increments("id").primary();
             table.integer("userid");
             table.integer("profid");
@@ -40,7 +41,7 @@ module.exports = {
             table.string("desc");
           }).toString());
 
-          handle.run(knex.schema.createTableIfNotExists("timeoff", function(table) {//logs table
+          handle.run(knex.schema.createTableIfNotExists("logs", function(table) {//logs table
             table.increments("id").primary();
             table.string("tag");
             table.integer("studentid");
@@ -49,7 +50,7 @@ module.exports = {
             table.string("location");
           }).toString());
 
-          handle.run(knex.schema.createTableIfNotExists("notification", function(table) {//notification table
+          handle.run(knex.schema.createTableIfNotExists("notifications", function(table) {//notification table
             table.increments("id").primary();
             table.integer("userid");
             table.integer("type");
