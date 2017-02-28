@@ -48,6 +48,15 @@ module.exports = {
             table.string("date");
             table.string("location");
           }).toString());
+
+          handle.run(knex.schema.createTableIfNotExists("notification", function(table) {//notification table
+            table.increments("id").primary();
+            table.integer("userid");
+            table.integer("type");
+            table.string("date");
+            table.string("message");
+            table.boolean("read");
+          }).toString());
       });
       handle.get("SELECT * FROM users WHERE rank=2",(err,data) => {
         if(data === undefined)
