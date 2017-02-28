@@ -9,21 +9,21 @@ module.exports = {
             var data = jsonfile.readFileSync(filename);
             globaldata = data;
         } catch (err) {
-            console.log("Can't read from the file, aborting... (utils/config.js)\n Filename : " + filename);
+            console.log("Can't read from the file, aborting...\n Filename : " + filename);
             return;
         }
     },
     data: () => {
-      return globaldata;
+        return globaldata;
     },
     write: (ndata) => {
-      try {
-          jsonfile.writeFileSync(filename,ndata);
-          globaldata = ndata;
-      } catch (err) {
-          console.log("Can't write the file, aborting... (utils/config.js)\n Filename : " + filename);
-          return;
-      }
+        try {
+            jsonfile.writeFileSync(filename, ndata);
+            globaldata = ndata;
+        } catch (err) {
+            console.log("Can't write the file, aborting...\n Filename : " + filename);
+            return;
+        }
     }
 
 };

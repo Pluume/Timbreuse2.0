@@ -61,7 +61,7 @@ module.exports = {
       handle.get("SELECT * FROM users WHERE rank=2",(err,data) => {
         if(data === undefined)
         {
-          handle.run(knex("users").insert({username: "admin",password: "password",rank: RANK.ADMIN, fname: "Administrator", lname: "", dob: "", email: ""}).toString());
+          handle.run(knex("users").insert({username: "admin",password: "4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9",rank: RANK.ADMIN, fname: "Administrator", lname: "", dob: "", email: ""}).toString()); //password: administrator
         }
       });
 
