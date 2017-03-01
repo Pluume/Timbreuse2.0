@@ -6,6 +6,13 @@ RANK = {
   PROF: 1,
   ADMIN: 2
 };
+STATUS = {
+  IN: 1,
+  OUT: 2,
+  ABS: 3
+};
+global.RANK = RANK;
+global.STATUS = STATUS;
 module.exports = {
   handle: handle,
   RANK: RANK,
@@ -22,6 +29,7 @@ module.exports = {
             table.string("lname");
             table.string("dob");
             table.string("email");
+            table.string("tag");
           }).toString());
 
           handle.run(knex.schema.createTableIfNotExists("students", function(table) {//Student table
@@ -29,8 +37,12 @@ module.exports = {
             table.integer("userid");
             table.integer("profid");
             table.integer("timeDiff");
+            table.integer("timeDiffToday");
+            table.string("lastTagTime");
             table.integer("status");
             table.boolean("isBlocked");
+            table.string("firstClass");
+            table.string("project");
           }).toString());
 
 
@@ -47,7 +59,8 @@ module.exports = {
             table.integer("studentid");
             table.integer("nstatus");
             table.string("date");
-            table.string("location");
+            table.string("class");
+            table.string("description");
           }).toString());
 
           handle.run(knex.schema.createTableIfNotExists("notifications", function(table) {//notification table

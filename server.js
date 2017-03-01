@@ -1,5 +1,5 @@
 net = require('net');
-const method = require("./server_method");
+const method = require("./server_methods");
 var clients = [];
 
 function removeClient(conn) {
@@ -14,7 +14,6 @@ module.exports = {
     net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
       addClient(connection);
-      console.log(clients);
         socket.on('error', function() {
             removeClient(connection);
         });

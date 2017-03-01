@@ -1,0 +1,6 @@
+-fnc
+-tag
+-time
+-class
+-error
+-student
