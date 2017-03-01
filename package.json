@@ -41,6 +41,8 @@
     "xss-filters": "^1.2.7"
   },
   "devDependencies": {
-    "electron": "^1.4.15"
+    "builder": "^3.2.1",
+    "electron": "^1.4.15",
+    "nan": "^2.5.1"
   }
 }
