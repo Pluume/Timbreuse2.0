@@ -22,8 +22,11 @@
   },
   "homepage": "https://github.com/Pluume/Timbreuse2.0#readme",
   "dependencies": {
+    "colors": "^1.1.2",
+    "console-at": "^2.0.1",
     "cron": "^1.2.1",
     "crypto-js": "^3.1.9-1",
+    "drivelist": "^5.0.14",
     "express": "^4.14.1",
     "express-session": "^1.15.1",
     "jsonfile": "^2.4.0",

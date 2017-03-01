@@ -1,4 +1,5 @@
-var knex = require('knex')({client: 'sqlite3'});
+var knex = require('knex')({client: 'sqlite3',
+  useNullAsDefault: true});
 var sqlite = require("sqlite3");
 var handle;
 RANK = {
@@ -70,6 +71,12 @@ module.exports = {
             table.string("date");
             table.string("message");
             table.boolean("read");
+          }).toString());
+
+          handle.run(knex.schema.createTableIfNotExists("class", function(table) {//class table
+            table.increments("id").primary();
+            table.prof("id");
+            table.string("name");
           }).toString());
       });
       handle.get("SELECT * FROM users WHERE rank=2",(err,data) => {

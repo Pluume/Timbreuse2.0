@@ -14,7 +14,7 @@ module.exports = {
                 fs.closeSync(fd);
                 return;
             } catch (err) {
-                console.log("Can't write to the file, aborting...\n Filename : " + filename);
+                log.error("Can't write to the file, aborting...\n Filename : " + filename);
                 return;
             }
         }
@@ -24,7 +24,7 @@ module.exports = {
             fs.closeSync(fd);
             return;
         } catch (err) {
-            console.log("Can't write to the file, aborting...\n Filename : " + filename);
+            log.error("Can't write to the file, aborting...\n Filename : " + filename);
             return;
         }
 

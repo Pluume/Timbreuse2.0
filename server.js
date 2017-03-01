@@ -1,3 +1,4 @@
+const log = require("./utils/log.js");
 net = require('net');
 const method = require("./server_methods");
 var clients = [];
@@ -31,7 +32,7 @@ module.exports = {
             removeClient(connection);
         });
     }).listen(703).on('listening', function() {
-      console.log("The server up on the port 703");
+      log.info("The server up on the port 703");
     });
   }
 };

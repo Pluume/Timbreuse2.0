@@ -9,7 +9,7 @@ module.exports = {
             var data = jsonfile.readFileSync(filename);
             globaldata = data;
         } catch (err) {
-            console.log("Can't read from the file, aborting...\n Filename : " + filename);
+            log.error("Can't read from the file, aborting...\n Filename : " + filename);
             return;
         }
     },
@@ -21,7 +21,7 @@ module.exports = {
             jsonfile.writeFileSync(filename, ndata);
             globaldata = ndata;
         } catch (err) {
-            console.log("Can't write the file, aborting...\n Filename : " + filename);
+            log.error("Can't write the file, aborting...\n Filename : " + filename);
             return;
         }
     }

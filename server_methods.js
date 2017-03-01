@@ -1,6 +1,8 @@
+const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const knex = require('knex')({
-    client: 'sqlite3'
+    client: 'sqlite3',
+  useNullAsDefault: true
 });
 const moment = require("moment");
 ERROR = {
@@ -29,14 +31,14 @@ function pingRequest(conn) {
 function tagRequest(conn, ireq) {
     var oreq;
     if (ireq.tag === undefined || ireq.time === undefined || ireq.class === undefined) {
-        console.log("Request ill formed. Closing socket.");
+        log.error("Request ill formed. Closing socket.");
         conn.socket.end();
         return;
     }
     global.db.serialize(() => {
         global.db.get(knex.select().from("users").where("tag", ireq.tag).toString(), (err, row) => {
             if (err) {
-                console.log("Error while accessing the database... Aborting.\n" + err);
+                log.error("Error while accessing the database... Aborting.\n" + err);
                 oreq = getBaseReq();
                 oreq.fnc = REQUEST.TAG;
                 oreq.error = ERROR.SQLITE;
@@ -44,7 +46,7 @@ function tagRequest(conn, ireq) {
                 return;
             }
             if (row === undefined) {
-                console.log("No user with this tag... Aborting.\n" + err);
+                log.error("No user with this tag... Aborting.\n" + err);
                 oreq = getBaseReq();
                 oreq.fnc = REQUEST.TAG;
                 oreq.error = ERROR.WRONGTAG;
@@ -57,7 +59,7 @@ function tagRequest(conn, ireq) {
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
                 if (err2) {
-                    console.log("Error while accessing the database... Aborting.\n" + err);
+                    log.error("Error while accessing the database... Aborting.\n" + err);
                     oreq = getBaseReq();
                     oreq.fnc = REQUEST.TAG;
                     oreq.error = ERROR.SQLITE;
@@ -80,7 +82,7 @@ function tagRequest(conn, ireq) {
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {
-                                console.log("Error while accessing the database... Aborting.\n" + err);
+                                log.error("Error while accessing the database... Aborting.\n" + err);
                                 oreq = getBaseReq();
                                 oreq.fnc = REQUEST.TAG;
                                 oreq.error = ERROR.SQLITE;
@@ -106,7 +108,7 @@ function tagRequest(conn, ireq) {
                     }).where("userid", row.id).toString());
                     global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                         if (err3) {
-                            console.log("Error while accessing the database... Aborting.\n" + err);
+                            log.error("Error while accessing the database... Aborting.\n" + err);
                             oreq = getBaseReq();
                             oreq.fnc = REQUEST.TAG;
                             oreq.error = ERROR.SQLITE;
@@ -129,7 +131,7 @@ function tagRequest(conn, ireq) {
 function authenticate(conn, ireq) {
     var oreq;
     if (ireq.user === undefined || ireq.pass === undefined) {
-        console.log("Request ill formed. Closing socket.");
+        log.error("Request ill formed. Closing socket.");
         conn.socket.end();
         return;
     }
@@ -141,7 +143,7 @@ module.exports = {
         try {
             ireq = JSON.parse(data);
         } catch (err) {
-            console.log("Request ill formed. Closing socket.");
+            log.error("Request ill formed. Closing socket.");
             oreq = getBaseReq();
             oreq.error = ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq));
@@ -149,7 +151,7 @@ module.exports = {
             return;
         }
         if (ireq.fnc === undefined) {
-            console.log("fnc param not specified in request. Aborting.");
+            log.error("fnc param not specified in request. Aborting.");
             oreq = getBaseReq();
             oreq.error = ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq));
