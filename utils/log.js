@@ -5,17 +5,17 @@ var path = require("path");
 var info = (msg) =>
 {
   var stack = at(1);
-  console.log("[" + process.uptime() + "] " + "[INFO] ".green + "(" + path.relative(".", stack.file) + ":" + stack.line + ") >> " + msg);
+  console.log("[" + process.uptime() + "] " + "[INFO] ".green + " > " + msg);
 };
 var error = (msg) =>
 {
   var stack = at(1);
-  console.error("[" + process.uptime() + "] " + "[ERROR] ".red + "(" + path.relative(".", stack.file) + ":" + stack.line + ") >> " + msg);
+  console.error("[" + process.uptime() + "] " + "[ERROR] ".red + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg);
 };
 var warning = (msg) =>
 {
   var stack = at(1);
-  console.log("[" + process.uptime() + "] " + "[WARNING] ".magenta + "(" + path.relative(".", stack.file) + ":" + stack.line + ") >> " + msg);
+  console.log("[" + process.uptime() + "] " + "[WARNING] ".magenta + " > " + msg);
 };
 module.exports = {
   info,

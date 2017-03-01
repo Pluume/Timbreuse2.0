@@ -4,7 +4,10 @@
   "description": "Software meant to follow students activities and hours of work done.",
   "main": "Main.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "server": "set ELECTRON_RUN_AS_NODE=1 && electron Main.js --server",
+    "client": "electron Main.js",
+    "slave": "electron Main.js --slave"
   },
   "repository": {
     "type": "git",

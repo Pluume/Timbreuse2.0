@@ -75,7 +75,7 @@ module.exports = {
 
           handle.run(knex.schema.createTableIfNotExists("class", function(table) {//class table
             table.increments("id").primary();
-            table.prof("id");
+            table.integer("profid");
             table.string("name");
           }).toString());
       });

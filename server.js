@@ -12,7 +12,7 @@ function addClient(conn) {
 }
 module.exports = {
   start: () => {
-    net.createServer(function(socket) {
+    global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
       addClient(connection);
         socket.on('error', function() {
@@ -34,5 +34,8 @@ module.exports = {
     }).listen(703).on('listening', function() {
       log.info("The server up on the port 703");
     });
+  },
+  stop: () => {
+    //TODO
   }
 };
