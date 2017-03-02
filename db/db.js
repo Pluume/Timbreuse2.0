@@ -53,7 +53,7 @@ module.exports = {
             table.string("date2");
             table.string("desc");
           }).toString());
-
+          //TODO Add timediff in the log table
           handle.run(knex.schema.createTableIfNotExists("logs", function(table) {//logs table
             table.increments("id").primary();
             table.string("tag");

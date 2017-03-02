@@ -8,12 +8,17 @@ const log = require("./log");
 module.exports = {
     writeBruteLoggingToCSV: (tag, time) => {
         var filename;
+        var dirname = path.join(__dirname,"..", "CSV");
+        if(!fs.existsSync(dirname))
+        {
+          fs.mkdirSync(dirname);
+        }
         if (global.config.csvFreq) {
             filename = moment().format("DD_MM_YYYY") + ".csv";
         } else {
             filename = "week_" + moment().week() + ".csv";
         }
-        var npath = path.join(path.join(__dirname, "CSV", global.config.class + "_" + filename).toString());
+        var npath = path.join(path.join(dirname, global.config.class + "_" + filename).toString());
         var fd;
         if (!fs.existsSync(npath)) {
             try {
@@ -55,7 +60,11 @@ module.exports = {
                     } else {
                       fs.mkdirSync(remotefolder);
                     }
-                    var localfolder = path.join("CSV");
+                    var localfolder = path.join(__dirname, "..", "CSV");
+                    if(!fs.existsSync(localfolder))
+                    {
+                      fs.mkdirSync(localfolder);
+                    }
                     var filelist = fs.readdirSync(localfolder);
                     for (var i = 0; i < filelist.length; i++) {
                         try {

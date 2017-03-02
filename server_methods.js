@@ -55,8 +55,12 @@ function tagRequest(conn, ireq) {
                 conn.socket.write(JSON.stringify(oreq));
                 return;
             }
-            if (row.rank == global.RANK.ADMIN) {
-                csv.exportCSV(() => {}); //TODO Callback to GUI
+            if (row.rank == global.RANK.ADMIN) { //Master card tagged
+                csv.exportCSV(() => {
+                  oreq = getBaseReq();
+                  oreq.fnc = REQUEST.TAG;
+                  conn.socket.write(JSON.stringify(oreq));
+                }); //TODO Callback to GUI
                 return;
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {

@@ -19,6 +19,9 @@ function createWindow()
     global.mwin.on('closed', function() {
         mainWindow = null;
     });
+    global.mwin.on("ready-to-show", () => {
+      global.mwin.show();
+    });
 }
 function load()
 {

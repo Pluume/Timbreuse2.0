@@ -4,19 +4,23 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 
-function createWin() {
+function createWindow() {
     global.mwin = new BrowserWindow({
         width: 800,
-        height: 600
+        height: 600,
+        show: false
     });
-    mainWindow.loadURL(url.format({
+    global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, 'slave.html'),
         protocol: 'file:',
         slashes: true
     }));
-    mainWindow.webContents.openDevTools();
-    mainWindow.on('closed', function() {
-        mainWindow = null;
+    global.mwin.webContents.openDevTools();
+    global.mwin.on('closed', function() {
+        global.mwin = null;
+    });
+    global.mwin.on("ready-to-show", () => {
+      global.mwin.show();
     });
 }
 
@@ -28,7 +32,7 @@ function load() {
         }
     });
     app.on('activate', function() {
-        if (mainWindow === null) {
+        if (global.mwin === null) {
             createWindow();
         }
     });
