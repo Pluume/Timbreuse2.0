@@ -4,10 +4,7 @@
   "description": "Software meant to follow students activities and hours of work done.",
   "main": "Main.js",
   "scripts": {
-    "test": "node test.js",
-    "server": "set ELECTRON_RUN_AS_NODE=1 && electron Main.js --server",
-    "client": "electron Main.js",
-    "slave": "electron Main.js --slave"
+    "test": "electron test.js"
   },
   "repository": {
     "type": "git",
@@ -25,7 +22,6 @@
   },
   "homepage": "https://github.com/Pluume/Timbreuse2.0#readme",
   "dependencies": {
-    "colors": "^1.1.2",
     "console-at": "^2.0.1",
     "cron": "^1.2.1",
     "crypto-js": "^3.1.9-1",

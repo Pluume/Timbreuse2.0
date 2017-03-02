@@ -1,22 +1,36 @@
 const moment = require("moment");
 const at = require("console-at");
-var colors = require('colors');
 var path = require("path");
+const fs = require("fs");
+var access = fs.createWriteStream("Timbreuse.log",{ flags: 'w' });
 var info = (msg) =>
 {
   var stack = at(1);
-  console.log("[" + process.uptime() + "] " + "[INFO] ".green + " > " + msg);
+  var cmsg = "[" + process.uptime() + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  console.log(cmsg);
+  access.write(cmsg + "\n");
 };
 var error = (msg) =>
 {
   var stack = at(1);
-  console.error("[" + process.uptime() + "] " + "[ERROR] ".red + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg);
+  var cmsg = "[" + process.uptime() + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  console.log(cmsg);
+  access.write(cmsg + "\n");
 };
 var warning = (msg) =>
 {
   var stack = at(1);
-  console.log("[" + process.uptime() + "] " + "[WARNING] ".magenta + " > " + msg);
+  var cmsg = "[" + process.uptime() + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  console.log(cmsg);
+  access.write(cmsg + "\n");
 };
+process.on('uncaughtException', function(err) {
+  error((err && err.stack) ? err.stack : err);
+});
+process.on("exit",(code) => {
+  info("Exiting with code " + code);
+  access.end();
+});
 module.exports = {
   info,
   error,
