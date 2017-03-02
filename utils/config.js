@@ -4,24 +4,20 @@ const jsonfile = require("jsonfile");
 const log = require("./log.js");
 var filename = path.join(__dirname, "..", "config.json");
 var TYPE = {SERVER: {int: 0, string: "server"}, SLAVE: {int: 1, string: "slave"}, CLIENT: {int: 2, string: "client"}};
-var globaldata = {};
 module.exports = {
     read: () => {
         try {
             var data = jsonfile.readFileSync(filename);
-            globaldata = data;
+            global.config = data;
         } catch (err) {
             log.error("Can't read from the file, aborting...\n Filename : " + filename);
             return;
         }
     },
-    data: () => {
-        return globaldata;
-    },
     write: (ndata) => {
         try {
             jsonfile.writeFileSync(filename, ndata);
-            globaldata = ndata;
+            global.config = ndata;
         } catch (err) {
             log.error("Can't write the file, aborting...\n Filename : " + filename);
             return;
