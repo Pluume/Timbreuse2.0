@@ -3,6 +3,39 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
+const net = require("net");
+const log = require("./../utils/log.js");
+const csv = require("./../utils/csv.js");
+var goingToClose = false;
+var slaveconn;
+function tag(stag,ntime)
+{
+
+  csv.writeBruteLoggingToCSV(stag, ntime);
+}
+function foreverConnect() {
+    slaveconn = net.createConnection({
+      host:global.config.server,
+        port: 703
+    }, () => {
+        log.info('Connected to server!');
+
+    });
+    slaveconn.on("close", (err) => {
+        if (!goingToClose) {
+            if (err) {
+                log.warning("The connection was closed with an error. Connecting back in 5 seconds");
+                setTimeout(foreverConnect, 5000);
+            } else {
+                log.warning("The connection was closed without an error. Connecting back in 5 seconds");
+                setTimeout(foreverConnect, 5000);
+            }
+        } else {
+            log.info("Connection closed.");
+        }
+
+    });
+}
 
 function createWindow() {
     global.mwin = new BrowserWindow({
@@ -20,7 +53,10 @@ function createWindow() {
         global.mwin = null;
     });
     global.mwin.on("ready-to-show", () => {
-      global.mwin.show();
+        global.mwin.show();
+    });
+    global.mwin.on("show", () => {
+        foreverConnect();
     });
 }
 

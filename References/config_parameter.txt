@@ -1,2 +1,3 @@
 -class
 -csvFreq (0 for day : 1 for week)
+-server (address)
