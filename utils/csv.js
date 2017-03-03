@@ -52,7 +52,7 @@ module.exports = {
             }
             drives.forEach((drive) => {
                 if (!drive.system) {
-                    var remotefolder = path.join(drive.mountpoints[0].path, moment().format('MMMM_Do_YYYY__HH_mm_ss'));
+                    var remotefolder = path.join(drive.mountpoints[0].path, global.config.class + "_" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
                     log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
                     if (fs.existsSync(remotefolder)) {
                         log.error("The folder already exists. Aborting");
