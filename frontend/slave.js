@@ -6,12 +6,36 @@ const url = require('url');
 const net = require("net");
 const log = require("./../utils/log.js");
 const csv = require("./../utils/csv.js");
+const request = require("./../request.js");
+const moment = require("moment");
 var goingToClose = false;
+var connected = false;
 var slaveconn;
+var oreqPile = [];
+function getNow()
+{
+  return moment().toDate().toISOString();
+}
+function executePile()
+{
+  var currreq = oreqPile.pop();
+  while(currreq!==undefined)
+  {
+    slaveconn.write(currreq);
+  }
+}
 function tag(stag,ntime)
 {
-
+  var oreq = {fnc: request.REQUEST.TAG, error: request.ERROR.OK, tag: stag, time: ntime, class:global.config.class};
   csv.writeBruteLoggingToCSV(stag, ntime);
+  if(connected)
+  {
+    slaveconn.write(JSON.stringify(oreq));
+    //TODO Handle data incoming
+    } else {
+    oreqPile.push(oreq);
+  }
+  log.info("Tagging");
 }
 function foreverConnect() {
     slaveconn = net.createConnection({
@@ -19,9 +43,10 @@ function foreverConnect() {
         port: 703
     }, () => {
         log.info('Connected to server!');
-
+        connected = true;
     });
     slaveconn.on("close", (err) => {
+      connected = false;
         if (!goingToClose) {
             if (err) {
                 log.warning("The connection was closed with an error. Connecting back in 5 seconds");
@@ -74,5 +99,7 @@ function load() {
     });
 }
 module.exports = {
-    load
+    load,
+    tag,
+    getNow
 };

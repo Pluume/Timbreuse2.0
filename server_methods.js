@@ -1,28 +1,17 @@
 const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const csv = require("./utils/csv.js");
+const request = require("./request.js");
 const knex = require('knex')({
     client: 'sqlite3',
     useNullAsDefault: true
 });
 const moment = require("moment");
-ERROR = {
-    OK: 0,
-    UNKNOWN: 1,
-    WRONGTAG: 2,
-    SQLITE: 3
-};
-REQUEST = {
-    EXIT: -1,
-    PING: 0,
-    TAG: 1,
-    AUTH: 2
-};
 
 function getBaseReq() {
     return {
-        fnc: REQUEST.PING,
-        error: ERROR.OK
+        fnc: request.REQUEST.PING,
+        error: request.ERROR.OK
     };
 }
 
@@ -33,42 +22,42 @@ function pingRequest(conn) {
 function tagRequest(conn, ireq) {
     var oreq;
     if (ireq.tag === undefined || ireq.time === undefined || ireq.class === undefined) {
-        log.error("Request ill formed. Closing socket.");
-        conn.socket.write(JSON.stringify(getBaseReq().error = ERROR.UNKNOWN));
+        log.error("Request ill formed.");
+        conn.socket.write(JSON.stringify(getBaseReq().error = request.ERROR.UNKNOWN));
         return;
     }
     global.db.serialize(() => {
         global.db.get(knex.select().from("users").where("tag", ireq.tag).toString(), (err, row) => {
             if (err) {
-                log.error("Error while accessing the database... Aborting.\n" + err);
+                log.error("Error while accessing the database...\n" + err);
                 oreq = getBaseReq();
-                oreq.fnc = REQUEST.TAG;
-                oreq.error = ERROR.SQLITE;
+                oreq.fnc = request.REQUEST.TAG;
+                oreq.error = request.ERROR.SQLITE;
                 conn.socket.write(JSON.stringify(oreq));
                 return;
             }
             if (row === undefined) {
-                log.error("No user with this tag... Aborting.\n" + err);
+                log.error("No user with this tag...");
                 oreq = getBaseReq();
-                oreq.fnc = REQUEST.TAG;
-                oreq.error = ERROR.WRONGTAG;
+                oreq.fnc = request.REQUEST.TAG;
+                oreq.error = request.ERROR.WRONGTAG;
                 conn.socket.write(JSON.stringify(oreq));
                 return;
             }
             if (row.rank == global.RANK.ADMIN) { //Master card tagged
                 csv.exportCSV(() => {
-                  oreq = getBaseReq();
-                  oreq.fnc = REQUEST.TAG;
-                  conn.socket.write(JSON.stringify(oreq));
+                    oreq = getBaseReq();
+                    oreq.fnc = request.REQUEST.TAG;
+                    conn.socket.write(JSON.stringify(oreq));
                 }); //TODO Callback to GUI
                 return;
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
                 if (err2) {
-                    log.error("Error while accessing the database... Aborting.\n" + err);
+                    log.error("Error while accessing the database...\n" + err);
                     oreq = getBaseReq();
-                    oreq.fnc = REQUEST.TAG;
-                    oreq.error = ERROR.SQLITE;
+                    oreq.fnc = request.REQUEST.TAG;
+                    oreq.error = request.ERROR.SQLITE;
                     conn.socket.write(JSON.stringify(oreq));
                     return;
                 }
@@ -88,15 +77,15 @@ function tagRequest(conn, ireq) {
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {
-                                log.error("Error while accessing the database... Aborting.\n" + err);
+                                log.error("Error while accessing the database...\n" + err);
                                 oreq = getBaseReq();
-                                oreq.fnc = REQUEST.TAG;
-                                oreq.error = ERROR.SQLITE;
+                                oreq.fnc = request.REQUEST.TAG;
+                                oreq.error = request.ERROR.SQLITE;
                                 conn.socket.write(JSON.stringify(oreq));
                                 return;
                             }
                             oreq = getBaseReq();
-                            oreq.fnc = REQUEST.TAG;
+                            oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
                             conn.socket.write(JSON.stringify(oreq));
 
@@ -115,15 +104,15 @@ function tagRequest(conn, ireq) {
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {
-                                log.error("Error while accessing the database... Aborting.\n" + err);
+                                log.error("Error while accessing the database...\n" + err);
                                 oreq = getBaseReq();
-                                oreq.fnc = REQUEST.TAG;
-                                oreq.error = ERROR.SQLITE;
+                                oreq.fnc = request.REQUEST.TAG;
+                                oreq.error = request.ERROR.SQLITE;
                                 conn.socket.write(JSON.stringify(oreq));
                                 return;
                             }
                             oreq = getBaseReq();
-                            oreq.fnc = REQUEST.TAG;
+                            oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
                             conn.socket.write(JSON.stringify(oreq));
                         });
@@ -138,7 +127,7 @@ function tagRequest(conn, ireq) {
 function authenticate(conn, ireq) {
     var oreq;
     if (ireq.user === undefined || ireq.pass === undefined) {
-        log.error("Request ill formed. Closing socket.");
+        log.error("Request ill formed.");
         conn.socket.write(JSON.stringify(getBaseReq().error = ERROR.UNKNOWN));
         return;
     }
@@ -152,32 +141,35 @@ module.exports = {
         var oreq;
         var ireq;
         try {
+            if (global.DEBUG) {
+                console.log(data);
+            }
             ireq = JSON.parse(data);
         } catch (err) {
-            log.error("Request ill formed. Closing socket.");
+            log.error("Request ill formed.");
             oreq = getBaseReq();
             oreq.error = ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
         if (ireq.fnc === undefined) {
-            log.error("fnc param not specified in request. Aborting.");
+            log.error("fnc param not specified in request.");
             oreq = getBaseReq();
             oreq.error = ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
         switch (ireq.fnc) {
-            case REQUEST.EXIT:
+            case request.REQUEST.EXIT:
                 socketExit(connection);
                 break;
-            case REQUEST.PING:
+            case request.REQUEST.PING:
                 pingRequest(connection);
                 break;
-            case REQUEST.TAG:
+            case request.REQUEST.TAG:
                 tagRequest(connection, ireq);
                 break;
-            case REQUEST.AUTH:
+            case request.REQUEST.AUTH:
                 authenticate(connection, ireq);
                 break;
         }

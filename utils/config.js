@@ -25,17 +25,16 @@ module.exports = {
     },
     TYPE,
     getType: () => {
-      var helpstring = "\nTo start as a server : --server\nTo start as a slave : --slave\nTo start as a client : no arguments.";
-      if(process.argv.length > 3)
-      {
-        log.error("To many argument : \n" + helpstring);
-        console.log(process.argv.length);
-        process.exit(0);
-      }
+      var helpstring = "\nTo start as a server : --server\nTo start as a slave : --slave\nTo start in debug mode : --debug\nTo start as a client : no arguments.";
+
       if(process.argv.indexOf("-h")>-1 || process.argv.indexOf("--h")>-1)
       {
         console.log(helpstring);
         process.exit(0);
+      }
+      if(process.argv.indexOf("--debug")>-1)
+      {
+        global.DEBUG = true;
       }
       if(process.argv.indexOf("--server")>-1)
       {
@@ -47,6 +46,7 @@ module.exports = {
         global.TYPE = TYPE.SLAVE;
         return;
       }
+
       global.TYPE = TYPE.CLIENT;
     }
 
