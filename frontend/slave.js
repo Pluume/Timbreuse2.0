@@ -32,18 +32,11 @@ function getNow() {
  * @method executePile
  **/
 function executePile() {
-    var currreq = oreqPile.pop();
-    while (currreq !== undefined) {
-        slaveconn.write(JSON.stringify(currreq));
-        currreq = oreqPile.pop();
-    }
+    slaveconn.write(JSON.stringify(oreqPile));
     for (var i = 0; i < slaves.length; i++) {
-        currreq = slaves[i].pile.pop();
-        while (currreq !== undefined) {
-            slaves[i].conn.write(JSON.stringify(currreq));
-            currreq = slaves[i].pile.pop();
-        }
+        slaves[i].conn.write(JSON.stringify(oreqPile));
     }
+    oreqPile = [];
 }
 /**
  * Tag an user
@@ -68,9 +61,9 @@ function tag(stag, ntime) {
     }
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].conn.connected) {
-            slaves[i].conn.write(ntime);
+            slaves[i].conn.write(oreq);
         } else {
-            slaves[i].pile.push(ntime);
+            slaves[i].pile.push(oreq);
         }
 
     }

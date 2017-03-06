@@ -1,95 +1,26 @@
-[0.11] [INFO] (Main.js:7) > Loading configuration...
-[0.12] [INFO] (Main.js:12) > Starting as a slave
-[0.12] [INFO] (Main.js:15) > Initializing database...
-[0.853] [INFO] (Main.js:18) > Starting server...
-[0.963] [INFO] (server.js:53) > The server up on the port 703
-[2.218] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+[0.128] [INFO] (Main.js:7) > Loading configuration...
+[0.138] [INFO] (Main.js:12) > Starting as a slave
+[0.138] [INFO] (Main.js:15) > Initializing database...
+[0.924] [INFO] (Main.js:18) > Starting server...
+[1.041] [INFO] (server.js:53) > The server up on the port 703
+[2.292] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
     at Object.exports._errnoException (util.js:1026:11)
     at exports._exceptionWithHostPort (util.js:1049:20)
     at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[2.22] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[8.24] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+[2.294] [WARNING] (frontend\slave.js:91) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[8.311] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
     at Object.exports._errnoException (util.js:1026:11)
     at exports._exceptionWithHostPort (util.js:1049:20)
     at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[8.241] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[8.905] [INFO] (frontend\slave.js:78) > Tagging
-[9.8] [INFO] (frontend\slave.js:78) > Tagging
-[10.199] [INFO] (frontend\slave.js:78) > Tagging
-[10.542] [INFO] (frontend\slave.js:78) > Tagging
-[10.878] [INFO] (frontend\slave.js:78) > Tagging
-[11.199] [INFO] (frontend\slave.js:78) > Tagging
-[11.503] [INFO] (frontend\slave.js:78) > Tagging
-[11.798] [INFO] (frontend\slave.js:78) > Tagging
-[12.063] [INFO] (frontend\slave.js:78) > Tagging
-[12.33] [INFO] (frontend\slave.js:78) > Tagging
-[12.578] [INFO] (frontend\slave.js:78) > Tagging
-[12.815] [INFO] (frontend\slave.js:78) > Tagging
-[13.047] [INFO] (frontend\slave.js:78) > Tagging
-[13.255] [INFO] (frontend\slave.js:78) > Tagging
-[13.488] [INFO] (frontend\slave.js:78) > Tagging
-[13.672] [INFO] (frontend\slave.js:78) > Tagging
-[13.886] [INFO] (frontend\slave.js:78) > Tagging
-[14.094] [INFO] (frontend\slave.js:78) > Tagging
-[14.262] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
-    at Object.exports._errnoException (util.js:1026:11)
-    at exports._exceptionWithHostPort (util.js:1049:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[14.263] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[14.297] [INFO] (frontend\slave.js:78) > Tagging
-[14.519] [INFO] (frontend\slave.js:78) > Tagging
-[20.294] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
-    at Object.exports._errnoException (util.js:1026:11)
-    at exports._exceptionWithHostPort (util.js:1049:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[20.294] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[26.322] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
-    at Object.exports._errnoException (util.js:1026:11)
-    at exports._exceptionWithHostPort (util.js:1049:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[26.323] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[31.331] [INFO] (frontend\slave.js:94) > The Timbreuse YE-S1x is online.
-[31.342] [ERROR] (server_methods.js:185) > Request ill formed.
-[31.343] [ERROR] (utils\log.js:49) > ReferenceError: ERROR is not defined
-    at Object.sortRequest (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server_methods.js:187:26)
+[8.312] [WARNING] (frontend\slave.js:91) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[14.327] [INFO] (frontend\slave.js:85) > The Timbreuse YE-S1x is online.
+[14.329] [ERROR] (server_methods.js:192) > fnc param not specified in request.
+[14.33] [ERROR] (utils\log.js:49) > ReferenceError: ERROR is not defined
+    at Object.sortRequest (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server_methods.js:194:26)
     at Socket.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server.js:44:18)
     at emitOne (events.js:96:13)
     at Socket.emit (events.js:188:7)
     at readableAddChunk (_stream_readable.js:176:18)
     at Socket.Readable.push (_stream_readable.js:134:10)
     at TCP.onread (net.js:543:20)
-[40.08] [INFO] (frontend\slave.js:78) > Tagging
-[41.485] [INFO] (frontend\slave.js:78) > Tagging
-[140.139] [INFO] (frontend\slave.js:78) > Tagging
-[145.396] [INFO] (frontend\slave.js:78) > Tagging
-[150.287] [ERROR] (utils\log.js:49) > Error: read ECONNRESET
-    at exports._errnoException (util.js:1026:11)
-    at TCP.onread (net.js:564:26)
-[150.29] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[153.89] [INFO] (frontend\slave.js:78) > Tagging
-[156.321] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
-    at Object.exports._errnoException (util.js:1026:11)
-    at exports._exceptionWithHostPort (util.js:1049:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[156.322] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[158.748] [INFO] (frontend\slave.js:78) > Tagging
-[162.334] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
-    at Object.exports._errnoException (util.js:1026:11)
-    at exports._exceptionWithHostPort (util.js:1049:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
-[162.335] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[167.344] [INFO] (frontend\slave.js:94) > The Timbreuse YE-S1x is online.
-[167.346] [ERROR] (server_methods.js:185) > Request ill formed.
-[167.348] [ERROR] (utils\log.js:49) > ReferenceError: ERROR is not defined
-    at Object.sortRequest (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server_methods.js:187:26)
-    at Socket.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server.js:44:18)
-    at emitOne (events.js:96:13)
-    at Socket.emit (events.js:188:7)
-    at readableAddChunk (_stream_readable.js:176:18)
-    at Socket.Readable.push (_stream_readable.js:134:10)
-    at TCP.onread (net.js:543:20)
-[171.347] [ERROR] (utils\log.js:49) > Error: read ECONNRESET
-    at exports._errnoException (util.js:1026:11)
-    at TCP.onread (net.js:564:26)
-[171.348] [WARNING] (frontend\slave.js:100) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
-[173.428] [WARNING] (utils\log.js:66) > Interruption caught !
+[20.375] [WARNING] (utils\log.js:66) > Interruption caught !
