@@ -1,3 +1,10 @@
+/**
+ * Handle the Timbreuse's server incoming data.
+ *
+ * @module server
+ * @submodule server_methods
+ * @class server_methods
+ */
 const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const csv = require("./utils/csv.js");
@@ -7,18 +14,32 @@ const knex = require('knex')({
     useNullAsDefault: true
 });
 const moment = require("moment");
-
+/**
+ * Generate the a base for an outgoing request
+ * @method getBaseReq
+ * @return {Object} request base
+ **/
 function getBaseReq() {
     return {
         fnc: request.REQUEST.PING,
         error: request.ERROR.OK
     };
 }
-
+/**
+ * Send a ping to server
+ * @method pingRequest
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ **/
 function pingRequest(conn) {
     socket.write("up");
+    //TODO
 }
-
+/**
+ * Handle a tag request (When a student arrive or leave)
+ * @method tagRequest
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the incoming data.
+ **/
 function tagRequest(conn, ireq) {
     var oreq;
     if (ireq.tag === undefined || ireq.time === undefined || ireq.class === undefined) {
@@ -123,7 +144,12 @@ function tagRequest(conn, ireq) {
         });
     });
 }
-
+/**
+ * Handle a login request
+ * @method authenticate
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the incoming data.
+ **/
 function authenticate(conn, ireq) {
     var oreq;
     if (ireq.user === undefined || ireq.pass === undefined) {
@@ -132,11 +158,21 @@ function authenticate(conn, ireq) {
         return;
     }
 }
-
+/**
+ * End the provided socket
+ * @method socketExit
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ **/
 function socketExit(conn) {
     conn.socket.end();
 }
 module.exports = {
+  /**
+   * Sort the incoming request. Redirect the request to the correct function.
+   * @method sortRequest
+   * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+   * @param {Object} data raw data from the client.
+   **/
     sortRequest: (connection, data) => {
         var oreq;
         var ireq;

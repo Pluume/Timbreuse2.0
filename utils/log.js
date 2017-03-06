@@ -1,8 +1,19 @@
+/**
+ * Handle logging functions.
+ *
+ * @module log
+ * @class log
+ */
 const moment = require("moment");
 const at = require("console-at");
 var path = require("path");
 const fs = require("fs");
 var access = fs.createWriteStream("Timbreuse.log",{ flags: 'w' });
+/**
+ * Print a user friendly information message to the console
+ * @method info
+ * @param {String} msg the message.
+ **/
 var info = (msg) =>
 {
   var stack = at(1);
@@ -10,6 +21,11 @@ var info = (msg) =>
   console.log(cmsg);
   access.write(cmsg + "\n");
 };
+/**
+ * Print a user friendly error message to the console
+ * @method error
+ * @param {String} msg the message.
+ **/
 var error = (msg) =>
 {
   var stack = at(1);
@@ -17,6 +33,11 @@ var error = (msg) =>
   console.log(cmsg);
   access.write(cmsg + "\n");
 };
+/**
+ * Print a user friendly information warning to the console
+ * @method warning
+ * @param {String} msg the message.
+ **/
 var warning = (msg) =>
 {
   var stack = at(1);
@@ -36,6 +57,10 @@ module.exports = {
   error,
   warning
 };
+/**
+ * On SIGINT (Ctrl + C), quit the app nicely
+ * @method interruption
+ **/
 function interruption()
 {
   warning("Interruption caught !");

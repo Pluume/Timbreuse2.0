@@ -1,3 +1,8 @@
+/**
+ * Define some global enumeration used in network methods.
+ *
+ * @module request
+ */
 module.exports = {
   ERROR: {
     OK: 0,

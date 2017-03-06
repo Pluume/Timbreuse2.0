@@ -1,0 +1,813 @@
+{
+    "project": {
+        "name": "Timbreuse",
+        "description": "Software meant to follow students activities and hours of work done.",
+        "version": "2.0.0",
+        "url": "https://github.com/Pluume/Timbreuse2.0"
+    },
+    "files": {
+        "db\\db.js": {
+            "name": "db\\db.js",
+            "modules": {
+                "db": 1
+            },
+            "classes": {
+                "db": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "frontend\\client.js": {
+            "name": "frontend\\client.js",
+            "modules": {
+                "client": 1
+            },
+            "classes": {
+                "client": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "frontend\\slave.js": {
+            "name": "frontend\\slave.js",
+            "modules": {
+                "slave": 1
+            },
+            "classes": {
+                "slave": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "utils\\config.js": {
+            "name": "utils\\config.js",
+            "modules": {
+                "config": 1
+            },
+            "classes": {
+                "config": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "utils\\csv.js": {
+            "name": "utils\\csv.js",
+            "modules": {
+                "csv": 1
+            },
+            "classes": {
+                "csv": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "utils\\log.js": {
+            "name": "utils\\log.js",
+            "modules": {
+                "log": 1
+            },
+            "classes": {
+                "log": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "utils\\math.js": {
+            "name": "utils\\math.js",
+            "modules": {
+                "math": 1
+            },
+            "classes": {
+                "math": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "Main.js": {
+            "name": "Main.js",
+            "modules": {
+                "main": 1
+            },
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "request.js": {
+            "name": "request.js",
+            "modules": {
+                "request": 1
+            },
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "server.js": {
+            "name": "server.js",
+            "modules": {
+                "server": 1
+            },
+            "classes": {
+                "server": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "server_methods.js": {
+            "name": "server_methods.js",
+            "modules": {
+                "server_methods": 1
+            },
+            "classes": {
+                "server_methods": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "db": {
+            "name": "db",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "db": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "db\\db.js",
+            "line": 1,
+            "description": "Handle the database"
+        },
+        "client": {
+            "name": "client",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "client": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "frontend\\client.js",
+            "line": 1,
+            "description": "Handle client frontend."
+        },
+        "slave": {
+            "name": "slave",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "slave": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "frontend\\slave.js",
+            "line": 1,
+            "description": "Handle slave frontend."
+        },
+        "config": {
+            "name": "config",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "config": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "utils\\config.js",
+            "line": 1,
+            "description": "Handle the app config."
+        },
+        "csv": {
+            "name": "csv",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "csv": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "utils\\csv.js",
+            "line": 1,
+            "description": "Handle mathematics functions needed by the server."
+        },
+        "log": {
+            "name": "log",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "log": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "utils\\log.js",
+            "line": 1,
+            "description": "Handle logging functions."
+        },
+        "math": {
+            "name": "math",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "math": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "utils\\math.js",
+            "line": 1,
+            "description": "Handle mathematics functions needed by the server."
+        },
+        "main": {
+            "name": "main",
+            "submodules": {},
+            "elements": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "Main.js",
+            "line": 1,
+            "description": "Main module. Makes all the other modules start by parsing the command line argument."
+        },
+        "request": {
+            "name": "request",
+            "submodules": {},
+            "elements": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "request.js",
+            "line": 1,
+            "description": "Define some global enumeration used in network methods."
+        },
+        "server": {
+            "name": "server",
+            "submodules": {
+                "server_methods": 1
+            },
+            "elements": {},
+            "classes": {
+                "server": 1,
+                "server_methods": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "server_methods.js",
+            "line": 1,
+            "description": "Declare the Timbreuse's server and handle the client connection management. Redirect any request to the module server_methods"
+        },
+        "server_methods": {
+            "name": "server_methods",
+            "submodules": {},
+            "elements": {},
+            "classes": {
+                "server_methods": 1
+            },
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "server",
+            "namespace": "",
+            "file": "server_methods.js",
+            "line": 1,
+            "description": "Handle the Timbreuse's server incoming data."
+        }
+    },
+    "classes": {
+        "db": {
+            "name": "db",
+            "shortname": "db",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "db",
+            "namespace": "",
+            "file": "db\\db.js",
+            "line": 1,
+            "description": "Handle the database"
+        },
+        "client": {
+            "name": "client",
+            "shortname": "client",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "client",
+            "namespace": "",
+            "file": "frontend\\client.js",
+            "line": 1,
+            "description": "Handle client frontend."
+        },
+        "slave": {
+            "name": "slave",
+            "shortname": "slave",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "slave",
+            "namespace": "",
+            "file": "frontend\\slave.js",
+            "line": 1,
+            "description": "Handle slave frontend."
+        },
+        "config": {
+            "name": "config",
+            "shortname": "config",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "config",
+            "namespace": "",
+            "file": "utils\\config.js",
+            "line": 1,
+            "description": "Handle the app config."
+        },
+        "csv": {
+            "name": "csv",
+            "shortname": "csv",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "csv",
+            "namespace": "",
+            "file": "utils\\csv.js",
+            "line": 1,
+            "description": "Handle mathematics functions needed by the server."
+        },
+        "log": {
+            "name": "log",
+            "shortname": "log",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "log",
+            "namespace": "",
+            "file": "utils\\log.js",
+            "line": 1,
+            "description": "Handle logging functions."
+        },
+        "math": {
+            "name": "math",
+            "shortname": "math",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "math",
+            "namespace": "",
+            "file": "utils\\math.js",
+            "line": 1,
+            "description": "Handle mathematics functions needed by the server."
+        },
+        "server": {
+            "name": "server",
+            "shortname": "server",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "server",
+            "namespace": "",
+            "file": "server.js",
+            "line": 1,
+            "description": "Declare the Timbreuse's server and handle the client connection management. Redirect any request to the module server_methods"
+        },
+        "server_methods": {
+            "name": "server_methods",
+            "shortname": "server_methods",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "server",
+            "submodule": "server_methods",
+            "namespace": "",
+            "file": "server_methods.js",
+            "line": 1,
+            "description": "Handle the Timbreuse's server incoming data."
+        }
+    },
+    "elements": {},
+    "classitems": [
+        {
+            "file": "db\\db.js",
+            "line": 26,
+            "description": "Init the database",
+            "itemtype": "method",
+            "name": "init",
+            "class": "db",
+            "module": "db"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 12,
+            "description": "Create a windows for the client",
+            "itemtype": "method",
+            "name": "createWindow",
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 37,
+            "description": "Load the client interface",
+            "itemtype": "method",
+            "name": "load",
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 21,
+            "description": "Get the current time",
+            "itemtype": "method",
+            "name": "getNow",
+            "return": {
+                "description": "the current time in a ISO string",
+                "type": "String"
+            },
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 30,
+            "description": "Execute the pile of saved request",
+            "itemtype": "method",
+            "name": "executePile",
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 42,
+            "description": "Tag an user",
+            "itemtype": "method",
+            "name": "tag",
+            "params": [
+                {
+                    "name": "stag",
+                    "description": "the user's tag.",
+                    "type": "String"
+                },
+                {
+                    "name": "ntime",
+                    "description": "the current time.",
+                    "type": "String"
+                }
+            ],
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 61,
+            "description": "Make the slave always try to maintain a connection with the server",
+            "itemtype": "method",
+            "name": "foreverConnect",
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "utils\\config.js",
+            "line": 15,
+            "description": "Read the config",
+            "itemtype": "method",
+            "name": "read",
+            "class": "config",
+            "module": "config"
+        },
+        {
+            "file": "utils\\config.js",
+            "line": 28,
+            "description": "Write the new config to disk",
+            "itemtype": "method",
+            "name": "write",
+            "params": [
+                {
+                    "name": "ndata",
+                    "description": "the new JSON config.",
+                    "type": "Object"
+                }
+            ],
+            "class": "config",
+            "module": "config"
+        },
+        {
+            "file": "utils\\config.js",
+            "line": 43,
+            "description": "Get the program type at startup. Whenether start the program as a client, slave or server and set it in the TYPE global variable.",
+            "itemtype": "method",
+            "name": "getType",
+            "class": "config",
+            "module": "config"
+        },
+        {
+            "file": "utils\\csv.js",
+            "line": 15,
+            "description": "Write to a CSV the tag and tag-time provided",
+            "itemtype": "method",
+            "name": "writeBruteLoggingToCSV",
+            "params": [
+                {
+                    "name": "tag",
+                    "description": "the tag.",
+                    "type": "String"
+                },
+                {
+                    "name": "time",
+                    "description": "the tag-time.",
+                    "type": "String"
+                }
+            ],
+            "class": "csv",
+            "module": "csv"
+        },
+        {
+            "file": "utils\\csv.js",
+            "line": 58,
+            "description": "Export all the server's CSV to a USB key.",
+            "itemtype": "method",
+            "name": "exportCSV",
+            "params": [
+                {
+                    "name": "cb",
+                    "description": "a callback that will be called when all the file has been copied to the USB key.",
+                    "type": "Function"
+                }
+            ],
+            "class": "csv",
+            "module": "csv"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 12,
+            "description": "Print a user friendly information message to the console",
+            "itemtype": "method",
+            "name": "info",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "the message.",
+                    "type": "String"
+                }
+            ],
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 24,
+            "description": "Print a user friendly error message to the console",
+            "itemtype": "method",
+            "name": "error",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "the message.",
+                    "type": "String"
+                }
+            ],
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 36,
+            "description": "Print a user friendly information warning to the console",
+            "itemtype": "method",
+            "name": "warning",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "the message.",
+                    "type": "String"
+                }
+            ],
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 60,
+            "description": "On SIGINT (Ctrl + C), quit the app nicely",
+            "itemtype": "method",
+            "name": "interruption",
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\math.js",
+            "line": 8,
+            "description": "Compute the delta in seconds between two given time",
+            "itemtype": "method",
+            "name": "getTimeDelta",
+            "params": [
+                {
+                    "name": "date1",
+                    "description": "the start date.",
+                    "type": "Date"
+                },
+                {
+                    "name": "date2",
+                    "description": "the end date.",
+                    "type": "Date"
+                }
+            ],
+            "return": {
+                "description": "the difference in seconds between the date1 and the date2",
+                "type": "Integer"
+            },
+            "class": "math",
+            "module": "math"
+        },
+        {
+            "file": "server.js",
+            "line": 11,
+            "description": "Remove a client from the client list",
+            "itemtype": "method",
+            "name": "removeClient",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "server.js",
+            "line": 19,
+            "description": "Add a client to the client list",
+            "itemtype": "method",
+            "name": "addClient",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "server.js",
+            "line": 28,
+            "description": "Start the server routine and link all the event listener of the server.",
+            "itemtype": "method",
+            "name": "start",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "server.js",
+            "line": 56,
+            "description": "Stop the server.",
+            "itemtype": "method",
+            "name": "stop",
+            "class": "server",
+            "module": "server"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 17,
+            "description": "Generate the a base for an outgoing request",
+            "itemtype": "method",
+            "name": "getBaseReq",
+            "return": {
+                "description": "request base",
+                "type": "Object"
+            },
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 28,
+            "description": "Send a ping to server",
+            "itemtype": "method",
+            "name": "pingRequest",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 37,
+            "description": "Handle a tag request (When a student arrive or leave)",
+            "itemtype": "method",
+            "name": "tagRequest",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                },
+                {
+                    "name": "ireq",
+                    "description": "a JSON object containing the incoming data.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 147,
+            "description": "Handle a login request",
+            "itemtype": "method",
+            "name": "authenticate",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                },
+                {
+                    "name": "ireq",
+                    "description": "a JSON object containing the incoming data.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 161,
+            "description": "End the provided socket",
+            "itemtype": "method",
+            "name": "socketExit",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 170,
+            "description": "Sort the incoming request. Redirect the request to the correct function.",
+            "itemtype": "method",
+            "name": "sortRequest",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "a JSON object containing a socket connection and an userid variable.",
+                    "type": "Object"
+                },
+                {
+                    "name": "data",
+                    "description": "raw data from the client.",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        }
+    ],
+    "warnings": []
+}

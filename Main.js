@@ -1,3 +1,8 @@
+/**
+ * Main module. Makes all the other modules start by parsing the command line argument.
+ *
+ * @module main
+ */
 const log = require("./utils/log.js");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");

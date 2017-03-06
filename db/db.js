@@ -1,3 +1,9 @@
+/**
+ * Handle the database
+ *
+ * @module db
+ * @class db
+ */
 var knex = require('knex')({client: 'sqlite3',
   useNullAsDefault: true});
 var sqlite = require("sqlite3");
@@ -17,6 +23,10 @@ global.STATUS = STATUS;
 module.exports = {
   handle: handle,
   RANK: RANK,
+  /**
+   * Init the database
+   * @method init
+   **/
   init: function() {
       handle = new sqlite.Database("Data.db");
       global.db = handle;

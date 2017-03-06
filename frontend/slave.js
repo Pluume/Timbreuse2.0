@@ -1,3 +1,9 @@
+/**
+ * Handle slave frontend.
+ *
+ * @module slave
+ * @class slave
+ */
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -12,10 +18,19 @@ var goingToClose = false;
 var connected = false;
 var slaveconn;
 var oreqPile = [];
+/**
+ * Get the current time
+ * @method getNow
+ * @return {String} the current time in a ISO string
+ **/
 function getNow()
 {
   return moment().toDate().toISOString();
 }
+/**
+ * Execute the pile of saved request
+ * @method executePile
+ **/
 function executePile()
 {
   var currreq = oreqPile.pop();
@@ -24,6 +39,12 @@ function executePile()
     slaveconn.write(currreq);
   }
 }
+/**
+ * Tag an user
+ * @method tag
+ * @param {String} stag the user's tag.
+ * @param {String} ntime the current time.
+ **/
 function tag(stag,ntime)
 {
   var oreq = {fnc: request.REQUEST.TAG, error: request.ERROR.OK, tag: stag, time: ntime, class:global.config.class};
@@ -37,6 +58,10 @@ function tag(stag,ntime)
   }
   log.info("Tagging");
 }
+/**
+ * Make the slave always try to maintain a connection with the server
+ * @method foreverConnect
+ **/
 function foreverConnect() {
     slaveconn = net.createConnection({
       host:global.config.server,

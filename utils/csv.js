@@ -1,3 +1,9 @@
+/**
+ * Handle mathematics functions needed by the server.
+ *
+ * @module csv
+ * @class csv
+ */
 const moment = require("moment");
 const fs = require("fs");
 const path = require('path');
@@ -6,6 +12,12 @@ const fsextra = require('fs-extra');
 const drivelist = require('drivelist');
 const log = require("./log");
 module.exports = {
+  /**
+   * Write to a CSV the tag and tag-time provided
+   * @method writeBruteLoggingToCSV
+   * @param {String} tag the tag.
+   * @param {String} time the tag-time.
+   **/
     writeBruteLoggingToCSV: (tag, time) => {
         var filename;
         var dirname = path.join(__dirname,"..", "CSV");
@@ -43,6 +55,11 @@ module.exports = {
         }
 
     },
+    /**
+     * Export all the server's CSV to a USB key.
+     * @method exportCSV
+     * @param {Function} cb a callback that will be called when all the file has been copied to the USB key.
+     **/
     exportCSV: (cb) => {
         log.info("Master key detected. Detecting USB drive...");
         drivelist.list((error, drives) => {

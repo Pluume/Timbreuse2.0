@@ -1,8 +1,19 @@
+/**
+ * Handle client frontend.
+ *
+ * @module client
+ * @class client
+ */
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
+/**
+ * Create a windows for the client
+ * @method createWindow
+ *
+ **/
 function createWindow()
 {
     global.mwin = new BrowserWindow({
@@ -23,6 +34,10 @@ function createWindow()
       global.mwin.show();
     });
 }
+/**
+ * Load the client interface
+ * @method load
+ **/
 function load()
 {
     app.on('ready', createWindow);
