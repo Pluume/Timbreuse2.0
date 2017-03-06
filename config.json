@@ -1,1 +1,1 @@
-{"class":"YE-S1z","csvFreq":0,"server":"localhost" }
+{"class":"YE-S1z","csvFreq":0,"server":"localhost","slaves": [{"class":"YE-S1x", "ip":"localhost"}] }
