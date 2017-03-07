@@ -9,6 +9,7 @@ const config = require("./utils/config.js");
 config.read();
 config.getType();
 global.mwin = null;
+const slaveHandle = require("./frontend/slave.js");
 log.info("Starting as a " + global.TYPE.string);
 
 if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYPE.SLAVE.int) { //Check if the app is starting as server or slave
@@ -19,7 +20,6 @@ if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYP
     var tserver = require("./server.js");
     tserver.start();//Start the server
     if (global.TYPE.int === config.TYPE.SLAVE.int) {
-        const slaveHandle = require("./frontend/slave.js");
         slaveHandle.load(); //Load the slave frontend
     }
 } else {

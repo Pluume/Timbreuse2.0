@@ -66,11 +66,9 @@ function tagRequest(conn, ireq) {
                 return;
             }
             if (row.rank == global.RANK.ADMIN) { //Master card tagged
-                csv.exportCSV(() => {
                     oreq = getBaseReq();
-                    oreq.fnc = request.REQUEST.TAG;
+                    oreq.fnc = request.REQUEST.MASTER;
                     conn.socket.write(JSON.stringify(oreq));
-                }); //TODO Callback to GUI
                 return;
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
@@ -157,6 +155,7 @@ function authenticate(conn, ireq) {
         conn.socket.write(JSON.stringify(getBaseReq().error = ERROR.UNKNOWN));
         return;
     }
+
 }
 /**
  * End the provided socket
@@ -188,26 +187,30 @@ module.exports = {
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
-        if (ireq.fnc === undefined) {
-            log.error("fnc param not specified in request.");
-            oreq = getBaseReq();
-            oreq.error = ERROR.UNKNOWN;
-            connection.socket.write(JSON.stringify(oreq));
-            return;
+        for(var i = 0; i<ireq.length;i++)
+        {
+          if (ireq[i].fnc === undefined) {
+              log.error("fnc param not specified in request.");
+              oreq = getBaseReq();
+              oreq.error = ERROR.UNKNOWN;
+              connection.socket.write(JSON.stringify(oreq));
+              return;
+          }
+          switch (ireq[i].fnc) {
+              case request.REQUEST.EXIT:
+                  socketExit(connection);
+                  break;
+              case request.REQUEST.PING:
+                  pingRequest(connection);
+                  break;
+              case request.REQUEST.TAG:
+                  tagRequest(connection, ireq[i]);
+                  break;
+              case request.REQUEST.AUTH:
+                  authenticate(connection, ireq[i]);
+                  break;
+          }
         }
-        switch (ireq.fnc) {
-            case request.REQUEST.EXIT:
-                socketExit(connection);
-                break;
-            case request.REQUEST.PING:
-                pingRequest(connection);
-                break;
-            case request.REQUEST.TAG:
-                tagRequest(connection, ireq);
-                break;
-            case request.REQUEST.AUTH:
-                authenticate(connection, ireq);
-                break;
-        }
+
     }
 };

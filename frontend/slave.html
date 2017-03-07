@@ -34,7 +34,6 @@
     <!--text-hide-->
     <script>
         var slave = require('electron').remote.require("./frontend/slave.js");
-
         function tag() {
             slave.tag(document.getElementById("tagInput").value, slave.getNow());
         }

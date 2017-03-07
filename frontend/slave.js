@@ -27,11 +27,13 @@ var oreqPile = [];
 function getNow() {
     return moment().toDate().toISOString();
 }
+
+
 /**
  * Execute the pile of saved request
  * @method executePile
  **/
-function executePile() {
+function executePile() { //TODO refaire pour gerer le cas par cas
     if (oreqPile.length) {
         slaveconn.write(JSON.stringify(oreqPile));
         for (var i = 0; i < slaves.length; i++) {
@@ -48,6 +50,9 @@ function executePile() {
  * @param {String} ntime the current time.
  **/
 function tag(stag, ntime) {
+    if (global.DEBUG) {
+        log.info("Tag : " + stag + " Time : " + ntime);
+    }
     var oreq = {
         fnc: request.REQUEST.TAG,
         error: request.ERROR.OK,
@@ -57,20 +62,41 @@ function tag(stag, ntime) {
     };
     csv.writeBruteLoggingToCSV(stag, ntime);
     if (connected) {
-        slaveconn.write(JSON.stringify(oreq));
+        slaveconn.write(JSON.stringify(request.toArray(oreq)));
         //TODO Handle data incoming
     } else {
+        oreq.delayed = true;
         oreqPile.push(oreq);
     }
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(oreq));
+            slaves[i].conn.write(JSON.stringify(request.toArray(oreq)));
         } else {
+            oreq.delayed = true;
             slaves[i].pile.push(oreq);
         }
 
     }
 }
+//TODO Function that handle master card
+
+/**
+ * Export all the CSV to USB key on master key
+ * @method onSocketData
+ * @param {Object} ireq The json request 
+ **/
+function onSocketData(ireq) {
+  for(var i = 0; i<ireq.length;i++)
+  {
+    switch(ireq[i].fnc)
+    {
+      case MASTER:
+      csv.exportCSV(()=>{});
+      break;
+    }
+  }
+}
+
 /**
  * Make the slave always try to maintain a connection with the server
  * @method foreverConnect

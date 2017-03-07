@@ -11,19 +11,24 @@ const config = require("./config.js");
 const fsextra = require('fs-extra');
 const drivelist = require('drivelist');
 const log = require("./log");
+const json2csv = require('json2csv');
+const async = require('async');
+var knex = require('knex')({
+    client: 'sqlite3',
+    useNullAsDefault: true
+});
 module.exports = {
-  /**
-   * Write to a CSV the tag and tag-time provided
-   * @method writeBruteLoggingToCSV
-   * @param {String} tag the tag.
-   * @param {String} time the tag-time.
-   **/
+    /**
+     * Write to a CSV the tag and tag-time provided
+     * @method writeBruteLoggingToCSV
+     * @param {String} tag the tag.
+     * @param {String} time the tag-time.
+     **/
     writeBruteLoggingToCSV: (tag, time) => {
         var filename;
-        var dirname = path.join(__dirname,"..", "CSV");
-        if(!fs.existsSync(dirname))
-        {
-          fs.mkdirSync(dirname);
+        var dirname = path.join(__dirname, "..", "CSV");
+        if (!fs.existsSync(dirname)) {
+            fs.mkdirSync(dirname);
         }
         if (global.config.csvFreq) {
             filename = moment().format("DD_MM_YYYY") + ".csv";
@@ -75,12 +80,11 @@ module.exports = {
                         log.error("The folder already exists. Aborting");
                         return;
                     } else {
-                      fs.mkdirSync(remotefolder);
+                        fs.mkdirSync(remotefolder);
                     }
                     var localfolder = path.join(__dirname, "..", "CSV");
-                    if(!fs.existsSync(localfolder))
-                    {
-                      fs.mkdirSync(localfolder);
+                    if (!fs.existsSync(localfolder)) {
+                        fs.mkdirSync(localfolder);
                     }
                     var filelist = fs.readdirSync(localfolder);
                     for (var i = 0; i < filelist.length; i++) {
@@ -96,5 +100,74 @@ module.exports = {
                 }
             });
         });
+    },
+    exportDBtoCSV: () => {
+        async.waterfall([
+            function(callback) {
+                var data = [];
+                global.db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
+                    if (err)
+                        callback(err, null);
+                    for (var i = 0; i < rows.length; i++) {
+                        data[i] = rows[i];
+                        data[i].id = i;
+                    }
+
+                    callback(null, data);
+                });
+            },
+            function(data, callback) {
+                async.each(data, function(cur, callback2) {
+                    global.db.all("pragma table_info(" + cur.name + ");", (err, rows) => {
+                        data[cur.id].columns = [];
+                        for (var i = 0; i < rows.length; i++) {
+                            data[cur.id].columns[i] = rows[i].name;
+                        }
+                        callback2(err);
+                    });
+                }, function(err) {
+                    if (err) {
+                        log.error("Error happened during the database dump : " + err);
+                        callback(err, null);
+                    }
+                    callback(null, data);
+                });
+            },
+            function(data, callback) {
+
+                async.each(data, function(cur, callback2) {
+                    global.db.all(knex.select().from(cur.name).toString(), (err, rows) => {
+                        data[cur.id].rows = [];
+                        for (var i = 0; i < rows.length; i++) {
+                            var keysbyindex = Object.keys(rows[i]);
+                            var row = [];
+                            console.log(rows[i]);
+                            for (var ii = 0; ii < keysbyindex.length; ii  ++)
+                            {
+                              row[ii] = rows[i][keysbyindex[ii]];
+                            }
+
+                            data[cur.id].rows.push(row);
+                            console.log(rows[i]);
+                        }
+                        callback2(err);
+
+                    });
+                }, function(err) {
+                    if (err) {
+                        log.error("Error happened during the database dump : " + err);
+                        callback(err, data);
+                    }
+                    console.log(JSON.stringify(data, null, "\t"));
+                    console.log("------");
+                });
+
+            }
+        ], function(err, result) {
+            if (err) {
+                log.error("Error happened during the database dump : " + err);
+            }
+        });
+
     }
 };

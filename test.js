@@ -4,6 +4,7 @@ const path = require('path');
 const moment = require("moment");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");
-csv.exportCSV(() => {
-
-});
+log.info("Initializing database...");
+const db = require("./db/db.js");
+db.init();//Init the database
+csv.exportDBtoCSV();
