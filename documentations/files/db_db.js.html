@@ -105,99 +105,115 @@
  * @module db
  * @class db
  */
-var knex = require(&#x27;knex&#x27;)({client: &#x27;sqlite3&#x27;,
-  useNullAsDefault: true});
+var knex = require(&#x27;knex&#x27;)({
+    client: &#x27;sqlite3&#x27;,
+    useNullAsDefault: true
+});
 var sqlite = require(&quot;sqlite3&quot;);
 var handle;
 RANK = {
-  STUDENT: 0,
-  PROF: 1,
-  ADMIN: 2
+    STUDENT: 0,
+    PROF: 1,
+    ADMIN: 2
 };
 STATUS = {
-  IN: 1,
-  OUT: 2,
-  ABS: 3
+    IN: 1,
+    OUT: 2,
+    ABS: 3
 };
 global.RANK = RANK;
 global.STATUS = STATUS;
 module.exports = {
-  handle: handle,
-  RANK: RANK,
-  /**
-   * Init the database
-   * @method init
-   **/
-  init: function() {
-      handle = new sqlite.Database(&quot;Data.db&quot;);
-      global.db = handle;
-      handle.serialize(function() {
-          handle.run(knex.schema.createTableIfNotExists(&quot;users&quot;, function(table) { //Users table
-            table.increments(&quot;id&quot;).primary();
-            table.string(&quot;username&quot;);
-            table.string(&quot;password&quot;);
-            table.integer(&quot;rank&quot;);
-            table.string(&quot;fname&quot;);
-            table.string(&quot;lname&quot;);
-            table.string(&quot;dob&quot;);
-            table.string(&quot;email&quot;);
-            table.string(&quot;tag&quot;);
-          }).toString());
+    handle: handle,
+    RANK: RANK,
+    /**
+     * Init the database
+     * @method init
+     **/
+    init: function() {
+        handle = new sqlite.Database(&quot;Data.db&quot;);
+        global.db = handle;
+        global.db.prototype = {};
+        global.db.prototype.all = function(sql, stdCallback) {
+            var res = this.prepare(sql, function(err) {
+                return stdCallback(err, rows);
+            });
+        };
 
-          handle.run(knex.schema.createTableIfNotExists(&quot;students&quot;, function(table) {//Student table
-            table.increments(&quot;id&quot;).primary();
-            table.integer(&quot;userid&quot;);
-            table.integer(&quot;profid&quot;);
-            table.integer(&quot;timeDiff&quot;);
-            table.integer(&quot;timeDiffToday&quot;);
-            table.string(&quot;lastTagTime&quot;);
-            table.integer(&quot;status&quot;);
-            table.boolean(&quot;isBlocked&quot;);
-            table.string(&quot;firstClass&quot;);
-            table.string(&quot;project&quot;);
-          }).toString());
+        handle.serialize(function() {
+            handle.run(knex.schema.createTableIfNotExists(&quot;users&quot;, function(table) { //Users table
+                table.increments(&quot;id&quot;).primary();
+                table.string(&quot;username&quot;);
+                table.string(&quot;password&quot;);
+                table.integer(&quot;rank&quot;);
+                table.string(&quot;fname&quot;);
+                table.string(&quot;lname&quot;);
+                table.string(&quot;dob&quot;);
+                table.string(&quot;email&quot;);
+                table.string(&quot;tag&quot;);
+            }).toString());
+
+            handle.run(knex.schema.createTableIfNotExists(&quot;students&quot;, function(table) { //Student table
+                table.increments(&quot;id&quot;).primary();
+                table.integer(&quot;userid&quot;);
+                table.integer(&quot;profid&quot;);
+                table.integer(&quot;timeDiff&quot;);
+                table.integer(&quot;timeDiffToday&quot;);
+                table.string(&quot;lastTagTime&quot;);
+                table.integer(&quot;status&quot;);
+                table.boolean(&quot;isBlocked&quot;);
+                table.string(&quot;firstClass&quot;);
+                table.string(&quot;project&quot;);
+            }).toString());
 
 
-          handle.run(knex.schema.createTableIfNotExists(&quot;timeoff&quot;, function(table) {//timeoff table
-            table.increments(&quot;id&quot;).primary();
-            table.string(&quot;date1&quot;);
-            table.string(&quot;date2&quot;);
-            table.string(&quot;desc&quot;);
-          }).toString());
-          //TODO Add timediff in the log table
-          handle.run(knex.schema.createTableIfNotExists(&quot;logs&quot;, function(table) {//logs table
-            table.increments(&quot;id&quot;).primary();
-            table.string(&quot;tag&quot;);
-            table.integer(&quot;studentid&quot;);
-            table.integer(&quot;nstatus&quot;);
-            table.string(&quot;date&quot;);
-            table.string(&quot;class&quot;);
-            table.string(&quot;description&quot;);
-          }).toString());
+            handle.run(knex.schema.createTableIfNotExists(&quot;timeoff&quot;, function(table) { //timeoff table
+                table.increments(&quot;id&quot;).primary();
+                table.string(&quot;date1&quot;);
+                table.string(&quot;date2&quot;);
+                table.string(&quot;desc&quot;);
+            }).toString());
+            //TODO Add timediff in the log table
+            handle.run(knex.schema.createTableIfNotExists(&quot;logs&quot;, function(table) { //logs table
+                table.increments(&quot;id&quot;).primary();
+                table.string(&quot;tag&quot;);
+                table.integer(&quot;studentid&quot;);
+                table.integer(&quot;nstatus&quot;);
+                table.string(&quot;date&quot;);
+                table.string(&quot;class&quot;);
+                table.string(&quot;description&quot;);
+            }).toString());
 
-          handle.run(knex.schema.createTableIfNotExists(&quot;notifications&quot;, function(table) {//notification table
-            table.increments(&quot;id&quot;).primary();
-            table.integer(&quot;userid&quot;);
-            table.integer(&quot;type&quot;);
-            table.string(&quot;date&quot;);
-            table.string(&quot;message&quot;);
-            table.boolean(&quot;read&quot;);
-          }).toString());
+            handle.run(knex.schema.createTableIfNotExists(&quot;notifications&quot;, function(table) { //notification table
+                table.increments(&quot;id&quot;).primary();
+                table.integer(&quot;userid&quot;);
+                table.integer(&quot;type&quot;);
+                table.string(&quot;date&quot;);
+                table.string(&quot;message&quot;);
+                table.boolean(&quot;read&quot;);
+            }).toString());
 
-          handle.run(knex.schema.createTableIfNotExists(&quot;class&quot;, function(table) {//class table
-            table.increments(&quot;id&quot;).primary();
-            table.integer(&quot;profid&quot;);
-            table.string(&quot;name&quot;);
-          }).toString());
-      });
-      handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;,(err,data) =&gt; {
-        if(data === undefined)
-        {
-          handle.run(knex(&quot;users&quot;).insert({username: &quot;admin&quot;,password: &quot;4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9&quot;,rank: RANK.ADMIN, fname: &quot;Administrator&quot;, lname: &quot;&quot;, dob: &quot;&quot;, email: &quot;&quot;}).toString()); //password: administrator
-        }
-      });
+            handle.run(knex.schema.createTableIfNotExists(&quot;class&quot;, function(table) { //class table
+                table.increments(&quot;id&quot;).primary();
+                table.integer(&quot;profid&quot;);
+                table.string(&quot;name&quot;);
+            }).toString());
+        });
+        handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;, (err, data) =&gt; {
+            if (data === undefined) {
+                handle.run(knex(&quot;users&quot;).insert({
+                    username: &quot;admin&quot;,
+                    password: &quot;4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9&quot;,
+                    rank: RANK.ADMIN,
+                    fname: &quot;Administrator&quot;,
+                    lname: &quot;&quot;,
+                    dob: &quot;&quot;,
+                    email: &quot;&quot;
+                }).toString()); //password: administrator
+            }
+        });
 
-  }
+    }
 };
 
     </pre>

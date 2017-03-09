@@ -414,7 +414,7 @@
     "classitems": [
         {
             "file": "db\\db.js",
-            "line": 26,
+            "line": 28,
             "description": "Init the database",
             "itemtype": "method",
             "name": "init",
@@ -441,7 +441,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 21,
+            "line": 22,
             "description": "Get the current time",
             "itemtype": "method",
             "name": "getNow",
@@ -454,7 +454,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 30,
+            "line": 32,
             "description": "Execute the pile of saved request",
             "itemtype": "method",
             "name": "executePile",
@@ -463,7 +463,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 42,
+            "line": 46,
             "description": "Tag an user",
             "itemtype": "method",
             "name": "tag",
@@ -484,10 +484,44 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 61,
+            "line": 83,
+            "description": "Export all the CSV to USB key on master key",
+            "itemtype": "method",
+            "name": "onSocketData",
+            "params": [
+                {
+                    "name": "ireq",
+                    "description": "The json request",
+                    "type": "Object"
+                }
+            ],
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 100,
             "description": "Make the slave always try to maintain a connection with the server",
             "itemtype": "method",
             "name": "foreverConnect",
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 160,
+            "description": "Create the slave frontend",
+            "itemtype": "method",
+            "name": "createWindow",
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 193,
+            "description": "Load the slave frontend",
+            "itemtype": "method",
+            "name": "load",
             "class": "slave",
             "module": "slave"
         },
@@ -527,7 +561,7 @@
         },
         {
             "file": "utils\\csv.js",
-            "line": 15,
+            "line": 21,
             "description": "Write to a CSV the tag and tag-time provided",
             "itemtype": "method",
             "name": "writeBruteLoggingToCSV",
@@ -548,7 +582,7 @@
         },
         {
             "file": "utils\\csv.js",
-            "line": 58,
+            "line": 63,
             "description": "Export all the server's CSV to a USB key.",
             "itemtype": "method",
             "name": "exportCSV",
@@ -643,6 +677,22 @@
             },
             "class": "math",
             "module": "math"
+        },
+        {
+            "file": "request.js",
+            "line": 11,
+            "description": "Create single-item array from a json object",
+            "itemtype": "method",
+            "name": "toArray",
+            "params": [
+                {
+                    "name": "singleItem",
+                    "description": "the item to turn into an arrays.",
+                    "type": "String"
+                }
+            ],
+            "class": "server",
+            "module": "request"
         },
         {
             "file": "server.js",
@@ -749,7 +799,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 147,
+            "line": 145,
             "description": "Handle a login request",
             "itemtype": "method",
             "name": "authenticate",
@@ -771,7 +821,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 161,
+            "line": 160,
             "description": "End the provided socket",
             "itemtype": "method",
             "name": "socketExit",
@@ -788,7 +838,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 170,
+            "line": 169,
             "description": "Sort the incoming request. Redirect the request to the correct function.",
             "itemtype": "method",
             "name": "sortRequest",

@@ -36,6 +36,7 @@ REQUEST: {
     PING: 0,
     TAG: 1,
     AUTH: 2,
-    MASTER: 3
+    MASTER: 3,
+    PROPAGATE_TAG:4
 }
 };

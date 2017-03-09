@@ -1,12 +1,46 @@
-[0.474] [INFO] (test.js:5) > Loading configuration...
-[0.477] [INFO] (test.js:7) > Initializing database...
-[0.536] [INFO] (utils\csv.js:167) > Master key detected. Detecting USB drive...
-[1.065] [INFO] (utils\csv.js:178) > Copying CSV to Kingston DataTraveler 2.0 USB Device in path F:\DB_DUMP___March_9th_2017__09_42_48
-[1.195] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\users.csv
-[1.255] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\sqlite_sequence.csv
-[1.317] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\students.csv
-[1.377] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\timeoff.csv
-[1.438] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\logs.csv
-[1.499] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\notifications.csv
-[1.56] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\class.csv
-[5.67] [WARNING] (utils\log.js:66) > Interruption caught !
+[0.128] [INFO] (Main.js:7) > Loading configuration...
+[1.017] [INFO] (Main.js:13) > Starting as a slave
+[1.017] [INFO] (Main.js:16) > Initializing database...
+[1.101] [INFO] (Main.js:19) > Starting server...
+[1.109] [ERROR] (utils\log.js:49) > Error: listen EADDRINUSE :::703
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at Server._listen2 (net.js:1253:14)
+    at listen (net.js:1289:10)
+    at Server.listen (net.js:1385:5)
+    at Object.start (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\server.js:52:8)
+    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\Main.js:21:13)
+    at Module._compile (module.js:556:32)
+    at Object.Module._extensions..js (module.js:565:10)
+    at Module.load (module.js:473:32)
+    at tryModuleLoad (module.js:432:12)
+    at Function.Module._load (module.js:424:3)
+    at loadApplicationPackage (C:\Users\Francis-Lucien-Hugue\AppData\Roaming\npm\node_modules\electron\dist\resources\default_app.asar\main.js:280:12)
+    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\AppData\Roaming\npm\node_modules\electron\dist\resources\default_app.asar\main.js:322:5)
+    at Module._compile (module.js:556:32)
+    at Object.Module._extensions..js (module.js:565:10)
+[2.371] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
+[2.372] [WARNING] (frontend\slave.js:121) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[8.386] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
+[8.386] [WARNING] (frontend\slave.js:121) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[14.412] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
+[14.412] [WARNING] (frontend\slave.js:121) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[20.441] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
+[20.441] [WARNING] (frontend\slave.js:121) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds
+[26.461] [ERROR] (utils\log.js:49) > Error: connect ECONNREFUSED 127.0.0.1:704
+    at Object.exports._errnoException (util.js:1026:11)
+    at exports._exceptionWithHostPort (util.js:1049:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1081:14)
+[26.461] [WARNING] (frontend\slave.js:121) > The connection to the Timbreuse YE-S1x was closed with an error. Connecting back in 5 seconds

@@ -109,26 +109,23 @@ log.info(&quot;Loading configuration...&quot;);
 const config = require(&quot;./utils/config.js&quot;);
 config.read();
 config.getType();
+global.mwin = null;
+const slaveHandle = require(&quot;./frontend/slave.js&quot;);
 log.info(&quot;Starting as a &quot; + global.TYPE.string);
 
-if (global.TYPE.int === config.TYPE.SERVER.int) {
+if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYPE.SLAVE.int) { //Check if the app is starting as server or slave
     log.info(&quot;Initializing database...&quot;);
     const db = require(&quot;./db/db.js&quot;);
-    db.init();
+    db.init();//Init the database
     log.info(&quot;Starting server...&quot;);
     var tserver = require(&quot;./server.js&quot;);
-    tserver.start();
-} else {
-
-    global.mwin = null;
+    tserver.start();//Start the server
     if (global.TYPE.int === config.TYPE.SLAVE.int) {
-        const slaveHandle = require(&quot;./frontend/slave.js&quot;);
-        slaveHandle.load();
-
-    } else {
-        const clientHandle = require(&quot;./frontend/client.js&quot;);
-        clientHandle.load();
+        slaveHandle.load(); //Load the slave frontend
     }
+} else {
+        const clientHandle = require(&quot;./frontend/client.js&quot;);
+        clientHandle.load(); //Load the client frontend
 }
 
     </pre>

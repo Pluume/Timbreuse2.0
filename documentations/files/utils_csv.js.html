@@ -112,19 +112,24 @@ const config = require(&quot;./config.js&quot;);
 const fsextra = require(&#x27;fs-extra&#x27;);
 const drivelist = require(&#x27;drivelist&#x27;);
 const log = require(&quot;./log&quot;);
+const json2csv = require(&#x27;json2csv&#x27;);
+const async = require(&#x27;async&#x27;);
+var knex = require(&#x27;knex&#x27;)({
+    client: &#x27;sqlite3&#x27;,
+    useNullAsDefault: true
+});
 module.exports = {
-  /**
-   * Write to a CSV the tag and tag-time provided
-   * @method writeBruteLoggingToCSV
-   * @param {String} tag the tag.
-   * @param {String} time the tag-time.
-   **/
+    /**
+     * Write to a CSV the tag and tag-time provided
+     * @method writeBruteLoggingToCSV
+     * @param {String} tag the tag.
+     * @param {String} time the tag-time.
+     **/
     writeBruteLoggingToCSV: (tag, time) =&gt; {
         var filename;
-        var dirname = path.join(__dirname,&quot;..&quot;, &quot;CSV&quot;);
-        if(!fs.existsSync(dirname))
-        {
-          fs.mkdirSync(dirname);
+        var dirname = path.join(__dirname, &quot;..&quot;, &quot;CSV&quot;);
+        if (!fs.existsSync(dirname)) {
+            fs.mkdirSync(dirname);
         }
         if (global.config.csvFreq) {
             filename = moment().format(&quot;DD_MM_YYYY&quot;) + &quot;.csv&quot;;
@@ -176,12 +181,11 @@ module.exports = {
                         log.error(&quot;The folder already exists. Aborting&quot;);
                         return;
                     } else {
-                      fs.mkdirSync(remotefolder);
+                        fs.mkdirSync(remotefolder);
                     }
                     var localfolder = path.join(__dirname, &quot;..&quot;, &quot;CSV&quot;);
-                    if(!fs.existsSync(localfolder))
-                    {
-                      fs.mkdirSync(localfolder);
+                    if (!fs.existsSync(localfolder)) {
+                        fs.mkdirSync(localfolder);
                     }
                     var filelist = fs.readdirSync(localfolder);
                     for (var i = 0; i &lt; filelist.length; i++) {
@@ -197,6 +201,107 @@ module.exports = {
                 }
             });
         });
+    },
+    exportDBtoCSV: (cb) =&gt; {
+        var data = [];
+        async.waterfall([
+            function(callback) {
+                global.db.all(&quot;SELECT name FROM sqlite_master WHERE type=&#x27;table&#x27;;&quot;, (err, rows) =&gt; {
+                    if (err)
+                        callback(err, null);
+                    for (var i = 0; i &lt; rows.length; i++) {
+                        data[i] = rows[i];
+                        data[i].id = i;
+                    }
+
+                    callback(null, data);
+                });
+            },
+            function(data, callback) {
+                async.each(data, function(cur, callback2) {
+                    global.db.all(&quot;pragma table_info(&quot; + cur.name + &quot;);&quot;, (err, rows) =&gt; {
+                        data[cur.id].columns = [];
+                        for (var i = 0; i &lt; rows.length; i++) {
+                            data[cur.id].columns[i] = rows[i].name;
+                        }
+                        callback2(err);
+                    });
+                }, function(err) {
+                    if (err) {
+                        log.error(&quot;Error happened during the database dump : &quot; + err);
+                        callback(err, null);
+                    }
+                    callback(null, data);
+                });
+            },
+            function(data, callback) {
+
+                async.each(data, function(cur, callback2) {
+                    global.db.all(knex.select().from(cur.name).toString(), (err, rows) =&gt; {
+                        data[cur.id].rows = rows;
+                        callback2(err);
+
+                    });
+                }, function(err) {
+                    if (err) {
+                        log.error(&quot;Error happened during the database dump : &quot; + err);
+                        callback(err, data);
+                    }
+                    callback(null, data);
+                });
+
+            },
+            function(data, callback) {
+                var csv = [];
+                async.each(data, function(cur, callback2) {
+                    //console.log(cur.rows);
+                    csv.push({
+                        data: json2csv({
+                            data: cur.rows,
+                            fields: cur.columns
+                        }),
+                        name: cur.name
+                    });
+                    callback2(null);
+
+                }, function() {
+                    log.info(&quot;Master key detected. Detecting USB drive...&quot;);
+                    drivelist.list((error, drives) =&gt; {
+                        if (error) {
+                            log.error(&quot;Error while detecting USB drive. Aborting...&quot;);
+                            return;
+                        }
+                        drives.forEach((drive) =&gt; {
+                            var remotefolder = &quot;&quot;;
+                            if (!drive.system) {
+                              console.log(drive.mountpoints[0].path);
+                                remotefolder = path.join(drive.mountpoints[0].path, &quot;DB_DUMP___&quot; + moment().format(&#x27;MMMM_Do_YYYY__HH_mm_ss&#x27;));
+                                log.info(&quot;Copying CSV to &quot; + drive.description + &quot; in path &quot; + remotefolder.toString());
+                                if (fs.existsSync(remotefolder)) {
+                                    log.error(&quot;The folder already exists. Aborting&quot;);
+                                    return;
+                                } else {
+                                    fs.mkdirSync(remotefolder);
+                                }
+                                for (var i = 0; i &lt; csv.length; i++) {
+                                    var filename = csv[i].name + &quot;.csv&quot;;
+                                    var fpath = path.join(remotefolder, filename);
+                                    log.info(&quot;Writing data in &quot; + fpath);
+                                    fs.writeFileSync(fpath, csv[i].data);
+
+                                }
+                            }
+                        });
+                    });
+                });
+
+            }
+        ], function(err, result) {
+            if (err) {
+                log.error(&quot;Error happened during the database dump : &quot; + err);
+            }
+        });
+
     }
 };
 

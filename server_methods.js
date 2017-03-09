@@ -26,6 +26,14 @@ function getBaseReq() {
     };
 }
 /**
+ * Save the propagated tag request into this Timbreuse's CSV
+ * @method propagate_tag
+ * @param {Object} ireq a JSON object containing the incoming request.
+ **/
+function propagate_tag(ireq) {
+    csv.writeBruteLoggingToCSV(ireq.tag, ireq.time);
+}
+/**
  * Send a ping to server
  * @method pingRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -66,9 +74,9 @@ function tagRequest(conn, ireq) {
                 return;
             }
             if (row.rank == global.RANK.ADMIN) { //Master card tagged
-                    oreq = getBaseReq();
-                    oreq.fnc = request.REQUEST.MASTER;
-                    conn.socket.write(JSON.stringify(oreq));
+                oreq = getBaseReq();
+                oreq.fnc = request.REQUEST.MASTER;
+                conn.socket.write(JSON.stringify(oreq));
                 return;
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
@@ -166,12 +174,12 @@ function socketExit(conn) {
     conn.socket.end();
 }
 module.exports = {
-  /**
-   * Sort the incoming request. Redirect the request to the correct function.
-   * @method sortRequest
-   * @param {Object} conn a JSON object containing a socket connection and an userid variable.
-   * @param {Object} data raw data from the client.
-   **/
+    /**
+     * Sort the incoming request. Redirect the request to the correct function.
+     * @method sortRequest
+     * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+     * @param {Object} data raw data from the client.
+     **/
     sortRequest: (connection, data) => {
         var oreq;
         var ireq;
@@ -187,29 +195,31 @@ module.exports = {
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
-        for(var i = 0; i<ireq.length;i++)
-        {
-          if (ireq[i].fnc === undefined) {
-              log.error("fnc param not specified in request.");
-              oreq = getBaseReq();
-              oreq.error = ERROR.UNKNOWN;
-              connection.socket.write(JSON.stringify(oreq));
-              return;
-          }
-          switch (ireq[i].fnc) {
-              case request.REQUEST.EXIT:
-                  socketExit(connection);
-                  break;
-              case request.REQUEST.PING:
-                  pingRequest(connection);
-                  break;
-              case request.REQUEST.TAG:
-                  tagRequest(connection, ireq[i]);
-                  break;
-              case request.REQUEST.AUTH:
-                  authenticate(connection, ireq[i]);
-                  break;
-          }
+        for (var i = 0; i < ireq.length; i++) {
+            if (ireq[i].fnc === undefined) {
+                log.error("fnc param not specified in request.");
+                oreq = getBaseReq();
+                oreq.error = ERROR.UNKNOWN;
+                connection.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            switch (ireq[i].fnc) {
+                case request.REQUEST.EXIT:
+                    socketExit(connection);
+                    break;
+                case request.REQUEST.PING:
+                    pingRequest(connection);
+                    break;
+                case request.REQUEST.TAG:
+                    tagRequest(connection, ireq[i]);
+                    break;
+                case request.REQUEST.AUTH:
+                    authenticate(connection, ireq[i]);
+                    break;
+                case request.REQUEST.PROPAGATE_TAG:
+                    propagate_tag(ireq[i]);
+                    break;
+            }
         }
 
     }
