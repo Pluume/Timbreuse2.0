@@ -101,10 +101,10 @@ module.exports = {
             });
         });
     },
-    exportDBtoCSV: () => {
+    exportDBtoCSV: (cb) => {
+        var data = [];
         async.waterfall([
             function(callback) {
-                var data = [];
                 global.db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
                     if (err)
                         callback(err, null);
@@ -137,19 +137,7 @@ module.exports = {
 
                 async.each(data, function(cur, callback2) {
                     global.db.all(knex.select().from(cur.name).toString(), (err, rows) => {
-                        data[cur.id].rows = [];
-                        for (var i = 0; i < rows.length; i++) {
-                            var keysbyindex = Object.keys(rows[i]);
-                            var row = [];
-                            console.log(rows[i]);
-                            for (var ii = 0; ii < keysbyindex.length; ii  ++)
-                            {
-                              row[ii] = rows[i][keysbyindex[ii]];
-                            }
-
-                            data[cur.id].rows.push(row);
-                            console.log(rows[i]);
-                        }
+                        data[cur.id].rows = rows;
                         callback2(err);
 
                     });
@@ -158,8 +146,52 @@ module.exports = {
                         log.error("Error happened during the database dump : " + err);
                         callback(err, data);
                     }
-                    console.log(JSON.stringify(data, null, "\t"));
-                    console.log("------");
+                    callback(null, data);
+                });
+
+            },
+            function(data, callback) {
+                var csv = [];
+                async.each(data, function(cur, callback2) {
+                    //console.log(cur.rows);
+                    csv.push({
+                        data: json2csv({
+                            data: cur.rows,
+                            fields: cur.columns
+                        }),
+                        name: cur.name
+                    });
+                    callback2(null);
+
+                }, function() {
+                    log.info("Master key detected. Detecting USB drive...");
+                    drivelist.list((error, drives) => {
+                        if (error) {
+                            log.error("Error while detecting USB drive. Aborting...");
+                            return;
+                        }
+                        drives.forEach((drive) => {
+                            var remotefolder = "";
+                            if (!drive.system) {
+                              console.log(drive.mountpoints[0].path);
+                                remotefolder = path.join(drive.mountpoints[0].path, "DB_DUMP___" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
+                                log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
+                                if (fs.existsSync(remotefolder)) {
+                                    log.error("The folder already exists. Aborting");
+                                    return;
+                                } else {
+                                    fs.mkdirSync(remotefolder);
+                                }
+                                for (var i = 0; i < csv.length; i++) {
+                                    var filename = csv[i].name + ".csv";
+                                    var fpath = path.join(remotefolder, filename);
+                                    log.info("Writing data in " + fpath);
+                                    fs.writeFileSync(fpath, csv[i].data);
+
+                                }
+                            }
+                        });
+                    });
                 });
 
             }

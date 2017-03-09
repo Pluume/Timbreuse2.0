@@ -1,10 +1,12 @@
-[0.498] [INFO] (test.js:5) > Loading configuration...
-[0.5] [INFO] (test.js:7) > Initializing database...
-[56.437] [ERROR] (utils\log.js:49) > Error: kill ENOSYS
-    at exports._errnoException (util.js:1022:11)
-    at process.kill (internal/process.js:172:13)
-    at process.listener (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:86:15)
-    at emitNone (events.js:86:13)
-    at process.emit (events.js:185:7)
-    at processEmit (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:146:32)
-    at Signal.wrap.onsignal (internal/process.js:199:44)
+[0.474] [INFO] (test.js:5) > Loading configuration...
+[0.477] [INFO] (test.js:7) > Initializing database...
+[0.536] [INFO] (utils\csv.js:167) > Master key detected. Detecting USB drive...
+[1.065] [INFO] (utils\csv.js:178) > Copying CSV to Kingston DataTraveler 2.0 USB Device in path F:\DB_DUMP___March_9th_2017__09_42_48
+[1.195] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\users.csv
+[1.255] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\sqlite_sequence.csv
+[1.317] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\students.csv
+[1.377] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\timeoff.csv
+[1.438] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\logs.csv
+[1.499] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\notifications.csv
+[1.56] [INFO] (utils\csv.js:188) > Writing data in F:\DB_DUMP___March_9th_2017__09_42_48\class.csv
+[5.67] [WARNING] (utils\log.js:66) > Interruption caught !
