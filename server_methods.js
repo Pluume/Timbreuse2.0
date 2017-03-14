@@ -55,6 +55,7 @@ function tagRequest(conn, ireq) {
         conn.socket.write(JSON.stringify(getBaseReq().error = request.ERROR.UNKNOWN));
         return;
     }
+    csv.writeBruteLoggingToCSV(ireq.tag,ireq.time);
     global.db.serialize(() => {
         global.db.get(knex.select().from("users").where("tag", ireq.tag).toString(), (err, row) => {
             if (err) {

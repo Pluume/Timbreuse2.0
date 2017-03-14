@@ -112,19 +112,22 @@ function foreverConnect() {
         connected = true;
     };
     var slavesConnect = function() {
+      if(this.connected)
+      return;
         this.connected = true;
         executePile();
         log.info("The Timbreuse " + this.class + " is online.");
     };
     var slavesClose = function(err) {
         this.connected = false;
-        console.log(this);
         var tsock = this;
+        tsock.removeAllListeners("connect");
+        tsock.on("connect",slavesConnect);
         if (!goingToClose) {
             if (err) {
                 log.warning("The connection to the Timbreuse " + this.class + " was closed with an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  tsock.conn.connect({
+                  tsock.connect({
                       host: tsock.ip,
                       port: 703
                   });
@@ -132,7 +135,7 @@ function foreverConnect() {
             } else {
                 log.warning("The connection to the Timbreuse " + this.class + " was closed without an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  tsock.conn.connect({
+                  tsock.connect({
                       host: tsock.ip,
                       port: 703
                   });
