@@ -68,6 +68,14 @@ module.exports = {
       }
 
       global.TYPE = TYPE.CLIENT;
+    },
+    /**
+     * Get the config for the day specified as parameter
+     * @method loadDay
+     * @param the number of the day in the week from 0 to 6 (0=sunday)
+     **/
+    loadDay: (d) => {
+      return global.config.workDay[d];
     }
 
 };

@@ -21,6 +21,9 @@ if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYP
     tserver.start();//Start the server
     if (global.TYPE.int === config.TYPE.SLAVE.int) {
         slaveHandle.load(); //Load the slave frontend
+    } else {
+      const scheduler = require("./utils/scheduler.js");
+      scheduler.start();
     }
 } else {
         const clientHandle = require("./frontend/client.js");

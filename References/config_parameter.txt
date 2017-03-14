@@ -2,3 +2,17 @@
 -csvFreq (0 for day : 1 for week)
 -server (address)
 -slaves--[{class:TimbreuseClass,ip:IP},{...,...},...]
+-workDays-monday-timeToDo
+                -schedule-[{begin:time,end:time},..]
+
+         -tuesday-timeToDo
+                  -schedule-[{begin:time,end:time},..]
+
+         -wednesday-timeToDo
+                   -schedule-[{begin:time,end:time},..]
+
+         -thursday-timeToDo
+                  -schedule-[{begin:time,end:time},..]
+
+         -friday-timeToDo
+                  -schedule-[{begin:time,end:time},..]

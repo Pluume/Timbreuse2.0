@@ -59,6 +59,7 @@ module.exports = {
                 table.integer("timeDiff");
                 table.integer("timeDiffToday");
                 table.string("lastTagTime");
+                table.string("details");
                 table.integer("status");
                 table.boolean("isBlocked");
                 table.string("firstClass");

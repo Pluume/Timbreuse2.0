@@ -29,20 +29,9 @@
             Timbreuse
           </h1>
     </center>
-
-    <input id="tagInput" type="password" class="form-control show tag" value>
+    <input id="userLogin" type="text" class="form-control show tag" placeholder="Username" value>
+    <input id="userPass" type="password" class="form-control show tag" placeholder="Password" value>
     <!--text-hide-->
-    <script>
-        var slave = require('electron').remote.require("./frontend/slave.js");
-        function tag() {
-            slave.tag(document.getElementById("tagInput").value, slave.getNow());
-        }
-        document.getElementById('tagInput').onkeydown = function(event) {
-            if (event.keyCode == 13) {
-                tag();
-            }
-        }
-    </script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
