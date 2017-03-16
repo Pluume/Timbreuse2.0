@@ -6,6 +6,8 @@
         "class": "YE-S1x",
         "ip": "localhost"
     }],
+    "lunch": {"begin":41400,"end": 48600, "time": 1800},
+    "pause": {"time":1200,"minimum": 360,"interval": 14400},
     "workDay": [{
             "name": "sunday",
             "timeToDo": 0,

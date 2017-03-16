@@ -59,6 +59,8 @@ module.exports = {
                 table.integer("timeDiff");
                 table.integer("timeDiffToday");
                 table.string("lastTagTime");
+                table.integer("missedPause");
+                table.boolean("hadLunch");
                 table.string("details");
                 table.integer("status");
                 table.boolean("isBlocked");

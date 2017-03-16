@@ -55,7 +55,7 @@ function tagRequest(conn, ireq) {
         conn.socket.write(JSON.stringify(getBaseReq().error = request.ERROR.UNKNOWN));
         return;
     }
-    csv.writeBruteLoggingToCSV(ireq.tag,ireq.time);
+    csv.writeBruteLoggingToCSV(ireq.tag, ireq.time);
     global.db.serialize(() => {
         global.db.get(knex.select().from("users").where("tag", ireq.tag).toString(), (err, row) => {
             if (err) {
@@ -95,13 +95,15 @@ function tagRequest(conn, ireq) {
                 if (row2.status == global.STATUS.IN) //Departure
                 {
                     nstatus = global.STATUS.OUT;
-                    nTimeDiffToday = row2.timeDiffToday + math.getTimeDelta(moment().toDate(), new Date(row2.lastTagTime));
-                    nlastTagTime = moment().toDate().toISOString();
+                    var delta = math.getTimeDelta(ireq.time, new Date(row2.lastTagTime));
+                    nTimeDiffToday = row2.timeDiffToday + delta;
+                    var missedPause = Math.floor(delta / global.config.pause.interval);
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({
-                            timeDiffToday: nTimeDiffToday,
-                            lastTagTime: nlastTagTime,
-                            status: nstatus
+                            timeDiffToday: isNaN(nTimeDiffToday) ? 0 : nTimeDiffToday,
+                            lastTagTime: ireq.time,
+                            status: nstatus,
+                            missedPause: isNaN(missedPause) ? 0 : missedPause
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {
@@ -125,10 +127,34 @@ function tagRequest(conn, ireq) {
                 } else { //Arrival
                     nstatus = global.STATUS.IN;
                     nlastTagTime = moment().toDate().toISOString();
+                    var delta = math.getTimeDelta(row2.lastTagTime, nlastTagTime);
+                    var nTimeDiffToday = row2.timeDiffToday;
+                    console.log(delta);
+                    if (isNaN(delta) ? 0:delta < global.config.pause.minimum) //FIXME
+                    {
+                      nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
+                      log.warning("USRID : " + row.id + " minimum pause rule not respected !");
+                    }
+
+                    var now = moment();
+                    var nowAtMidnight = moment().clone().startOf('day');
+                    var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
+                    var hadLunch = 0;
+                    var missedPause = row2.missedPause;
+                    if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
+                        var pauseDelta = math.getTimeDelta(moment().toDate(), row2.lastTagTime);
+                        if (pauseDelta >= global.config.lunch.time) {
+                            hadLunch = 1;
+                        }
+                    }
+                    if (math.getTimeDelta(row2.lastTagTime, nlastTagTime) >= global.config.pause.time)
+                        missedPause--;
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({
                             status: nstatus,
-                            lastTagTime: nlastTagTime
+                            lastTagTime: nlastTagTime,
+                            hadLunch: hadLunch,
+                            timeDiffToday: nTimeDiffToday
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {

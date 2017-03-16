@@ -39,8 +39,11 @@ function endOfDay() {
         } else {
             ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
         }
+        ntimeDiff += (row.missedPause<=0) ? 0:(row.missedPause * (-20 * 60)); //20 minutes when missing a pause
         var ndetails;
         try {
+            if (ndetails === undefined || ndetails === null)
+                throw "Null";
             ndetails = JSON.parse(row.details);
         } catch (err2) {
             ndetails = {
@@ -71,7 +74,9 @@ function endOfDay() {
             status: global.STATUS.OUT,
             timeDiff: ntimeDiff,
             timeDiffToday: 0,
-            details: JSON.stringify(ndetails)
+            details: JSON.stringify(ndetails),
+            hadLunch: 0,
+            missedPause: -1
         }).toString());
     }, (err, nb) => {
         if (err) {
@@ -87,7 +92,7 @@ module.exports = {
      * @method start
      **/
     start: function() {
-        job = new CronJob('*/10 * * * * 1-7', function() {
+        job = new CronJob('* 30 16 * * 1-7', function() { //TODO * 30 23 * * *
 
                 endOfDay();
                 job.stop() //TODO REMOVE
