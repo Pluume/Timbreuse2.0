@@ -6,6 +6,7 @@ var knex = require('knex')({
     useNullAsDefault: true
 });
 var moment = require("moment");
+const config = require("./config.js");
 /**
  * Convert seconds to H:M:S format
  * @method secondsToHms
@@ -27,7 +28,7 @@ function secondsToHms(d) {
 function endOfDay() {
     var d = new Date();
     var dayConfig = config.loadDay(d.getDay());
-    global.db.each(knex("students").select().toString(), null, (err, row) => {
+    global.db.each(knex.select().from('students').toString(), (err, row) => {
         if (err) {
             log.error("Error while iterating through students in the database : " + err);
             return;
@@ -49,16 +50,16 @@ function endOfDay() {
             };
         }
         ndetails.day.push({
-            time: moment.toDate().toISOString(),
+            time: moment().toDate().toISOString(),
             timeDiff: ntimeDiff
         });
-        if (moment(moment().format()).isSame(moment.endOf("week"), 'day')) {
+        if (moment(moment().format()).isSame(moment().endOf("week"), 'day')) {
             ndetails.week.push({
                 time: moment.toDate().toISOString(),
                 timeDiff: ntimeDiff
             });
         }
-        if (moment(moment().format()).isSame(moment.endOf("month"), 'day')) {
+        if (moment(moment().format()).isSame(moment().endOf("month"), 'day')) {
             ndetails.month.push({
                 time: moment.toDate().toISOString(),
                 timeDiff: ntimeDiff
@@ -66,8 +67,8 @@ function endOfDay() {
         }
 
         //TODO Notification on student's status == IN at end of day
-        global.db.update(knex("students").where("id", row.id), update({
-            status: global.STATUS.IN,
+        global.db.run(knex("students").where("id", row.id).update({
+            status: global.STATUS.OUT,
             timeDiff: ntimeDiff,
             timeDiffToday: 0,
             details: JSON.stringify(ndetails)
@@ -86,9 +87,10 @@ module.exports = {
      * @method start
      **/
     start: function() {
-        job = new CronJob('00 30 23 * * 1-7', function() {
+        job = new CronJob('*/10 * * * * 1-7', function() {
 
-                //TODO
+                endOfDay();
+                job.stop() //TODO REMOVE
             }, function() {
                 log.warning("The end-of-day scheduler has stopped !");
             },
