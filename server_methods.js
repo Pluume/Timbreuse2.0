@@ -95,7 +95,7 @@ function tagRequest(conn, ireq) {
                 if (row2.status == global.STATUS.IN) //Departure
                 {
                     nstatus = global.STATUS.OUT;
-                    var delta = math.getTimeDelta(ireq.time, new Date(row2.lastTagTime));
+                    var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
                     nTimeDiffToday = row2.timeDiffToday + delta;
                     var missedPause = Math.floor(delta / global.config.pause.interval);
                     global.db.serialize(() => {
@@ -127,10 +127,10 @@ function tagRequest(conn, ireq) {
                 } else { //Arrival
                     nstatus = global.STATUS.IN;
                     nlastTagTime = moment().toDate().toISOString();
-                    var delta = math.getTimeDelta(row2.lastTagTime, nlastTagTime);
+                    var delta = math.getTimeDelta(new Date(row2.lastTagTime).getTime(), new Date(nlastTagTime).getTime());
                     var nTimeDiffToday = row2.timeDiffToday;
-                    console.log(delta);
-                    if (isNaN(delta) ? 0:delta < global.config.pause.minimum) //FIXME
+                    delta = isNaN(delta) ? 0 : delta;
+                    if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error)
                     {
                       nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
                       log.warning("USRID : " + row.id + " minimum pause rule not respected !");
