@@ -98,12 +98,16 @@ function tagRequest(conn, ireq) {
                     var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
                     nTimeDiffToday = row2.timeDiffToday + delta;
                     var missedPause = Math.floor(delta / global.config.pause.interval);
+                    if(missedPause)
+                    {
+                        log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause +" time(s) !");
+                    }
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({
-                            timeDiffToday: isNaN(nTimeDiffToday) ? 0 : nTimeDiffToday,
+                            timeDiffToday: isNaN(nTimeDiffToday) ? row2.timeDiffToday : nTimeDiffToday,
                             lastTagTime: ireq.time,
                             status: nstatus,
-                            missedPause: isNaN(missedPause) ? 0 : missedPause
+                            missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
                         }).where("userid", row.id).toString());
                         global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
                             if (err3) {
@@ -133,21 +137,21 @@ function tagRequest(conn, ireq) {
                     if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error)
                     {
                       nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
-                      log.warning("USRID : " + row.id + " minimum pause rule not respected !");
+                      log.warning("USRID : " + row.id + " : minimum pause rule not respected !");
                     }
 
-                    var now = moment();
-                    var nowAtMidnight = moment().clone().startOf('day');
+                    var now = moment(ireq.time);
+                    var nowAtMidnight = moment(ireq.time).clone().startOf('day');
                     var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
                     var hadLunch = 0;
                     var missedPause = row2.missedPause;
                     if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
-                        var pauseDelta = math.getTimeDelta(moment().toDate(), row2.lastTagTime);
+                        var pauseDelta = math.getTimeDelta(moment(ireq.time).toDate().getTime(), new Date(row2.lastTagTime).getTime());
                         if (pauseDelta >= global.config.lunch.time) {
                             hadLunch = 1;
                         }
                     }
-                    if (math.getTimeDelta(row2.lastTagTime, nlastTagTime) >= global.config.pause.time)
+                    if (math.getTimeDelta(row2.lastTagTime, nlastTagTime) >= global.config.pause.time && row2.missedPause > 0)
                         missedPause--;
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({

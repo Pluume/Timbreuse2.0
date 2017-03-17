@@ -40,6 +40,7 @@ function endOfDay() {
             ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
         }
         ntimeDiff += (row.missedPause<=0) ? 0:(row.missedPause * (-20 * 60)); //20 minutes when missing a pause
+        ntimeDiff += (row.hadLunch) ? 0 : global.config.lunch.time;
         var ndetails;
         try {
             if (ndetails === undefined || ndetails === null)
