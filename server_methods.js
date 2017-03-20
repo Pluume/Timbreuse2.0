@@ -97,7 +97,7 @@ function tagRequest(conn, ireq) {
                     nstatus = global.STATUS.OUT;
                     var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
                     nTimeDiffToday = row2.timeDiffToday + delta;
-                    var missedPause = Math.floor(delta / global.config.pause.interval);
+                    var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
                     if(missedPause)
                     {
                         log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause +" time(s) !");
@@ -134,7 +134,7 @@ function tagRequest(conn, ireq) {
                     var delta = math.getTimeDelta(new Date(row2.lastTagTime).getTime(), new Date(nlastTagTime).getTime());
                     var nTimeDiffToday = row2.timeDiffToday;
                     delta = isNaN(delta) ? 0 : delta;
-                    if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error)
+                    if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
                     {
                       nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
                       log.warning("USRID : " + row.id + " : minimum pause rule not respected !");

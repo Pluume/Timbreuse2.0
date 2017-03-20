@@ -33,15 +33,20 @@ function getNow() {
  * Execute the pile of saved request
  * @method executePile
  **/
-function executePile() { //TODO refaire pour gerer le cas par cas
-    if (oreqPile.length) {
+function executePile() {
+    if (oreqPile.length && connected) {
         slaveconn.write(JSON.stringify(oreqPile));
-        for (var i = 0; i < slaves.length; i++) {
-            slaves[i].conn.write(JSON.stringify(oreqPile));
-        }
         oreqPile = [];
     }
+    for (var i = 0; i < slaves.length; i++) {
+        if (slaves[i].pile.length && slaves[i].conn.connected) {
+            slaves[i].conn.write(JSON.stringify(slaves[i].pile));
+            slaves[i].pile = [];
+        }
 
+    }
+
+    console.log("PILE : " + JSON.stringify(oreqPile));
 }
 /**
  * Tag an user
@@ -74,6 +79,7 @@ function tag(stag, ntime) {
             slaves[i].conn.write(JSON.stringify(request.toArray(oreq)));
         } else {
             oreq.delayed = true;
+
             slaves[i].pile.push(oreq);
         }
 
@@ -87,15 +93,13 @@ function tag(stag, ntime) {
  * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-  for(var i = 0; i<ireq.length;i++)
-  {
-    switch(ireq[i].fnc)
-    {
-      case MASTER:
-      csv.exportCSV(()=>{});//TODO Function that handle master card
-      break;
+    for (var i = 0; i < ireq.length; i++) {
+        switch (ireq[i].fnc) {
+            case MASTER:
+                csv.exportCSV(() => {}); //TODO Function that handle master card
+                break;
+        }
     }
-  }
 }
 
 /**
@@ -105,15 +109,15 @@ function onSocketData(ireq) {
 function foreverConnect() {
     slaveconn = new net.Socket();
     var connectedToServer = function() {
-      if(connected)
-      return;
+        if (connected)
+            return;
         log.info('Connected to server!');
         executePile();
         connected = true;
     };
     var slavesConnect = function() {
-      if(this.connected)
-      return;
+        if (this.connected)
+            return;
         this.connected = true;
         executePile();
         log.info("The Timbreuse " + this.class + " is online.");
@@ -122,23 +126,23 @@ function foreverConnect() {
         this.connected = false;
         var tsock = this;
         tsock.removeAllListeners("connect");
-        tsock.on("connect",slavesConnect);
+        tsock.on("connect", slavesConnect);
         if (!goingToClose) {
             if (err) {
                 log.warning("The connection to the Timbreuse " + this.class + " was closed with an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  tsock.connect({
-                      host: tsock.ip,
-                      port: 703
-                  });
+                    tsock.connect({
+                        host: tsock.ip,
+                        port: 703
+                    });
                 }, 5000);
             } else {
                 log.warning("The connection to the Timbreuse " + this.class + " was closed without an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  tsock.connect({
-                      host: tsock.ip,
-                      port: 703
-                  });
+                    tsock.connect({
+                        host: tsock.ip,
+                        port: 703
+                    });
                 }, 5000);
             }
         } else {
@@ -164,18 +168,18 @@ function foreverConnect() {
             if (err) {
                 log.warning("The connection with the server was closed with an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  slaveconn.connect({
-                      host: global.config.server,
-                      port: 703
-                  },connectedToServer);
+                    slaveconn.connect({
+                        host: global.config.server,
+                        port: 703
+                    }, connectedToServer);
                 }, 5000);
             } else {
                 log.warning("The connection with the server was closed without an error. Connecting back in 5 seconds");
                 setTimeout(() => {
-                  slaveconn.connect({
-                      host: global.config.server,
-                      port: 703
-                  },connectedToServer);
+                    slaveconn.connect({
+                        host: global.config.server,
+                        port: 703
+                    }, connectedToServer);
                 }, 5000);
             }
         } else {
@@ -186,7 +190,7 @@ function foreverConnect() {
     slaveconn.connect({
         host: global.config.server,
         port: 703
-    },connectedToServer); //FIXME Reboot  socket by unity and not all of them
+    }, connectedToServer); //FIXME Reboot  socket by unity and not all of them
 }
 /**
  * Create the slave frontend
@@ -213,8 +217,8 @@ function createWindow() {
     global.mwin.on("show", () => {
         for (var i = 0; i < global.config.slaves.length; i++) {
             if (global.config.slaves[i].class != global.config.class) {
-            slaves[i] = global.config.slaves[i];
-            slaves[i].pile = [];
+                slaves[i] = global.config.slaves[i];
+                slaves[i].pile = [];
             }
         }
         foreverConnect();
