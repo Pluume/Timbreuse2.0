@@ -1,0 +1,288 @@
+---
+FieldType: Button
+FieldName: EPAI
+FieldNameAlt: EPAI
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: EPCB
+FieldNameAlt: EPCB
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: EPCY
+FieldNameAlt: EPCY
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: EPSY
+FieldNameAlt: EPSY
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: EMP
+FieldNameAlt: EMP
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: EMY
+FieldNameAlt: EMY
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: MECA
+FieldNameAlt: MECA
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: MEDIA
+FieldNameAlt: MEDIA
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: INFO
+FieldNameAlt: INFO
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Button
+FieldName: LOGISTIQUE
+FieldNameAlt: LOGISTIQUE
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: On
+---
+FieldType: Text
+FieldName: Nom
+FieldNameAlt: Nom
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Pr&#233;nom
+FieldNameAlt: Pr&#233;nom
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Classe
+FieldNameAlt: Classe
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Ma&#238;tre de classe
+FieldNameAlt: Ma&#238;tre de classe
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Employeur
+FieldNameAlt: Employeur
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Nombre de p&#233;riodes manqu&#233;es
+FieldNameAlt: Nombre de p&#233;riodes manqu&#233;es
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Autres &#224; pr&#233;ciser cidessous
+FieldNameAlt: Autres (&#224; pr&#233;ciser ci-dessous
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Lieu
+FieldNameAlt: Lieu
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Date
+FieldNameAlt: Date
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Formulaire re&#231;u  le
+FieldNameAlt: Formulaire re&#231;u  le
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Pr&#233;avis
+FieldNameAlt: Pr&#233;avis
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Remarque
+FieldNameAlt: Remarque
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: avec rattrapage de
+FieldNameAlt: avec rattrapage de
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: p&#233;riodes le
+FieldNameAlt: p&#233;riodes le
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Date_2
+FieldNameAlt: Date
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: D&#233;but
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Heure 1
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Fin Absence
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Heure 2
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: AM
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: D
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: CO
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: PC
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: MAC
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: MASC
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: TM
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: A
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: CM2
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: ATT
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: Convoc
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: accord&#233;
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: Refus&#233;
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui
+---
+FieldType: Button
+FieldName: Check Box1
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Oui

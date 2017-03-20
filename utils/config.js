@@ -75,7 +75,6 @@ module.exports = {
      * @param the number of the day in the week from 0 to 6 (0=sunday)
      **/
     loadDay: (d) => {
-      console.log(JSON.stringify(global.config.workDay));
       return global.config.workDay[d];
     }
 

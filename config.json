@@ -19,12 +19,12 @@
             "timeToDo": 25200,
             "endOfDay": 60000,
             "schedule": [{
-                    "begin": 28800,
-                    "end": 44400
+                    "begin": 32400,
+                    "end": 41400
                 },
                 {
-                    "begin": 47700,
-                    "end": 60000
+                    "begin": 48600,
+                    "end": 57600
                 }
             ]
         },
@@ -33,12 +33,12 @@
             "timeToDo": 25200,
             "endOfDay": 60000,
             "schedule": [{
-                    "begin": 28800,
-                    "end": 44400
+                    "begin": 32400,
+                    "end": 41400
                 },
                 {
-                    "begin": 47700,
-                    "end": 60000
+                    "begin": 48600,
+                    "end": 57600
                 }
             ]
         },
@@ -53,12 +53,12 @@
             "timeToDo": 25200,
             "endOfDay": 60000,
             "schedule": [{
-                    "begin": 28800,
-                    "end": 44400
+                    "begin": 32400,
+                    "end": 41400
                 },
                 {
-                    "begin": 47700,
-                    "end": 60000
+                    "begin": 48600,
+                    "end": 57600
                 }
             ]
         },
@@ -67,14 +67,14 @@
             "timeToDo": 25200,
             "endOfDay": 60000,
             "schedule": [{
-                "begin": 28800,
-                "end": 44400
+                "begin": 32400,
+                "end": 41400
             }]
         },
         {
             "name": "saturday",
             "timeToDo": 0,
-            "endOfDay": 5000,
+            "endOfDay": 0,
             "schedule": [{
                 "begin": 0,
                 "end": 0

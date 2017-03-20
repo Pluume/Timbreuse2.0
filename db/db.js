@@ -20,11 +20,29 @@ STATUS = {
     OUT: 2,
     ABS: 3
 };
+REASON = {
+  MILITARY:0,
+  DEAD:1,
+  OFFICIAL:2,
+  DRIVER:3,
+  SICKW:4,
+  SICKWO:5,
+  TREATEMENT:6,
+  OTHER:7
+};
+PROOF = {
+  NONE: 0,
+  MEDICAL: 1,
+  CERTIFICATE: 2,
+  CONVOCATION: 3
+};
 global.RANK = RANK;
 global.STATUS = STATUS;
 module.exports = {
     handle: handle,
     RANK: RANK,
+    REASON: REASON,
+    PROOF: PROOF,
     /**
      * Init the database
      * @method init
@@ -64,7 +82,6 @@ module.exports = {
                 table.string("details");
                 table.integer("status");
                 table.boolean("isBlocked");
-                table.string("firstClass");
                 table.string("project");
             }).toString());
 
@@ -100,7 +117,20 @@ module.exports = {
                 table.integer("profid");
                 table.string("name");
             }).toString());
-        });
+
+        handle.run(knex.schema.createTableIfNotExists("leavereq", function(table) { //leavereq table
+            table.increments("id").primary();
+            table.integer("studentid");
+            table.string("dateFrom");
+            table.string("dateTo");
+            table.boolean("missedTest");
+            table.integer("reason");
+            table.string("reasonDesc");
+            table.integer("proof");
+            table.string("where");
+
+        }).toString());
+    });
         handle.get("SELECT * FROM users WHERE rank=2", (err, data) => {
             if (data === undefined) {
                 handle.run(knex("users").insert({
