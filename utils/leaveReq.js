@@ -26,8 +26,7 @@ function create(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, pro
         reason: reason,
         reasonDesc: reasonDesc,
         proof: proof,
-        where: where,
-        missedTest: missedTest
+        where: where
     }).returning("*").toString());
 }
 /**
@@ -106,7 +105,19 @@ function routine(res) {
         diff = today.timeToDo;
     return diff;
 }
-//TODO DOCUMENTATION
+/**
+ * Update a leave request in the database
+ * @method update
+ * @param {Integer} id The id of the leavereq object.
+ * @param {Integer} studentid The id of the student in the database.
+ * @param {Date} dateFrom The date from which the student wants to leave.
+ * @param {Date} dateTo The date until when the student wants to leave.
+ * @param {Boolean} missedTest true if he has missed a test.
+ * @param {Integer} reason A reason from an enumeration in the db/db.js file.
+ * @param {String} reasonDesc If the reason is set to other, a description.
+ * @param {Integer} proof the proof provided.
+ * @param {String} where the place it has been made.
+ **/
 function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) {
     global.db.handle.run(knex("leavereq").where({
         id: id
@@ -118,60 +129,24 @@ function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc,
         reason: reason,
         reasonDesc: reasonDesc,
         proof: proof,
-        where: where,
-        missedTest: missedTest
+        where: where
     }).toString());
 }
-
+/**
+ * Delete a leave request in the database
+ * @method erase
+ * @param {Integer} id The id of the leavereq in the database.
+ **/
 function erase(id) {
     global.db.handle.run(knex("leavereq").where({
         id: id
     }).del().toString());
 }
 
-function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where, missedTest) //FIXME
+function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) //FIXME
 {
-    var result;
-    var tstudent;
-    var tclass;
-    var tprof;
-    var sync = true;
-    async.waterfall([
-        function(callback) { //Get the students
-            global.db.handle.get(knex("students").select().where({
-                id: studentid
-            }), callback);
-        },
-        function(row, callback) { //Get the class
-            tstudent = row;
-            global.db.handle.get(knex("class").select().where({
-                profid: tstudent.profid
-            }), callback);
-        },
-        function(row, callback) { //Get the prof
-            tclass = row;
-            global.db.handle.get(knex("users").select().where({
-                id: tstudent.profid
-            }), callback);
-        },
-        function(row, callback) { //Merge
-            tprof = row;
 
-        }
-    ], function(err, result) {
-        if (err) {
-            log.error("Error :" + err);
-            sync = false;
-            return;
-        }
-
-        sync = false;
-    });
-    while (sync) {
-        wait;
-    }
-    return result;
 }
 module.exports = {
     isToday
-}
+};
