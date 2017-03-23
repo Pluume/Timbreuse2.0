@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" onresize="myScript();">
 
 <head>
     <script>
@@ -99,7 +99,7 @@
                             <a href="#" onclick="loadPage('flot.html');"><i class="fa fa-bar-chart-o fa-fw"></i> Students</a>
                         </li>
                         <li>
-                            <a href="holydays.html"><i class="fa fa-calendar-o fa-fw"></i> Holydays</span></a>
+                            <a href="#" onclick="resizeIFrame();"><i class="fa fa-calendar-o fa-fw"></i> Holydays</span></a>
                         </li>
                     </ul>
                 </div>
@@ -108,40 +108,28 @@
             <!-- /.navbar-static-side -->
         </nav>
         <div id="page-wrapper">
-
-            <style>
-                iframe {
-                    width: 100%
-                }
-            </style>
-            <script>
-              document.getElementById("MainIFrame").height = window.innerHeight;
-
-            </script>
-                <iframe src="flot.html" frameborder="0" style="overflow:hidden;height:100%;width:100%" class="row col-lg-12" id="MainIFrame" onload="test();"height="100%" width="100%"></iframe>
-            </div>
-
-
+            <iframe src="flot.html" frameborder="0" style="overflow:hidden;height:1000px;width:100%" class="row col-lg-12" id="MainIFrame"></iframe>
+        </div>
         </iframe>
-            <!-- /.row -->
+        <!-- /.row -->
 
-            <!-- jQuery -->
-            <script src="../vendor/jquery/jquery.min.js"></script>
+        <!-- jQuery -->
+        <script src="../vendor/jquery/jquery.min.js"></script>
 
-            <!-- Bootstrap Core JavaScript -->
-            <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+        <!-- Bootstrap Core JavaScript -->
+        <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
-            <!-- Metis Menu Plugin JavaScript -->
-            <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+        <!-- Metis Menu Plugin JavaScript -->
+        <script src="../vendor/metisMenu/metisMenu.min.js"></script>
 
-            <!-- Morris Charts JavaScript -->
-            <script src="../vendor/raphael/raphael.min.js"></script>
-            <script src="../vendor/morrisjs/morris.min.js"></script>
-            <script src="../data/morris-data.js"></script>
+        <!-- Morris Charts JavaScript -->
+        <script src="../vendor/raphael/raphael.min.js"></script>
+        <script src="../vendor/morrisjs/morris.min.js"></script>
+        <script src="../data/morris-data.js"></script>
 
-            <!-- Custom Theme JavaScript -->
-            <script src="../dist/js/sb-admin-2.js"></script>
-            <script src="../dist/js/utils.js"></script>
+        <!-- Custom Theme JavaScript -->
+        <script src="../dist/js/sb-admin-2.js"></script>
+        <script src="../dist/js/utils.js"></script>
 
 
 

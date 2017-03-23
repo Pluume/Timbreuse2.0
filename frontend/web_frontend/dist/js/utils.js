@@ -30,3 +30,8 @@ function resizeToClient()
 {
   document.getElementById("MainIFrame").style.height = document.body.clientHeight + "px";
 }
+
+function resizeIFrame() {
+    document.getElementById("MainIFrame").style.height = (document.body.clientHeight - document.getElementById("MainIFrame").offsetTop) + "px";
+}
+window.onload = function () { resizeIFrame(); }

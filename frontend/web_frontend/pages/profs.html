@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="../dist/css/style.css" rel="stylesheet">
+    <link href="../dist/css/bootstrap-table.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <button type="button" id="salut" onclick="hey();" name="button">Hey</button>
+    <div class="container" style="width: 100%;">
+        <table id="table" data-toggle="table" data-height="800" data-click-to-select="true" data-sort-name="name" data-pagination="true" data-sort-order="desc">
+            <thead>
+                <tr>
+                  <th data-field="state" data-checkbox="true"></th>
+                    <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item ID</th>
+                    <th data-field="name" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item Name</th>
+                    <th data-field="price" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item Price</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <script>
+        function hey() {
+            var data = '[{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"}]';
+            blabla = JSON.parse(data);
+            $('#table').bootstrapTable("load", blabla);
+        };
+        document.addEventListener("DOMContentLoaded", function(event) {
+    hey();
+  });
+    </script>
+    <!-- jQuery -->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="../vendor/raphael/raphael.min.js"></script>
+    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="../data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../dist/js/bootstrap-table.js"></script>
+</body>
+
+</html>
