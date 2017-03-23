@@ -1,7 +1,4 @@
-var path = require('path');
-
-/**
-const {ipcRenderer} = require('electron');
+const {ipcRenderer} = require('electron') ;
 function getStudents(tableId)
 {
   ipcRenderer.send("students","*");
@@ -30,4 +27,3 @@ function getStudents(tableId)
   $('#' + tableId).bootstrapTable('load', data.data);
 });
 }
-**/

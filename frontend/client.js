@@ -20,8 +20,8 @@ function createWindow()
       width: 800,
         height: 600,
         webPreferences: {
-      nodeIntegration: true
-    }
+          nodeIntergrationInWorker: true
+        }
 
     });
     global.mwin.loadURL(url.format({
