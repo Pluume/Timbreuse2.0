@@ -22,27 +22,21 @@
 <body>
     <button type="button" id="salut" onclick="hey();" name="button">Hey</button>
     <div class="container" style="width: 100%;">
-        <table id="table" data-toggle="table" data-height="800" data-click-to-select="true" data-sort-name="name" data-pagination="true" data-sort-order="desc">
+        <table id="stdTable" data-toggle="table" data-height="800" data-click-to-select="true" data-sort-name="name" data-pagination="true" data-sort-order="desc">
             <thead>
                 <tr>
                   <th data-field="state" data-checkbox="true"></th>
-                    <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item ID</th>
-                    <th data-field="name" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item Name</th>
-                    <th data-field="price" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Item Price</th>
+                    <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Student ID</th>
+                    <th data-field="Lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
+                    <th data-field="Fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
+                    <th data-field="timeDiffToday" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time done today</th>
+                    <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
+                    <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
                 </tr>
             </thead>
         </table>
     </div>
-    <script>
-        function hey() {
-            var data = '[{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"},{"id": 0,"name": "Item 0","price": "$0"}, {"id": 1,"name": "Item 1","price": "$1"},{"id": 2,"name": "Item 2","price": "$2"}]';
-            blabla = JSON.parse(data);
-            $('#table').bootstrapTable("load", blabla);
-        };
-        document.addEventListener("DOMContentLoaded", function(event) {
-    hey();
-  });
-    </script>
+
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>
 
@@ -60,6 +54,14 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../dist/js/bootstrap-table.js"></script>
+    <script src="../dist/js/getInfos.js"></script>
+    <script>
+    
+    document.addEventListener("DOMContentLoaded", function(event) {
+    console.log("Asking for student to main process...");
+    getStudents("stdTable");
+  });
+    </script>
 </body>
 
 </html>

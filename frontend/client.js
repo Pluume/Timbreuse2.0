@@ -18,11 +18,14 @@ function createWindow()
 {
     global.mwin = new BrowserWindow({
       width: 800,
-        height: 600
+        height: 600,
+        webPreferences: {
+      nodeIntegration: true
+    }
 
     });
     global.mwin.loadURL(url.format({
-        pathname: path.join(__dirname, 'client.html'),
+        pathname: path.join(__dirname, 'web_frontend/pages/index.html'),
         protocol: 'file:',
         slashes: true
     }));

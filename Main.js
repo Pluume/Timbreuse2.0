@@ -11,11 +11,13 @@ config.getType();
 global.mwin = null;
 const slaveHandle = require("./frontend/slave.js");
 log.info("Starting as a " + global.TYPE.string);
-
+//FIXME
+log.info("Initializing database...");
+const db = require("./db/db.js");
+db.init();//Init the database
+//FIXME
 if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYPE.SLAVE.int) { //Check if the app is starting as server or slave
-    log.info("Initializing database...");
-    const db = require("./db/db.js");
-    db.init();//Init the database
+
     log.info("Starting server...");
     var tserver = require("./server.js");
     tserver.start();//Start the server
