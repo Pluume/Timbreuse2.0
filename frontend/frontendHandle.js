@@ -12,6 +12,7 @@ function getStudents(event,arg)
     var data = {};
     data.err = err;
     data.data = rows;
+    console.log(rows);
     event.sender.send("students",data);
   });
   }

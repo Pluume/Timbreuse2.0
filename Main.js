@@ -3,6 +3,7 @@
  *
  * @module main
  */
+const fh = require("./frontend/frontendHandle.js");
 const log = require("./utils/log.js");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");

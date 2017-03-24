@@ -26,6 +26,7 @@ function getStudents(tableId)
     document.body.appendChild(errEl);
     return;
   }
+  console.log("Parsed");
   $('#' + tableId).bootstrapTable('load', data.data);
 });
 }
