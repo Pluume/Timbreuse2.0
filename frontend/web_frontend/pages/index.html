@@ -1,12 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" onresize="resizeIFrame();">
 
 <head>
-    <script>
-        function resizeIframe(obj) {
-            obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-        }
-    </script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -93,7 +88,7 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
+                            <a href="#" onclick="loadPage('profs.html');"><i class="fa fa-home fa-fw"></i> Home</a>
                         </li>
                         <li>
                             <a href="#" onclick="loadPage('flot.html');"><i class="fa fa-bar-chart-o fa-fw"></i> Students</a>
@@ -108,7 +103,7 @@
             <!-- /.navbar-static-side -->
         </nav>
         <div id="page-wrapper">
-            <webview src="profs.html" frameborder="0" class="row col-lg-12" id="MainIFrame" nodeintegration></webview>
+            <webview src="profs.html" style="margin: 0;padding: 0;" frameborder="0" class="row col-lg-12 gutter-0" id="MainIFrame" nodeintegration></webview>
             <script>
                 document.getElementById("MainIFrame").addEventListener('console-message', (e) => {
                     console.log(e.message)

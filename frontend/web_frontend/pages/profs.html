@@ -20,9 +20,9 @@
 </head>
 
 <body>
-
+  <button onclick="getStudents('stdTable');" type="button" name="button">Hello</button>
     <div class="container" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-        <table id="stdTable" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="true" data-sort-name="name" data-pagination="true" data-sort-order="desc">
+        <table id="stdTable" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="name" data-pagination="true" data-sort-order="desc">
             <thead>
                 <tr>
                   <th data-field="state" data-checkbox="true"></th>
@@ -31,7 +31,9 @@
                     <th data-field="Fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
                     <th data-field="timeDiffToday" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time done today</th>
                     <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
+                    <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
                     <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
+                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"></th>
                 </tr>
             </thead>
         </table>
@@ -40,6 +42,12 @@
     <!-- jQuery -->
     <script>
         window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+
+        function studentsListFormatter()
+        {
+          return "<button data-toggle='tooltip' data-placement='left' title data-original-title='Details' href='#' onclick='' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-placement='left' title data-original-title='Edit' href='#' onclick='' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button>";<!-- TODO -->
+        }
+
     </script>
 
     <!-- Bootstrap Core JavaScript -->

@@ -33,6 +33,5 @@ function resizeToClient()
 
 function resizeIFrame() {
     document.getElementById("MainIFrame").style.height = (document.body.clientHeight - document.getElementById("MainIFrame").offsetTop) + "px";
-    document.getElementById("MainIFrame").style.width = "100%";
 }
 window.onload = function () { resizeIFrame(); }
