@@ -20,7 +20,7 @@
 </head>
 
 <body>
-    <button type="button" id="salut" onclick="hey();" name="button">Hey</button>
+    <button type="button" id="salut" onclick="getStudents('stdTable');" name="button">Hey</button>
     <div class="container" style="width: 100%;">
         <table id="stdTable" data-toggle="table" data-height="800" data-click-to-select="true" data-sort-name="name" data-pagination="true" data-sort-order="desc">
             <thead>
@@ -38,7 +38,9 @@
     </div>
 
     <!-- jQuery -->
-    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script>
+        window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+    </script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -61,6 +63,7 @@
     console.log("Asking for student to main process...");
     getStudents("stdTable");
   });
+  console.log("Test");
     </script>
 </body>
 

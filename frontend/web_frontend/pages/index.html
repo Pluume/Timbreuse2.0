@@ -108,12 +108,19 @@
             <!-- /.navbar-static-side -->
         </nav>
         <div id="page-wrapper">
-            <webview src="profs.html" frameborder="0" style="overflow:hidden;height:1000px;width:100%" class="row col-lg-12" id="MainIFrame"></webview>
+            <webview src="profs.html" frameborder="0" style="overflow:hidden;height:1000px;width:100%" class="row col-lg-12" id="MainIFrame" nodeintegration></webview>
+            <script>
+                document.getElementById("MainIFrame").addEventListener('console-message', (e) => {
+                    console.log(e.message)
+                });
+            </script>
         </div>
         <!-- /.row -->
 
         <!-- jQuery -->
-        <script src="../vendor/jquery/jquery.min.js"></script>
+        <script>
+            window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+        </script>
 
         <!-- Bootstrap Core JavaScript -->
         <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
