@@ -1,11 +1,9 @@
-const {ipcRenderer} = require('electron') ;
+const {ipcRenderer} = require('electron');
 function getStudents(tableId)
 {
   ipcRenderer.send("students","*");
-  console.log("Message sent");
   ipcRenderer.once("students",(event,data) =>
 {
-  console.log("Message answered");
   if(data.err)
   {
     var errEl = document.createElement("div");
@@ -26,7 +24,6 @@ function getStudents(tableId)
     document.body.appendChild(errEl);
     return;
   }
-  console.log("Parsed");
   $('#' + tableId).bootstrapTable('load', data.data);
 });
 }

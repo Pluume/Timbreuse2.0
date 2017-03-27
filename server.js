@@ -33,6 +33,8 @@ module.exports = {
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
       addClient(connection);
+      if(global.DEBUG)
+      log.info(socket.address().address + " just connected");
         socket.on('error', function() {
             removeClient(connection);
         });
@@ -48,6 +50,8 @@ module.exports = {
         });
         socket.on('close', function(hadError) {
             removeClient(connection);
+            if(global.DEBUG)
+            log.info(socket.address().address + " just disconnected");
         });
     }).listen(703).on('listening', function() {
       log.info("The server up on the port 703");

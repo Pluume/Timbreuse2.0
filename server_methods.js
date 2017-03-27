@@ -9,6 +9,7 @@ const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const csv = require("./utils/csv.js");
 const crypto = require("crypto-js");
+const lodash = require("lodash");
 const request = require("./request.js");
 const knex = require('knex')({
     client: 'sqlite3',
@@ -99,9 +100,8 @@ function tagRequest(conn, ireq) {
                     var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
                     nTimeDiffToday = row2.timeDiffToday + delta;
                     var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
-                    if(missedPause)
-                    {
-                        log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause +" time(s) !");
+                    if (missedPause) {
+                        log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause + " time(s) !");
                     }
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({
@@ -137,8 +137,8 @@ function tagRequest(conn, ireq) {
                     delta = isNaN(delta) ? 0 : delta;
                     if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
                     {
-                      nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
-                      log.warning("USRID : " + row.id + " : minimum pause rule not respected !");
+                        nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
+                        log.warning("USRID : " + row.id + " : minimum pause rule not respected !");
                     }
 
                     var now = moment(ireq.time);
@@ -197,36 +197,34 @@ function authenticate(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq));
         return;
     }
-    global.db.get(knex("users").select().where({username: ireq.user}).toString(), (err, row) =>
-  {
-    if(err)
-    {
-      log.error("Error while accessing the database...\n" + err);
-      oreq = getBaseReq();
-      oreq.fnc = request.REQUEST.AUTH;
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq));
-      return;
-    }
-    var passhash = crypto.SHA256(ireq.pass);
-    log.info(passhash);
-    log.info(row.password);
-    if(row.password == passhash)
-    {
-      conn.user = row;
-      log.info("User " + row.username + " logged in.");
-      oreq = getBaseReq();
-      oreq.fnc = request.REQUEST.AUTH;
-      oreq.error = request.ERROR.OK;
-      conn.socket.write(JSON.stringify(oreq));
-      return;
-    }
-    oreq = getBaseReq();
-    oreq.fnc = request.REQUEST.AUTH;
-    oreq.error = request.ERROR.WRONGCREDS;
-    conn.socket.write(JSON.stringify(oreq));
-    return;
-  });
+    conn.loading = true;
+    global.db.get(knex("users").select().where({
+        username: ireq.user
+    }).toString(), (err, row) => {
+        if (err) {
+            log.error("Error while accessing the database...\n" + err);
+            oreq = getBaseReq();
+            oreq.fnc = request.REQUEST.AUTH;
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        if (row.password == ireq.pass) {
+            conn.user = row;
+            oreq = getBaseReq();
+            oreq.fnc = request.REQUEST.AUTH;
+            oreq.error = request.ERROR.OK;
+            oreq.rank = row.rank;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        oreq = getBaseReq();
+        oreq.fnc = request.REQUEST.AUTH;
+        oreq.error = request.ERROR.WRONGCREDS;
+        conn.socket.end(JSON.stringify(oreq));
+
+        return;
+    });
 }
 /**
  * End the provided socket
@@ -234,11 +232,64 @@ function authenticate(conn, ireq) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function socketExit(conn) {
-  if(conn.user !== undefined)
-  {
-    log.info("User " + conn.user.username + " logged out.");
-  }
+    if (conn.user !== undefined) {
+        log.info("User " + conn.user.username + " logged out.");
+    }
     conn.socket.end();
+}
+/**
+ * Get one or multiple students
+ * @method getStudent
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getStudent(conn, ireq) {
+    var oreq;
+    if (conn.user !== undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.NOTLOGEDIN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.scope === undefined) {
+        log.error("Request ill formed.");
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    oreq = getBaseReq();
+    oreq.student = [];
+    if (ireq.scope == "*") {
+        var index = 0;
+        global.db.all(knex("students").select().toString(), (err, rows) => //Get the students
+            {
+                if (err) {
+                    log.error("Error : " + err);
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.SQLITE;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                }
+                var finalArray = [];
+                global.db.all(knex("users").select("id", "username", "rank", "fname", "lname", "dob", "email", "tag").toString(), (err, rows2) => {
+                    for (var ii = 0; ii < rows2.length; ii++) {
+                        var tmp = lodash.filter(rows, {
+                            "userid": rows2[ii].id
+                        });
+                        if (tmp[0] === undefined)
+                            continue;
+                        tmp[0].user = rows2[ii];
+                        finalArray.push(tmp[0]);
+                    }
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.OK;
+                    oreq.students = finalArray;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                });
+            });
+    }
 }
 module.exports = {
     /**
@@ -286,6 +337,10 @@ module.exports = {
                 case request.REQUEST.PROPAGATE_TAG:
                     propagate_tag(ireq[i]);
                     break;
+                case request.REQUEST.GETSTUDENT:
+                    getStudent(connection, ireq[i]);
+                    break;
+
             }
         }
 

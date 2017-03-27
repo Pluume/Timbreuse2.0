@@ -30,7 +30,8 @@ module.exports = {
     UNKNOWN: 1,
     WRONGTAG: 2,
     SQLITE: 3,
-    WRONGCREDS: 4
+    WRONGCREDS: 4,
+    NOTLOGEDIN: 5
 },
 REQUEST: {
     EXIT: -1,
@@ -38,6 +39,11 @@ REQUEST: {
     TAG: 1,
     AUTH: 2,
     MASTER: 3,
-    PROPAGATE_TAG:4
+    PROPAGATE_TAG: 4,
+    GETSTUDENT: 5
+},
+PAGES: {
+  LOGIN: 0,
+  PROFS: 1
 }
 };
