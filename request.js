@@ -29,7 +29,8 @@ module.exports = {
     OK: 0,
     UNKNOWN: 1,
     WRONGTAG: 2,
-    SQLITE: 3
+    SQLITE: 3,
+    WRONGCREDS: 4
 },
 REQUEST: {
     EXIT: -1,

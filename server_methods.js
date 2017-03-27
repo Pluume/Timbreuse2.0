@@ -8,6 +8,7 @@
 const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const csv = require("./utils/csv.js");
+const crypto = require("crypto-js");
 const request = require("./request.js");
 const knex = require('knex')({
     client: 'sqlite3',
@@ -191,10 +192,41 @@ function authenticate(conn, ireq) {
     var oreq;
     if (ireq.user === undefined || ireq.pass === undefined) {
         log.error("Request ill formed.");
-        conn.socket.write(JSON.stringify(getBaseReq().error = ERROR.UNKNOWN));
+        var oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
         return;
     }
-
+    global.db.get(knex("users").select().where({username: ireq.user}).toString(), (err, row) =>
+  {
+    if(err)
+    {
+      log.error("Error while accessing the database...\n" + err);
+      oreq = getBaseReq();
+      oreq.fnc = request.REQUEST.AUTH;
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq));
+      return;
+    }
+    var passhash = crypto.SHA256(ireq.pass);
+    log.info(passhash);
+    log.info(row.password);
+    if(row.password == passhash)
+    {
+      conn.user = row;
+      log.info("User " + row.username + " logged in.");
+      oreq = getBaseReq();
+      oreq.fnc = request.REQUEST.AUTH;
+      oreq.error = request.ERROR.OK;
+      conn.socket.write(JSON.stringify(oreq));
+      return;
+    }
+    oreq = getBaseReq();
+    oreq.fnc = request.REQUEST.AUTH;
+    oreq.error = request.ERROR.WRONGCREDS;
+    conn.socket.write(JSON.stringify(oreq));
+    return;
+  });
 }
 /**
  * End the provided socket
@@ -202,6 +234,10 @@ function authenticate(conn, ireq) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function socketExit(conn) {
+  if(conn.user !== undefined)
+  {
+    log.info("User " + conn.user.username + " logged out.");
+  }
     conn.socket.end();
 }
 module.exports = {
@@ -222,7 +258,7 @@ module.exports = {
         } catch (err) {
             log.error("Request ill formed.");
             oreq = getBaseReq();
-            oreq.error = ERROR.UNKNOWN;
+            oreq.error = request.ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
@@ -230,7 +266,7 @@ module.exports = {
             if (ireq[i].fnc === undefined) {
                 log.error("fnc param not specified in request.");
                 oreq = getBaseReq();
-                oreq.error = ERROR.UNKNOWN;
+                oreq.error = request.ERROR.UNKNOWN;
                 connection.socket.write(JSON.stringify(oreq));
                 return;
             }

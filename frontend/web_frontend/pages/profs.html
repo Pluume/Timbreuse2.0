@@ -31,9 +31,9 @@
                     <th data-field="Fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
                     <th data-field="timeDiffToday" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time done today</th>
                     <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
-                    <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
+                    <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Last tag time</th>
                     <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
-                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"></th>
+                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><button data-toggle='tooltip' data-placement='right' title='Add' href='#' onclick='gotoAddStudent();' class='btn btn-success btn-circle'><i class='fa fa-check'></i></button></th>
                 </tr>
             </thead>
         </table>
@@ -43,13 +43,18 @@
     <script>
         window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
 
-        function studentsListFormatter()
+        function studentsListFormatter(val, row)
         {
-          return "<button data-toggle='tooltip' data-placement='left' title data-original-title='Details' href='#' onclick='' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-placement='left' title data-original-title='Edit' href='#' onclick='' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button>";<!-- TODO -->
+          return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id + ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick=''gotoEditStudent(" + row.id + ");' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button><button data-toggle='tooltip' data-placement='top' title='Delete' href='#' onclick='gotoDeleteStudent(" + row.id + ");' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button>";
         }
-
+        function statusFormatter(val, row)
+        {
+          return val;
+        }
+        $(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});
     </script>
-
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -65,6 +70,7 @@
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../dist/js/bootstrap-table.js"></script>
     <script src="../dist/js/getInfos.js"></script>
+    <script src="../dist/js/redirect.js"></script>
     <script>
 
     document.addEventListener("DOMContentLoaded", function(event) {
