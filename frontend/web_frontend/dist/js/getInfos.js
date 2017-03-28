@@ -16,15 +16,39 @@ function redAlert(msg) {
     console.log(msg);
 }
 
-function getStudents(tableId) {
-    ipcRenderer.send("students", "*");
+function getClass(cb) {
+    ipcRenderer.once("class", (event, arg) => {
+        if (arg === window.ERROR.UNKNOWN) {
+            redAlert("Unable to contact the server...");
+            return;
+        }
+        switch (arg.error) {
+            case window.ERROR.OK:
+                cb(arg.class);
+                return;
+                break;
+            case window.ERROR.NOTLOGEDIN:
+                redAlert("Not logged in...");
+                break;
+            case window.ERROR.UNKNOWN:
+                redAlert("Unkown error...");
+                break;
+            default:
+                redAlert("Ill formed request...");
+        }
+        cb(null);
+    });
+    ipcRenderer.send("class", window.SCOPE.UNIQUE);
+}
+
+function getStudents(tableId, cb) {
+    ipcRenderer.send("students", window.SCOPE.ALL);
     ipcRenderer.once("students", (event, arg) => {
         if (arg === window.ERROR.UNKNOWN) {
             redAlert("Unable to contact the server...");
         }
         switch (arg.error) {
             case window.ERROR.OK:
-            console.log(1);
                 var data = [];
                 for (var i = 0; i < arg.students.length; i++) {
                     data.push({
@@ -37,15 +61,13 @@ function getStudents(tableId) {
                         lastTagTime: arg.students[i].timeDiff
                     });
                 }
-                console.log(JSON.stringify(data));
                 $('#' + tableId).bootstrapTable('load', data);
+                cb();
                 break;
             case window.ERROR.NOTLOGEDIN:
-            console.log(2);
                 redAlert("Not logged in !");
                 break;
             case window.ERROR.UNKNOWN:
-            console.log(3);
                 redAlert("Unkown error...");
                 break;
             default:
@@ -53,4 +75,34 @@ function getStudents(tableId) {
         }
 
     });
+}
+
+function createStudent(fname, lname, username, email, tag, tclass, dob, project, tableid) {
+    var obj = {};
+    obj.fname = fname;
+    obj.lname = lname;
+    obj.username = username;
+    obj.tag = tag;
+    obj.class = tclass;
+    obj.dob = dob;
+    obj.project = project;
+    obj.email = email;
+    ipcRenderer.once("createStudent", (event, arg) => {
+        if (arg === window.ERROR.UNKNOWN) {
+            redAlert("Unable to contact the server...");
+        }
+        switch (arg.error) {
+            case window.ERROR.OK:
+                getStudent(tableid, () => {});
+            case window.ERROR.NOTLOGEDIN:
+                redAlert("Not logged in !");
+                break;
+            case window.ERROR.UNKNOWN:
+                redAlert("Unkown error...");
+                break;
+            default:
+                redAlert("Ill formed request...");
+        }
+    });
+    ipcRenderer.send("createStudent", obj);
 }

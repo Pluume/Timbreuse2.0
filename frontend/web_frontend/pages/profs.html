@@ -17,6 +17,7 @@
 
     <!-- Custom Fonts -->
     <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <script src="../dist/js/pages.js"></script>
 </head>
 
 <body>
@@ -32,7 +33,7 @@
                     <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
                     <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
                     <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
-                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><button data-toggle='tooltip' data-placement='right' title='Add' href='#' onclick='gotoAddStudent();' class='btn btn-success btn-circle'><i class='fa fa-check'></i></button></th>
+                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick='gotoAddStudent();' class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
                 </tr>
             </thead>
         </table>
@@ -43,7 +44,9 @@
         window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
         window.ERROR = require('../../../request.js').ERROR;
         window.PAGES = require('../../../request.js').PAGES;
+        window.SCOPE = require('../../../request.js').SCOPE;
         window.RANK = require('../../../db/db.js').RANK;
+        setPage(window.PAGES.PROFS);
 
         function studentsListFormatter(val, row) {
             return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id +
@@ -59,11 +62,71 @@
             $("body").tooltip({
                 selector: '[data-toggle=tooltip]'
             });
-            console.log("Asking for student to main process...");
-            getStudents("stdTable");
-        });
+            getStudents("stdTable", () => {
+                getClass((tclass) => {
+                    if (tclass == null || tclass == undefined) {
+                        document.getElementById("tclass").setAttribute("placeholder", "error");
+                    } else {
+                        document.getElementById("tclass").setAttribute("placeholder", tclass.name);
+                        window.currentClass = tclass;
+                    }
 
+                });
+            });
+        });
     </script>
+    <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStudentModalTitle">Create a new student</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="tclass" class="form-control-label">Class : </label>
+                            <input type="text" class="form-control" readonly id="tclass">
+                        </div>
+                        <div class="form-group">
+                            <label for="fname" class="form-control-label">First name :</label>
+                            <input type="text" class="form-control" id="fname">
+                        </div>
+                        <div class="form-group">
+                            <label for="lname" class="form-control-label">Last name:</label>
+                            <input type="text" class="form-control" id="lname">
+                        </div>
+                        <div class="form-group">
+                            <label for="username" class="form-control-label">Username :</label>
+                            <input type="text" class="form-control" id="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="dob" class="form-control-label">Date of birth:</label>
+                            <input type="text" class="form-control" id="dob">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-control-label">Email :</label>
+                            <input type="text" class="form-control" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="tag" class="form-control-label">Tag :</label>
+                            <input type="text" class="form-control" id="tag">
+                        </div>
+                        <div class="form-group">
+                            <label for="project" class="form-control-label">Project :</label>
+                            <input type="text" class="form-control" id="project">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" data-dismiss="modal" onclick="createStudent(document.getElementById('fname').value, document.getElementById('lname').value, document.getElementById('username').value, document.getElementById('email').value,document.getElementById('tag').value, document.getElementById('tclass').value, document.getElementById('dob').value, document.getElementById('project').value);" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -80,6 +143,7 @@
     <script src="../dist/js/bootstrap-table.js"></script>
     <script src="../dist/js/getInfos.js"></script>
     <script src="../dist/js/redirect.js"></script>
+
     <script>
     </script>
 </body>

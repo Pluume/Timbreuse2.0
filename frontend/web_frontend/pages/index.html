@@ -105,8 +105,9 @@
         <div id="page-wrapper">
             <webview src="profs.html" style="margin: 0;padding: 0;" frameborder="0" class="row col-lg-12 gutter-0" id="MainIFrame" nodeintegration></webview>
             <script>
-                document.getElementById("MainIFrame").addEventListener('console-message', (e) => {
-                    console.log(e.message)
+                document.getElementById("MainIFrame").addEventListener('console-message', function(e) { //Thanks to https://discuss.atom.io/t/cannot-see-console-log-from-webview/19974/4
+                    var srcFile = e.sourceId.replace(/^.*[\\\/]/, '');
+                    console.log('WW Log >> ' + srcFile + '(' + e.line + '): ' + e.message);
                 });
             </script>
         </div>

@@ -209,6 +209,13 @@ function authenticate(conn, ireq) {
             conn.socket.write(JSON.stringify(oreq));
             return;
         }
+        if (row == undefined) {
+            oreq = getBaseReq();
+            oreq.fnc = request.REQUEST.AUTH;
+            oreq.error = request.ERROR.WRONGCREDS;
+            conn.socket.end(JSON.stringify(oreq));
+            return;
+        }
         if (row.password == ireq.pass) {
             conn.user = row;
             oreq = getBaseReq();
@@ -222,7 +229,6 @@ function authenticate(conn, ireq) {
         oreq.fnc = request.REQUEST.AUTH;
         oreq.error = request.ERROR.WRONGCREDS;
         conn.socket.end(JSON.stringify(oreq));
-
         return;
     });
 }
@@ -260,7 +266,7 @@ function getStudent(conn, ireq) {
     }
     oreq = getBaseReq();
     oreq.student = [];
-    if (ireq.scope == "*") {
+    if (ireq.scope == request.SCOPE.ALL) {
         var index = 0;
         global.db.all(knex("students").select().toString(), (err, rows) => //Get the students
             {
@@ -290,6 +296,107 @@ function getStudent(conn, ireq) {
                 });
             });
     }
+}
+/**
+ * Get the class associated with the profs
+ * @method getClass
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getClass(conn, ireq) {
+    var oreq;
+    if (conn.user === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.NOTLOGEDIN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.scope === undefined) {
+        log.error("Request ill formed.");
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.scope == request.SCOPE.UNIQUE) {
+        global.db.get(knex("class").select().where({
+            profid: conn.user.id
+        }).toString(), (err, row) => {
+            if (err) {
+                log.error("Error : " + err);
+                oreq = getBaseReq();
+                oreq.error = request.ERROR.SQLITE;
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            if (row == undefined) {
+                log.error("Error : " + err);
+                oreq = getBaseReq();
+                oreq.error = request.ERROR.UNKNOWN;
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            oreq = getBaseReq();
+            oreq.class = row;
+            console.log(JSON.stringify(row));
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        });
+    }
+}
+/**
+ * Create a new students
+ * @method createStudent
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function createStudent(conn, ireq) {
+    var oreq;
+    if (conn.user === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.NOTLOGEDIN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.scope === undefined) {
+        log.error("Request ill formed.");
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    global.db.run(knex('students').insert({
+        username: ireq.data.username,
+        password: global.config.defaultPass,
+        fname: ireq.data.fname,
+        lname: ireq.data.lname,
+        dob: ireq.data.dob,
+        email: ireq.data.email,
+        tag: ireq.data.tag
+    }).returning('*').toString(), (err) => {
+        if (err) {
+            log.error("Error : " + err);
+            oreq = getBaseReq();
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        global.db.run(knex('students').insert({
+            userid: this.lastID,
+            project: ireq.data.project
+        }).returning('*').toString(), (err) => {
+            if (err) {
+                log.error("Error : " + err);
+                oreq = getBaseReq();
+                oreq.error = request.ERROR.SQLITE;
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            oreq = getBaseReq();
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        });
+    });
 }
 module.exports = {
     /**
@@ -340,7 +447,12 @@ module.exports = {
                 case request.REQUEST.GETSTUDENT:
                     getStudent(connection, ireq[i]);
                     break;
-
+                case request.REQUEST.GETCLASS:
+                    getClass(connection, ireq[i]);
+                    break;
+                case request.REQUEST.ADDSTUDENT:
+                    getClass(connection, ireq[i]);
+                    break;
             }
         }
 

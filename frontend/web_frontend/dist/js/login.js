@@ -15,6 +15,7 @@ function login(user, pass) {
     ipcRenderer.once("login", (event, arg) => {
         if (arg === window.ERROR.UNKNOWN) {
             redAlert("Unable to contact the server...");
+            return;
         }
         switch (arg.error) {
             case window.ERROR.OK:

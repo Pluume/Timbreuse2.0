@@ -8,20 +8,20 @@ const crypto = require("crypto-js");
 const path = require('path');
 
 function getStudents(event, arg) {
-  var oreq = [{
-      fnc: request.REQUEST.GETSTUDENT,
-      error: request.ERROR.OK,
-      scope: "*"
-  }];
-  client.send(JSON.stringify(oreq), (err, data) => {
-      try {
-          var ireq = JSON.parse(data);
-          event.sender.send("students", ireq);
-      } catch (err) {
-          log.error("Error parsing request : " + err);
-          event.sender.send("students", request.ERROR.UNKNOWN);
-      }
-  });
+    var oreq = [{
+        fnc: request.REQUEST.GETSTUDENT,
+        error: request.ERROR.OK,
+        scope: request.SCOPE.ALL
+    }];
+    client.send(JSON.stringify(oreq), (err, data) => {
+        try {
+            var ireq = JSON.parse(data);
+            event.sender.send("students", ireq);
+        } catch (err1) {
+            log.error("Error parsing request : " + err1);
+            event.sender.send("students", request.ERROR.UNKNOWN);
+        }
+    });
 }
 
 function logIn(event, arg) {
@@ -42,8 +42,8 @@ function logIn(event, arg) {
             try {
                 var ireq = JSON.parse(data);
                 event.sender.send("login", ireq);
-            } catch (err) {
-                log.error("Error parsing request : " + err);
+            } catch (err1) {
+                log.error("Error parsing request : " + err1);
                 event.sender.send("login", request.ERROR.UNKNOWN);
             }
         });
@@ -53,11 +53,52 @@ function logIn(event, arg) {
 function redirect(event, arg) {
     switch (arg) {
         case request.PAGES.PROFS:
-        console.log(path.join(__dirname, 'web_frontend/pages/index.html'));
             global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/index.html'))
             break;
     }
 }
+
+function setPage(event, arg) {
+    global.currentPage = arg;
+}
+function getClass(event, arg) {
+  var oreq = [{
+      fnc: request.REQUEST.GETCLASS,
+      error: request.ERROR.OK,
+      scope: arg
+  }];
+
+      client.send(JSON.stringify(oreq), (err, data) => {
+          try {
+              var ireq = JSON.parse(data);
+              event.sender.send("class", ireq);
+          } catch (err1) {
+              log.error("Error parsing request : " + err1);
+              event.sender.send("class", request.ERROR.UNKNOWN);
+          }
+      });
+}
+function createStudent(event, arg)
+{
+  var oreq = [{
+      fnc: request.REQUEST.ADDSTUDENT,
+      error: request.ERROR.OK,
+      data: arg
+  }];
+
+      client.send(JSON.stringify(oreq), (err, data) => {
+          try {
+              var ireq = JSON.parse(data);
+              event.sender.send("createStudent", ireq);
+          } catch (err1) {
+              log.error("Error parsing request : " + err1);
+              event.sender.send("createStudent", request.ERROR.UNKNOWN);
+          }
+      });
+}
+ipcMain.on("createStudent", createStudent);
+ipcMain.on("class", getClass);
+ipcMain.on("pages", setPage);
 ipcMain.on("redirect", redirect);
 ipcMain.on("students", getStudents);
 ipcMain.on("login", logIn);

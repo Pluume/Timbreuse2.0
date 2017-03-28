@@ -10,12 +10,31 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 const net = require("net");
+const request = require("../request.js");
 
 function connect(cb) {
     clientconn = new net.Socket();
-    clientconn.on("error", (err) => {
+    clientconn.once("error", (err) => {
+      console.log(global.currentPage);
+        if (global.currentPage != request.PAGES.LOGIN)
+            global.mwin.loadURL(url.format({
+                pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
+                protocol: 'file:',
+                slashes: true
+            }));
         global.clientconn = null;
         cb(err);
+    });
+    clientconn.once("close", () => {
+      console.log(global.currentPage);
+        if (global.currentPage != request.PAGES.LOGIN)
+            global.mwin.loadURL(url.format({
+                pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
+                protocol: 'file:',
+                slashes: true
+            }));
+
+        global.clientconn = null;
     });
     clientconn.connect({
         host: global.config.server,
@@ -38,10 +57,10 @@ function disconnect(cb) {
 
 function send(data, cb) {
     global.clientconn.once("data", (buf) => {
-        cb(null,buf.toString("utf8"));
+        cb(null, buf.toString("utf8"));
     });
     global.clientconn.once("error", (err) => {
-        cb(err,null);
+        cb(err, null);
     });
     global.clientconn.write(data);
 

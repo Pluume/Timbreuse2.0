@@ -2,6 +2,7 @@
     "class": "YE-S1z",
     "csvFreq": 0,
     "server": "localhost",
+    "defaultPass":"test",
     "slaves": [{
         "class": "YE-S1x",
         "ip": "localhost"

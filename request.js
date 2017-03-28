@@ -40,10 +40,16 @@ REQUEST: {
     AUTH: 2,
     MASTER: 3,
     PROPAGATE_TAG: 4,
-    GETSTUDENT: 5
+    GETSTUDENT: 5,
+    GETCLASS: 6,
+    ADDSTUDENT: 7
 },
 PAGES: {
   LOGIN: 0,
   PROFS: 1
+},
+SCOPE: {
+  UNIQUE: 1,
+  ALL: "*"
 }
 };

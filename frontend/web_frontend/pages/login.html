@@ -29,7 +29,7 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+<script src="../dist/js/pages.js"></script>
 </head>
 
 <body>
@@ -56,7 +56,7 @@
                                     </label>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
-                                <a href="#" type="submit" onclick="login(document.getElementById('username').value,document.getElementById('password').value);"class="btn btn-lg btn-success btn-block">Login</a>
+                                <a href="#" type="submit" onclick="login(document.getElementById('username').value,document.getElementById('password').value,'stdTable');"class="btn btn-lg btn-success btn-block">Login</a>
                             </fieldset>
                         </form>
                         <div id="errorAlert"></div>
@@ -72,6 +72,7 @@
         window.ERROR = require('../../../request.js').ERROR;
         window.PAGES = require('../../../request.js').PAGES;
         window.RANK = require('../../../db/db.js').RANK;
+        setPage(window.PAGES.LOGIN);
         $(document).ready(function() {
     $("body").tooltip({ selector: '[data-toggle=tooltip]' });
   });
@@ -91,6 +92,7 @@
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../dist/js/bootstrap-table.js"></script>
     <script src="../dist/js/login.js"></script>
+
     <script>
     </script>
   </body>
