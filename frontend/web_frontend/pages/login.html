@@ -42,7 +42,7 @@
                         <h3 class="panel-title">Sign In</h3>
                     </div>
                     <div class="panel-body" id="loginPanel">
-                        <form role="form" onsubmit="console.log('test');">
+                        <form role="form">
                             <fieldset>
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Username" id="username" name="email" type="email" autofocus>
@@ -52,7 +52,7 @@
                                 </div>
                                 <div class="checkbox">
                                     <label>
-                                        <input name="remember" onclick="login(document.getElementById('username').value,document.getElementById('password').value);" type="checkbox" value="Remember Me">Remember Me
+                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
                                     </label>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
@@ -70,7 +70,7 @@
     <script>
         window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
         window.ERROR = require('../../../request.js').ERROR;
-        window.ERROR = require('../../../request.js').PAGES;
+        window.PAGES = require('../../../request.js').PAGES;
         window.RANK = require('../../../db/db.js').RANK;
         $(document).ready(function() {
     $("body").tooltip({ selector: '[data-toggle=tooltip]' });

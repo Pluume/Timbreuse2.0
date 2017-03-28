@@ -245,7 +245,7 @@ function socketExit(conn) {
  **/
 function getStudent(conn, ireq) {
     var oreq;
-    if (conn.user !== undefined) {
+    if (conn.user === undefined) {
         oreq = getBaseReq();
         oreq.error = request.ERROR.NOTLOGEDIN;
         conn.socket.write(JSON.stringify(oreq));

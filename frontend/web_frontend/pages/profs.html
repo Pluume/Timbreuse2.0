@@ -16,22 +16,21 @@
     <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-  <button onclick="getStudents('stdTable');" type="button" name="button">Hello</button>
-    <div class="container" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
+    <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
         <table id="stdTable" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="name" data-pagination="true" data-sort-order="desc">
             <thead>
                 <tr>
-                  <th data-field="state" data-checkbox="true"></th>
+                    <th data-field="state" data-checkbox="true"></th>
                     <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Student ID</th>
-                    <th data-field="Lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
-                    <th data-field="Fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
+                    <th data-field="lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
+                    <th data-field="fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
                     <th data-field="timeDiffToday" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time done today</th>
                     <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
-                    <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Last tag time</th>
+                    <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
                     <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
                     <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><button data-toggle='tooltip' data-placement='right' title='Add' href='#' onclick='gotoAddStudent();' class='btn btn-success btn-circle'><i class='fa fa-check'></i></button></th>
                 </tr>
@@ -42,18 +41,28 @@
     <!-- jQuery -->
     <script>
         window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+        window.ERROR = require('../../../request.js').ERROR;
+        window.PAGES = require('../../../request.js').PAGES;
+        window.RANK = require('../../../db/db.js').RANK;
 
-        function studentsListFormatter(val, row)
-        {
-          return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id + ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick=''gotoEditStudent(" + row.id + ");' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button><button data-toggle='tooltip' data-placement='top' title='Delete' href='#' onclick='gotoDeleteStudent(" + row.id + ");' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button>";
+        function studentsListFormatter(val, row) {
+            return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id +
+                ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick=''gotoEditStudent(" + row.id +
+                ");' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button><button data-toggle='tooltip' data-placement='top' title='Delete' href='#' onclick='gotoDeleteStudent(" + row.id +
+                ");' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button>";
         }
-        function statusFormatter(val, row)
-        {
-          return val;
+
+        function statusFormatter(val, row) {
+            return val;
         }
         $(document).ready(function() {
-    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
-});
+            $("body").tooltip({
+                selector: '[data-toggle=tooltip]'
+            });
+            console.log("Asking for student to main process...");
+            getStudents("stdTable");
+        });
+
     </script>
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -72,12 +81,6 @@
     <script src="../dist/js/getInfos.js"></script>
     <script src="../dist/js/redirect.js"></script>
     <script>
-
-    document.addEventListener("DOMContentLoaded", function(event) {
-    console.log("Asking for student to main process...");
-    getStudents("stdTable");
-  });
-  console.log("Test");
     </script>
 </body>
 
