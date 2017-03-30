@@ -1,7 +1,6 @@
 const {
     ipcRenderer
 } = require('electron');
-
 function redAlert(msg) {
     var message = document.createElement("div");
     message.setAttribute("class", "alert alert-danger");
@@ -15,7 +14,19 @@ function redAlert(msg) {
     document.getElementById("pageContainer").insertBefore(message, document.getElementById("pageContainer").firstChild);
     console.log(msg);
 }
-
+function greenAlert(msg) {
+    var message = document.createElement("div");
+    message.setAttribute("class", "alert alert-success");
+    message.innerHTML = msg;
+    var closeMsg = document.createElement("button");
+    closeMsg.setAttribute("type", "button");
+    closeMsg.setAttribute("class", "close");
+    closeMsg.setAttribute("data-dismiss", "alert");
+    closeMsg.innerHTML = "x";
+    message.appendChild(closeMsg);
+    document.getElementById("pageContainer").insertBefore(message, document.getElementById("pageContainer").firstChild);
+    console.log(msg);
+}
 function getClass(cb) {
     ipcRenderer.once("class", (event, arg) => {
         if (arg === window.ERROR.UNKNOWN) {
@@ -55,6 +66,7 @@ function getStudents(tableId, cb) {
                         id: arg.students[i].id,
                         lname: arg.students[i].user.lname,
                         fname: arg.students[i].user.lname,
+                        username: arg.students[i].user.username,
                         timeDiffToday: arg.students[i].timeDiffToday,
                         timeDiff: arg.students[i].timeDiff,
                         status: arg.students[i].status,
@@ -62,6 +74,7 @@ function getStudents(tableId, cb) {
                     });
                 }
                 $('#' + tableId).bootstrapTable('load', data);
+
                 cb();
                 break;
             case window.ERROR.NOTLOGEDIN:
@@ -93,7 +106,35 @@ function createStudent(fname, lname, username, email, tag, tclass, dob, project,
         }
         switch (arg.error) {
             case window.ERROR.OK:
-                getStudent(tableid, () => {});
+                getStudents("stdTable",()=>{});
+                greenAlert("Student added !");
+                break;
+            case window.ERROR.NOTLOGEDIN:
+                redAlert("Not logged in !");
+                break;
+            case window.ERROR.UNKNOWN:
+                redAlert("Unkown error...");
+                break;
+                case window.ERROR.USEREXISTS:
+                redAlert("User already exists with this username...");
+                break;
+            default:
+                redAlert("Ill formed request...");
+        }
+    });
+    ipcRenderer.send("createStudent", obj);
+}
+function deleteStudent(id, tableid) {
+
+    ipcRenderer.once("deleteStudent", (event, arg) => {
+        if (arg === window.ERROR.UNKNOWN) {
+            redAlert("Unable to contact the server...");
+        }
+        switch (arg.error) {
+            case window.ERROR.OK:
+                getStudents("stdTable",()=>{});
+                greenAlert("Student deleted !");
+                break;
             case window.ERROR.NOTLOGEDIN:
                 redAlert("Not logged in !");
                 break;
@@ -104,5 +145,5 @@ function createStudent(fname, lname, username, email, tag, tclass, dob, project,
                 redAlert("Ill formed request...");
         }
     });
-    ipcRenderer.send("createStudent", obj);
+    ipcRenderer.send("deleteStudent", id);
 }

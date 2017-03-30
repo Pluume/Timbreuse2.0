@@ -358,22 +358,15 @@ function createStudent(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq));
         return;
     }
-    if (ireq.scope === undefined) {
-        log.error("Request ill formed.");
+    if (ireq.data === undefined) {
         oreq = getBaseReq();
         oreq.error = request.ERROR.UNKNOWN;
         conn.socket.write(JSON.stringify(oreq));
         return;
     }
-    global.db.run(knex('students').insert({
-        username: ireq.data.username,
-        password: global.config.defaultPass,
-        fname: ireq.data.fname,
-        lname: ireq.data.lname,
-        dob: ireq.data.dob,
-        email: ireq.data.email,
-        tag: ireq.data.tag
-    }).returning('*').toString(), (err) => {
+    global.db.get(knex("users").select().where({
+        username: ireq.data.username
+    }).toString(), (err, res) => {
         if (err) {
             log.error("Error : " + err);
             oreq = getBaseReq();
@@ -381,10 +374,81 @@ function createStudent(conn, ireq) {
             conn.socket.write(JSON.stringify(oreq));
             return;
         }
-        global.db.run(knex('students').insert({
-            userid: this.lastID,
-            project: ireq.data.project
-        }).returning('*').toString(), (err) => {
+        if (res != undefined) {
+            oreq = getBaseReq();
+            oreq.error = request.ERROR.USEREXISTS;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        global.db.run(knex('users').insert({
+            username: ireq.data.username,
+            password: crypto.SHA256(global.config.defaultPass).toString(crypto.enc.utf8),
+            fname: ireq.data.fname,
+            lname: ireq.data.lname,
+            dob: ireq.data.dob,
+            rank: global.RANK.STUDENT,
+            email: ireq.data.email,
+            tag: ireq.data.tag
+        }).returning('*').toString(), function(err) {
+            if (err) {
+                log.error("Error : " + err);
+                oreq = getBaseReq();
+                oreq.error = request.ERROR.SQLITE;
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            global.db.run(knex('students').insert({
+                userid: this.lastID,
+                profid: conn.user.id,
+                project: ireq.data.project
+            }).returning('*').toString(), (err) => {
+                if (err) {
+                    log.error("Error : " + err);
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.SQLITE;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                }
+
+                oreq = getBaseReq();
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            });
+        });
+    });
+
+}
+/**
+ * Delete a students
+ * @method deleteStudent
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function deleteStudent(conn, ireq) {
+    var oreq;
+    if (conn.user === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.NOTLOGEDIN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.data === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    global.db.run(knex("users").where({
+        id: knex("students").where("id", "in", ireq.data).select("userid")
+    }).del().toString(), (err) => {
+        if (err) {
+            log.error("Error : " + err);
+            oreq = getBaseReq();
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        global.db.run(knex("students").where("id", "in", ireq.data).del().toString(), (err) => {
             if (err) {
                 log.error("Error : " + err);
                 oreq = getBaseReq();
@@ -394,7 +458,6 @@ function createStudent(conn, ireq) {
             }
             oreq = getBaseReq();
             conn.socket.write(JSON.stringify(oreq));
-            return;
         });
     });
 }
@@ -451,7 +514,10 @@ module.exports = {
                     getClass(connection, ireq[i]);
                     break;
                 case request.REQUEST.ADDSTUDENT:
-                    getClass(connection, ireq[i]);
+                    createStudent(connection, ireq[i]);
+                    break;
+                case request.REQUEST.DELSTUDENT:
+                    deleteStudent(connection, ireq[i]);
                     break;
             }
         }

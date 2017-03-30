@@ -61,41 +61,61 @@ function redirect(event, arg) {
 function setPage(event, arg) {
     global.currentPage = arg;
 }
+
 function getClass(event, arg) {
-  var oreq = [{
-      fnc: request.REQUEST.GETCLASS,
-      error: request.ERROR.OK,
-      scope: arg
-  }];
+    var oreq = [{
+        fnc: request.REQUEST.GETCLASS,
+        error: request.ERROR.OK,
+        scope: arg
+    }];
 
-      client.send(JSON.stringify(oreq), (err, data) => {
-          try {
-              var ireq = JSON.parse(data);
-              event.sender.send("class", ireq);
-          } catch (err1) {
-              log.error("Error parsing request : " + err1);
-              event.sender.send("class", request.ERROR.UNKNOWN);
-          }
-      });
+    client.send(JSON.stringify(oreq), (err, data) => {
+        try {
+            var ireq = JSON.parse(data);
+            event.sender.send("class", ireq);
+        } catch (err1) {
+            log.error("Error parsing request : " + err1);
+            event.sender.send("class", request.ERROR.UNKNOWN);
+        }
+    });
 }
-function createStudent(event, arg)
-{
-  var oreq = [{
-      fnc: request.REQUEST.ADDSTUDENT,
-      error: request.ERROR.OK,
-      data: arg
-  }];
 
-      client.send(JSON.stringify(oreq), (err, data) => {
-          try {
-              var ireq = JSON.parse(data);
-              event.sender.send("createStudent", ireq);
-          } catch (err1) {
-              log.error("Error parsing request : " + err1);
-              event.sender.send("createStudent", request.ERROR.UNKNOWN);
-          }
-      });
+function createStudent(event, arg) {
+    var oreq = [{
+        fnc: request.REQUEST.ADDSTUDENT,
+        error: request.ERROR.OK,
+        data: arg
+    }];
+
+    client.send(JSON.stringify(oreq), (err, data) => {
+        try {
+            var ireq = JSON.parse(data);
+            event.sender.send("createStudent", ireq);
+        } catch (err1) {
+            log.error("Error parsing request : " + err1);
+            event.sender.send("createStudent", request.ERROR.UNKNOWN);
+        }
+    });
 }
+
+function deleteStudent(event, arg) {
+    var oreq = [{
+        fnc: request.REQUEST.DELSTUDENT,
+        error: request.ERROR.OK,
+        data: arg
+    }];
+
+    client.send(JSON.stringify(oreq), (err, data) => {
+        try {
+            var ireq = JSON.parse(data);
+            event.sender.send("deleteStudent", ireq);
+        } catch (err1) {
+            log.error("Error parsing request : " + err1);
+            event.sender.send("deleteStudent", request.ERROR.UNKNOWN);
+        }
+    });
+}
+ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
 ipcMain.on("class", getClass);
 ipcMain.on("pages", setPage);

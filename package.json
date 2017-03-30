@@ -48,6 +48,7 @@
   "devDependencies": {
     "builder": "^3.2.1",
     "electron": "^1.6.1",
-    "nan": "^2.5.1"
+    "nan": "^2.5.1",
+    "throw-max-listeners-error": "^1.0.1"
   }
 }

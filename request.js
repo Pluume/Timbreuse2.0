@@ -31,7 +31,8 @@ module.exports = {
     WRONGTAG: 2,
     SQLITE: 3,
     WRONGCREDS: 4,
-    NOTLOGEDIN: 5
+    NOTLOGEDIN: 5,
+    USEREXISTS: 6
 },
 REQUEST: {
     EXIT: -1,
@@ -42,7 +43,8 @@ REQUEST: {
     PROPAGATE_TAG: 4,
     GETSTUDENT: 5,
     GETCLASS: 6,
-    ADDSTUDENT: 7
+    ADDSTUDENT: 7,
+    DELSTUDENT: 8
 },
 PAGES: {
   LOGIN: 0,

@@ -59,7 +59,7 @@ function send(data, cb) {
     global.clientconn.once("data", (buf) => {
         cb(null, buf.toString("utf8"));
     });
-    global.clientconn.once("error", (err) => {
+    global.clientconn.once("error", (err) => { //FIXME Fire to many events
         cb(err, null);
     });
     global.clientconn.write(data);
