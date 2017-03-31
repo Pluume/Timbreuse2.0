@@ -295,6 +295,25 @@ function getStudent(conn, ireq) {
                     return;
                 });
             });
+    } else {
+      global.db.get(knex("students").select().where({id: ireq.scope}).toString(), function (err, row) //Get the student
+          {
+              if (err) {
+                  log.error("Error : " + err);
+                  oreq = getBaseReq();
+                  oreq.error = request.ERROR.SQLITE;
+                  conn.socket.write(JSON.stringify(oreq));
+                  return;
+              }
+              global.db.get(knex("users").select().where({id:row.userid}).toString(), (err, row2) => {
+                  oreq = getBaseReq();
+                  oreq.error = request.ERROR.OK;
+                  row.user = row2;
+                  oreq.students = row;
+                  conn.socket.write(JSON.stringify(oreq));
+                  return;
+              });
+          });
     }
 }
 /**
@@ -461,6 +480,65 @@ function deleteStudent(conn, ireq) {
         });
     });
 }
+/**
+ * Edit a students
+ * @method editStudent
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function editStudent(conn, ireq) {
+    var oreq;
+    if (conn.user === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.NOTLOGEDIN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    if (ireq.data === undefined) {
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    console.log(JSON.stringify(ireq.data));
+    global.db.run(knex("users").where({ //FIXME Don't use subsub query but sub query 
+        id: knex("students").where({
+            id: ireq.data.id
+        }).select("userid").toString()
+    }).update({
+        username: ireq.data.username,
+        password: (ireq.data.password) ? crypto.SHA256(ireq.data.password).toString(crypto.enc.utf8) : knex("users").where({
+            id: knex("students").where({
+                id: ireq.data.id
+            }).select("userid").toString()
+        }).select("password").toString(),
+        fname: ireq.data.fname,
+        lname: ireq.data.lname,
+        dob: ireq.data.dob,
+        email: ireq.data.email,
+        tag: ireq.data.tag,
+
+    }).toString(), (err) => {
+        if (err) {
+            log.error("Error : " + err);
+            oreq = getBaseReq();
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq));
+            return;
+        }
+        global.db.run(knex("students").where({id: ireq.data.id}).update({project: ireq.data.project}).toString(), (err) => {
+            if (err) {
+                log.error("Error : " + err);
+                oreq = getBaseReq();
+                oreq.error = request.ERROR.SQLITE;
+                conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            oreq = getBaseReq();
+            conn.socket.write(JSON.stringify(oreq));
+        });
+    });
+}
 module.exports = {
     /**
      * Sort the incoming request. Redirect the request to the correct function.
@@ -518,6 +596,9 @@ module.exports = {
                     break;
                 case request.REQUEST.DELSTUDENT:
                     deleteStudent(connection, ireq[i]);
+                    break;
+                case request.REQUEST.EDITSTUDENT:
+                    editStudent(connection, ireq[i]);
                     break;
             }
         }

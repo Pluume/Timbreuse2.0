@@ -59,11 +59,11 @@ function send(data, cb) {
     global.clientconn.once("data", (buf) => {
         cb(null, buf.toString("utf8"));
     });
-    global.clientconn.once("error", (err) => { //FIXME Fire to many events
+    global.clientconn.removeAllListeners("error");
+    global.clientconn.once("error", (err) => {
         cb(err, null);
     });
     global.clientconn.write(data);
-
 }
 /**
  * Create a windows for the client

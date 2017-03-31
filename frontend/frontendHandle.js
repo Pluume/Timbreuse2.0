@@ -11,7 +11,7 @@ function getStudents(event, arg) {
     var oreq = [{
         fnc: request.REQUEST.GETSTUDENT,
         error: request.ERROR.OK,
-        scope: request.SCOPE.ALL
+        scope: arg
     }];
     client.send(JSON.stringify(oreq), (err, data) => {
         try {
@@ -104,7 +104,6 @@ function deleteStudent(event, arg) {
         error: request.ERROR.OK,
         data: arg
     }];
-
     client.send(JSON.stringify(oreq), (err, data) => {
         try {
             var ireq = JSON.parse(data);
@@ -115,6 +114,24 @@ function deleteStudent(event, arg) {
         }
     });
 }
+function editStudent(event, arg) {
+    var oreq = [{
+        fnc: request.REQUEST.EDITSTUDENT,
+        error: request.ERROR.OK,
+        data: arg
+    }];
+    console.log(JSON.stringify(oreq));
+    client.send(JSON.stringify(oreq), (err, data) => {
+        try {
+            var ireq = JSON.parse(data);
+            event.sender.send("editStudent", ireq);
+        } catch (err1) {
+            log.error("Error parsing request : " + err1);
+            event.sender.send("editStudent", request.ERROR.UNKNOWN);
+        }
+    });
+}
+ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
 ipcMain.on("class", getClass);

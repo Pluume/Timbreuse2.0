@@ -34,7 +34,7 @@
                     <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Time delta</th>
                     <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
                     <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
-                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick='gotoAddStudent();' class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+                    <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
                 </tr>
             </thead>
         </table>
@@ -49,10 +49,23 @@
         window.RANK = require('../../../db/db.js').RANK;
         setPage(window.PAGES.PROFS);
         var stdToDelete = [];
+        function editCb(std)
+        {
+          document.getElementById("elname").setAttribute("placeholder",std.students.user.lname==null ? "":std.students.user.lname);
+          document.getElementById("efname").setAttribute("placeholder",std.students.user.fname==null ? "":std.students.user.fname);
+          document.getElementById("eusername").setAttribute("placeholder",std.students.user.username==null ? "":std.students.user.username);
+          document.getElementById("eproject").setAttribute("placeholder",std.students.project==null ? "":std.students.project);
+          document.getElementById("edob").setAttribute("placeholder",std.students.user.dob==null ? "":std.students.user.dob);
+          document.getElementById("eemail").setAttribute("placeholder",std.students.user.email==null ? "":std.students.user.email);
+          document.getElementById("etag").setAttribute("placeholder",std.students.user.tag==null ? "":std.students.user.tag);
+          document.getElementById("updateSubmit").setAttribute("onclick","submitEditModal(" + std.students.id +");");
+          $('#editStudentModal').modal('show');
+        }
         function studentsListFormatter(val, row) {
             return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id +
-                ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick=''gotoEditStudent(" + row.id +
-                ");' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToDelete = [" + row.id +
+                ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" + row.id +
+                ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToDelete = [" +
+                row.id +
                 "];' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button></span>";
         }
 
@@ -67,27 +80,37 @@
                 getClass((tclass) => {
                     if (tclass == null || tclass == undefined) {
                         document.getElementById("ctclass").setAttribute("placeholder", "error");
+                        document.getElementById("etclass").setAttribute("placeholder", "error");
                     } else {
                         document.getElementById("ctclass").setAttribute("placeholder", tclass.name);
+                        document.getElementById("etclass").setAttribute("placeholder", tclass.name);
                         window.currentClass = tclass;
                     }
 
                 });
             });
         });
-
         function submitCreateModal() {
             if (validate(["cfname", "clname", "cusername", "ctag"])) {
                 createStudent(document.getElementById('cfname').value, document.getElementById('clname').value, document.getElementById('cusername').value, document.getElementById('cemail').value, document.getElementById('ctag').value, document.getElementById(
-                    'ctclass').value, document.getElementById('cdob').value, document.getElementById('cproject').value);
+                    'ctclass').value, document.getElementById('cdob').value, document.getElementById('cproject').value,"stdTable");
                 $('#addStudentModal').modal('toggle');
-                emptyInput(["cfname", "clname", "cusername", "ctag"]);
+                emptyInput(["cfname", "clname", "cusername", "ctag", "cemail", "cdob", "cproject"]);
             }
         }
 
         function submitDeleteModal() {
-            deleteStudent(stdToDelete,"stdTable");
+            deleteStudent(stdToDelete, "stdTable");
             $('#delStudentModal').modal('toggle');
+        }
+
+        function submitEditModal(id) {
+          if (validate(["efname", "elname", "eusername", "etag"])) {
+            editStudent(id,document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
+                'etclass').value, document.getElementById('edob').value, document.getElementById('eproject').value,document.getElementById('epass').checked, "stdTable");
+            $('#editStudentModal').modal('hide');
+            emptyInput(["efname", "elname", "eusername", "etag", "eemail", "edob", "eproject"]);
+          }
         }
     </script>
     <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
@@ -137,23 +160,84 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="submitCreateModal();" class="btn btn-primary">Create</button>
+                    <button type="button" onclick="submitCreateModal();" class="btn btn-success">Create</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="delStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
+    <div class="modal fade" id="delStudentModal" tabindex="-1" role="dialog" aria-labelledby="delStudentModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addStudentModalTitle">Are you sure to delete this/these student(s) ?</h5>
+                    <h5 class="modal-title" id="delStudentModalTitle">Are you sure to delete this/these student(s) ?</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" onclick="submitDeleteModal();" class="btn btn-danger">Create</button>
+                    <button type="button" onclick="submitDeleteModal();" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalTitle">Edit this student</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div id="fgetclass" class="form-group">
+                            <label for="etclass" class="form-control-label">Class : </label>
+                            <input type="text" class="form-control" readonly id="etclass">
+                        </div>
+                        <div id="fgecfname" class="form-group">
+                            <label for="efname" class="form-control-label">First name :</label>
+                            <input type="text" class="form-control" id="efname">
+                        </div>
+                        <div id="fgelname" class="form-group">
+                            <label for="elname" class="form-control-label">Last name:</label>
+                            <input type="text" class="form-control" id="elname">
+                        </div>
+                        <div id="fgeusername" class="form-group">
+                            <label for="eusername" class="form-control-label">Username :</label>
+                            <input type="text" class="form-control" id="eusername">
+                        </div>
+                        <div id="fgedob" class="form-group">
+                            <label for="edob" class="form-control-label">Date of birth:</label>
+                            <input type="text" class="form-control" id="edob">
+                        </div>
+                        <div id="fgeemail" class="form-group">
+                            <label for="eemail" class="form-control-label">Email :</label>
+                            <input type="text" class="form-control" id="eemail">
+                        </div>
+
+
+                        <div id="fgetag" class="form-group">
+                            <label for="etag" class="form-control-label">Tag :</label>
+                            <input type="text" class="form-control" id="etag">
+                        </div>
+                        <div id="fgeproject" class="form-group">
+                            <label for="eproject" class="form-control-label">Project :</label>
+                            <input type="text" class="form-control" id="eproject">
+                        </div>
+                        <div id="fgepass" class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                  <input id="epass" type="checkbox" value="Reset password">Reset password
+                              </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="updateSubmit" class="btn btn-primary">Update</button>
                 </div>
             </div>
         </div>
