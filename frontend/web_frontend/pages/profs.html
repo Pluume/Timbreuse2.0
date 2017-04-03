@@ -104,13 +104,11 @@
             $('#delStudentModal').modal('toggle');
         }
 
-        function submitEditModal(id) {
-          if (validate(["efname", "elname", "eusername", "etag"])) {
-            editStudent(id,document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
-                'etclass').value, document.getElementById('edob').value, document.getElementById('eproject').value,document.getElementById('epass').checked, "stdTable");
+        function submitEditModal(id) { 
+            editStudent(id,document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById('edob').value, document.getElementById('eproject').value,document.getElementById('epass').checked, "stdTable");
             $('#editStudentModal').modal('hide');
             emptyInput(["efname", "elname", "eusername", "etag", "eemail", "edob", "eproject"]);
-          }
+            document.getElementById("epass").checked = false;
         }
     </script>
     <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">

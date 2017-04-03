@@ -65,7 +65,7 @@ function getStudents(tableId, cb) {
                     data.push({
                         id: arg.students[i].id,
                         lname: arg.students[i].user.lname,
-                        fname: arg.students[i].user.lname,
+                        fname: arg.students[i].user.fname,
                         username: arg.students[i].user.username,
                         timeDiffToday: arg.students[i].timeDiffToday,
                         timeDiff: arg.students[i].timeDiff,
@@ -168,18 +168,18 @@ function deleteStudent(id, tableid) {
     });
     ipcRenderer.send("deleteStudent", id);
 }
-function editStudent(id,fname, lname, username, email, tag, tclass, dob, project,pass, tableid) {
+function editStudent(id,fname, lname, username, email, tag, dob, project,pass, tableid) {
   var obj = {};
   obj.id = id;
   obj.fname = fname;
   obj.lname = lname;
   obj.username = username;
   obj.tag = tag;
-  obj.class = tclass;
   obj.dob = dob;
   obj.project = project;
   obj.email = email;
   obj.pass = pass;
+  console.log(obj);
     ipcRenderer.once("editStudent", (event, arg) => {
         if (arg === window.ERROR.UNKNOWN) {
             redAlert("Unable to contact the server...");

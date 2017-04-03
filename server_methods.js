@@ -296,24 +296,28 @@ function getStudent(conn, ireq) {
                 });
             });
     } else {
-      global.db.get(knex("students").select().where({id: ireq.scope}).toString(), function (err, row) //Get the student
-          {
-              if (err) {
-                  log.error("Error : " + err);
-                  oreq = getBaseReq();
-                  oreq.error = request.ERROR.SQLITE;
-                  conn.socket.write(JSON.stringify(oreq));
-                  return;
-              }
-              global.db.get(knex("users").select().where({id:row.userid}).toString(), (err, row2) => {
-                  oreq = getBaseReq();
-                  oreq.error = request.ERROR.OK;
-                  row.user = row2;
-                  oreq.students = row;
-                  conn.socket.write(JSON.stringify(oreq));
-                  return;
-              });
-          });
+        global.db.get(knex("students").select().where({
+                id: ireq.scope
+            }).toString(), function(err, row) //Get the student
+            {
+                if (err) {
+                    log.error("Error : " + err);
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.SQLITE;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                }
+                global.db.get(knex("users").select().where({
+                    id: row.userid
+                }).toString(), (err, row2) => {
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.OK;
+                    row.user = row2;
+                    oreq.students = row;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                });
+            });
     }
 }
 /**
@@ -486,7 +490,8 @@ function deleteStudent(conn, ireq) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  * @param {Object} ireq a JSON object containing the request.
  **/
-function editStudent(conn, ireq) {
+function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag or username
+  //FIXME Handle when empty informations is passed
     var oreq;
     if (conn.user === undefined) {
         oreq = getBaseReq();
@@ -500,44 +505,56 @@ function editStudent(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq));
         return;
     }
-    console.log(JSON.stringify(ireq.data));
-    global.db.run(knex("users").where({ //FIXME Don't use subsub query but sub query 
-        id: knex("students").where({
-            id: ireq.data.id
-        }).select("userid").toString()
-    }).update({
-        username: ireq.data.username,
-        password: (ireq.data.password) ? crypto.SHA256(ireq.data.password).toString(crypto.enc.utf8) : knex("users").where({
-            id: knex("students").where({
-                id: ireq.data.id
-            }).select("userid").toString()
-        }).select("password").toString(),
-        fname: ireq.data.fname,
-        lname: ireq.data.lname,
-        dob: ireq.data.dob,
-        email: ireq.data.email,
-        tag: ireq.data.tag,
-
-    }).toString(), (err) => {
-        if (err) {
+    global.db.get(knex("students").select("userid").where({id: ireq.data.id}).toString(), (err, row0) =>
+  {
+    if (err || row0==undefined) {
+        log.error("Error : " + err);
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq));
+        return;
+    }
+    global.db.get(knex("users").select().where({
+            id: row0.userid
+    }).toString(), (err, row) => {
+        if (err || row==undefined) {
             log.error("Error : " + err);
             oreq = getBaseReq();
             oreq.error = request.ERROR.SQLITE;
             conn.socket.write(JSON.stringify(oreq));
             return;
         }
-        global.db.run(knex("students").where({id: ireq.data.id}).update({project: ireq.data.project}).toString(), (err) => {
-            if (err) {
-                log.error("Error : " + err);
+        global.db.serialize(function() {
+            global.db.run(knex("users").update({
+                username: ireq.data.username,
+                email: ireq.data.email,
+                tag: ireq.data.tag,
+                dob: ireq.data.dob,
+                fname: ireq.data.fname,
+                lname: ireq.data.lname,
+                password: (ireq.data.pass) ? global.config.defaultPass : row.password
+            }).where({
+                id: row.id
+            }).toString());
+            global.db.run(knex("students").update({
+                project: ireq.data.project
+            }).where({
+                id: ireq.data.id
+            }).toString(), (err) => {
+                if (err) {
+                    log.error("Error : " + err);
+                    oreq = getBaseReq();
+                    oreq.error = request.ERROR.SQLITE;
+                    conn.socket.write(JSON.stringify(oreq));
+                    return;
+                }
                 oreq = getBaseReq();
-                oreq.error = request.ERROR.SQLITE;
                 conn.socket.write(JSON.stringify(oreq));
-                return;
-            }
-            oreq = getBaseReq();
-            conn.socket.write(JSON.stringify(oreq));
+            });
         });
     });
+  });
+
 }
 module.exports = {
     /**
