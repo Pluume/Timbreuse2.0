@@ -15,6 +15,8 @@ const knex = require('knex')({
     client: 'sqlite3',
     useNullAsDefault: true
 });
+var tagReqList = [];
+var tagReqFncStarted = false;
 const moment = require("moment");
 /**
  * Generate the a base for an outgoing request
@@ -47,14 +49,25 @@ function pingRequest(conn) {
 /**
  * Handle a tag request (When a student arrive or leave)
  * @method tagRequest
- * @param {Object} conn a JSON object containing a socket connection and an userid variable.
- * @param {Object} ireq a JSON object containing the incoming data.
  **/
-function tagRequest(conn, ireq) {
+function tagRequest() {
+  tagReqFncStarted = true;
     var oreq;
+    if (!tagReqList.length)
+        return;
+    var ireq = tagReqList[0].ireq;
+    var conn = tagReqList[0].connection;
+    var returnFnc = function() {
+        if (tagReqList.length)
+            tagRequest();
+            else
+            tagReqFncStarted = false;
+    };
+    tagReqList.shift(); // Remove first item
     if (ireq.tag === undefined || ireq.time === undefined || ireq.class === undefined) {
         log.error("Request ill formed.");
         conn.socket.write(JSON.stringify(getBaseReq().error = request.ERROR.UNKNOWN));
+        returnFnc();
         return;
     }
     csv.writeBruteLoggingToCSV(ireq.tag, ireq.time);
@@ -66,6 +79,7 @@ function tagRequest(conn, ireq) {
                 oreq.fnc = request.REQUEST.TAG;
                 oreq.error = request.ERROR.SQLITE;
                 conn.socket.write(JSON.stringify(oreq));
+                returnFnc();
                 return;
             }
             if (row === undefined) {
@@ -74,12 +88,14 @@ function tagRequest(conn, ireq) {
                 oreq.fnc = request.REQUEST.TAG;
                 oreq.error = request.ERROR.WRONGTAG;
                 conn.socket.write(JSON.stringify(oreq));
+                returnFnc();
                 return;
             }
             if (row.rank == global.RANK.ADMIN) { //Master card tagged
                 oreq = getBaseReq();
                 oreq.fnc = request.REQUEST.MASTER;
                 conn.socket.write(JSON.stringify(oreq));
+                returnFnc();
                 return;
             }
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
@@ -89,6 +105,7 @@ function tagRequest(conn, ireq) {
                     oreq.fnc = request.REQUEST.TAG;
                     oreq.error = request.ERROR.SQLITE;
                     conn.socket.write(JSON.stringify(oreq));
+                    returnFnc();
                     return;
                 }
                 var nstatus;
@@ -117,13 +134,16 @@ function tagRequest(conn, ireq) {
                                 oreq.fnc = request.REQUEST.TAG;
                                 oreq.error = request.ERROR.SQLITE;
                                 conn.socket.write(JSON.stringify(oreq));
+                                returnFnc();
                                 return;
                             }
                             oreq = getBaseReq();
                             oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
+                            oreq.student.user = row;
+                            oreq.delayed = ireq.delayed;
                             conn.socket.write(JSON.stringify(oreq));
-
+                            returnFnc();
                         });
                     });
 
@@ -131,8 +151,7 @@ function tagRequest(conn, ireq) {
 
                 } else { //Arrival
                     nstatus = global.STATUS.IN;
-                    nlastTagTime = moment().toDate().toISOString();
-                    var delta = math.getTimeDelta(new Date(row2.lastTagTime).getTime(), new Date(nlastTagTime).getTime());
+                    var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
                     var nTimeDiffToday = row2.timeDiffToday;
                     delta = isNaN(delta) ? 0 : delta;
                     if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
@@ -157,7 +176,7 @@ function tagRequest(conn, ireq) {
                     global.db.serialize(() => {
                         global.db.run(knex("students").update({
                             status: nstatus,
-                            lastTagTime: nlastTagTime,
+                            lastTagTime: ireq.time,
                             hadLunch: hadLunch,
                             timeDiffToday: nTimeDiffToday
                         }).where("userid", row.id).toString());
@@ -168,12 +187,16 @@ function tagRequest(conn, ireq) {
                                 oreq.fnc = request.REQUEST.TAG;
                                 oreq.error = request.ERROR.SQLITE;
                                 conn.socket.write(JSON.stringify(oreq));
+                                returnFnc();
                                 return;
                             }
                             oreq = getBaseReq();
                             oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
+                            oreq.student.user = row;
+                            oreq.delayed = ireq.delayed;
                             conn.socket.write(JSON.stringify(oreq));
+                            returnFnc();
                         });
                     });
 
@@ -361,7 +384,6 @@ function getClass(conn, ireq) {
             }
             oreq = getBaseReq();
             oreq.class = row;
-            console.log(JSON.stringify(row));
             conn.socket.write(JSON.stringify(oreq));
             return;
         });
@@ -491,7 +513,7 @@ function deleteStudent(conn, ireq) {
  * @param {Object} ireq a JSON object containing the request.
  **/
 function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag or username
-  //FIXME Handle when empty informations is passed
+    //FIXME Handle when empty informations is passed
     var oreq;
     if (conn.user === undefined) {
         oreq = getBaseReq();
@@ -505,55 +527,56 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
         conn.socket.write(JSON.stringify(oreq));
         return;
     }
-    global.db.get(knex("students").select("userid").where({id: ireq.data.id}).toString(), (err, row0) =>
-  {
-    if (err || row0==undefined) {
-        log.error("Error : " + err);
-        oreq = getBaseReq();
-        oreq.error = request.ERROR.SQLITE;
-        conn.socket.write(JSON.stringify(oreq));
-        return;
-    }
-    global.db.get(knex("users").select().where({
-            id: row0.userid
-    }).toString(), (err, row) => {
-        if (err || row==undefined) {
+    global.db.get(knex("students").select("userid").where({
+        id: ireq.data.id
+    }).toString(), (err, row0) => {
+        if (err || row0 == undefined) {
             log.error("Error : " + err);
             oreq = getBaseReq();
             oreq.error = request.ERROR.SQLITE;
             conn.socket.write(JSON.stringify(oreq));
             return;
         }
-        global.db.serialize(function() {
-            global.db.run(knex("users").update({
-                username: ireq.data.username,
-                email: ireq.data.email,
-                tag: ireq.data.tag,
-                dob: ireq.data.dob,
-                fname: ireq.data.fname,
-                lname: ireq.data.lname,
-                password: (ireq.data.pass) ? global.config.defaultPass : row.password
-            }).where({
-                id: row.id
-            }).toString());
-            global.db.run(knex("students").update({
-                project: ireq.data.project
-            }).where({
-                id: ireq.data.id
-            }).toString(), (err) => {
-                if (err) {
-                    log.error("Error : " + err);
-                    oreq = getBaseReq();
-                    oreq.error = request.ERROR.SQLITE;
-                    conn.socket.write(JSON.stringify(oreq));
-                    return;
-                }
+        global.db.get(knex("users").select().where({
+            id: row0.userid
+        }).toString(), (err, row) => {
+            if (err || row == undefined) {
+                log.error("Error : " + err);
                 oreq = getBaseReq();
+                oreq.error = request.ERROR.SQLITE;
                 conn.socket.write(JSON.stringify(oreq));
+                return;
+            }
+            global.db.serialize(function() {
+                global.db.run(knex("users").update({
+                    username: ireq.data.username,
+                    email: ireq.data.email,
+                    tag: ireq.data.tag,
+                    dob: ireq.data.dob,
+                    fname: ireq.data.fname,
+                    lname: ireq.data.lname,
+                    password: (ireq.data.pass) ? global.config.defaultPass : row.password
+                }).where({
+                    id: row.id
+                }).toString());
+                global.db.run(knex("students").update({
+                    project: ireq.data.project
+                }).where({
+                    id: ireq.data.id
+                }).toString(), (err) => {
+                    if (err) {
+                        log.error("Error : " + err);
+                        oreq = getBaseReq();
+                        oreq.error = request.ERROR.SQLITE;
+                        conn.socket.write(JSON.stringify(oreq));
+                        return;
+                    }
+                    oreq = getBaseReq();
+                    conn.socket.write(JSON.stringify(oreq));
+                });
             });
         });
     });
-  });
 
 }
 module.exports = {
@@ -568,7 +591,7 @@ module.exports = {
         var ireq;
         try {
             if (global.DEBUG) {
-                console.log(data);
+                log.info(data);
             }
             ireq = JSON.parse(data);
         } catch (err) {
@@ -578,6 +601,24 @@ module.exports = {
             connection.socket.write(JSON.stringify(oreq));
             return;
         }
+        var toRm = [];
+        for(var i = 0; i < ireq.length; i++)
+        {
+          if(ireq[i].fnc == request.REQUEST.TAG)
+          {
+            tagReqList.push({
+              connection: connection,
+              ireq: ireq[i]
+          });
+          toRm.push(i);
+        }
+        }
+        for(var i = 0; i < toRm.length; i++)
+        {
+          ireq.splice(toRm[i],1);
+        }
+        if (!tagReqFncStarted)
+          tagRequest();
         for (var i = 0; i < ireq.length; i++) {
             if (ireq[i].fnc === undefined) {
                 log.error("fnc param not specified in request.");
@@ -586,6 +627,7 @@ module.exports = {
                 connection.socket.write(JSON.stringify(oreq));
                 return;
             }
+
             switch (ireq[i].fnc) {
                 case request.REQUEST.EXIT:
                     socketExit(connection);
@@ -594,7 +636,6 @@ module.exports = {
                     pingRequest(connection);
                     break;
                 case request.REQUEST.TAG:
-                    tagRequest(connection, ireq[i]);
                     break;
                 case request.REQUEST.AUTH:
                     authenticate(connection, ireq[i]);

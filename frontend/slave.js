@@ -46,7 +46,7 @@ function executePile() {
 
     }
 
-    console.log("PILE : " + JSON.stringify(oreqPile));
+
 }
 /**
  * Tag an user
@@ -68,19 +68,19 @@ function tag(stag, ntime) {
     csv.writeBruteLoggingToCSV(stag, ntime);
     if (connected) {
         slaveconn.write(JSON.stringify(request.toArray(oreq)));
-        //TODO Handle data incoming
     } else {
         oreq.delayed = true;
         oreqPile.push(oreq);
     }
-    oreq.fnc = request.REQUEST.PROPAGATE_TAG;
+    var soreq = {};
+    soreq.fnc = request.REQUEST.PROPAGATE_TAG;
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(request.toArray(oreq)));
+            slaves[i].conn.write(JSON.stringify(request.toArray(soreq)));
         } else {
-            oreq.delayed = true;
+            soreq.delayed = true;
 
-            slaves[i].pile.push(oreq);
+            slaves[i].pile.push(soreq);
         }
 
     }
@@ -95,8 +95,13 @@ function tag(stag, ntime) {
 function onSocketData(ireq) {
     for (var i = 0; i < ireq.length; i++) {
         switch (ireq[i].fnc) {
-            case MASTER:
+            case request.REQUEST.MASTER:
                 csv.exportCSV(() => {}); //TODO Function that handle master card
+                break;
+            case request.REQUEST.TAG:
+            //TODO HANDLE INCOMING
+                break;
+            default:
                 break;
         }
     }
@@ -111,9 +116,10 @@ function foreverConnect() {
     var connectedToServer = function() {
         if (connected)
             return;
+        connected = true;
         log.info('Connected to server!');
         executePile();
-        connected = true;
+
     };
     var slavesConnect = function() {
         if (this.connected)
@@ -203,7 +209,7 @@ function createWindow() {
         show: false
     });
     global.mwin.loadURL(url.format({
-        pathname: path.join(__dirname, 'slave.html'),
+        pathname: path.join(__dirname, 'web_frontend/pages/slave.html'),
         protocol: 'file:',
         slashes: true
     }));

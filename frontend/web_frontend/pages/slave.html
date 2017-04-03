@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="../dist/css/style.css" rel="stylesheet">
+    <link href="../dist/css/bootstrap-table.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <script src="../dist/js/pages.js"></script>
+
+    <title>Timbreuse - Slave</title>
+</head>
+<div id="testt"></div>
+<script>
+    var ProgressBar = require('../vendor/progressbarjs/progressbarjs.min.js')
+    window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+    var slave = require('electron').remote.require("./frontend/slave.js");
+    var currentTag = "";
+
+    function tag() {
+        slave.tag(document.getElementById("tagInput").value, slave.getNow());
+    }
+    $(function() {
+        $(window).keypress(function(e) {
+            if (e.keyCode == 13) {
+                slave.tag(currentTag, slave.getNow());
+                currentTag = ""
+                return;
+            }
+            currentTag += String.fromCharCode(e.keyCode);
+        });
+    });
+    var circle = new ProgressBar.Circle('#testt', {
+        color: '#981b00'
+    });
+
+    circle.animate(0.3, {
+        duration: 800
+    });
+</script>
+
+<body>
+    <div class="page-header">
+        <h1>Timbreuse <small>coded with the <i class="glyphicon glyphicon-heart"></i>.</small></h1>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-6 col-sm-4">Bonsoir</div>
+        <div class="col-xs-6 col-sm-4">Bonsoir</div>
+        <div class="col-xs-6 col-sm-4">Bonsoir</div>
+    </div>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="../vendor/raphael/raphael.min.js"></script>
+    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="../data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../dist/js/bootstrap-table.js"></script>
+    <script src="../dist/js/informations.js"></script>
+    <script src="../dist/js/redirect.js"></script>
+    <script>
+    </script>
+</body>
+
+</html>
