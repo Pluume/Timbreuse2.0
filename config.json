@@ -1,12 +1,9 @@
 {
-    "class": "YE-S1z",
+    "class": "Client",
     "csvFreq": 0,
-    "server": "localhost",
+    "server": "172.21.201.254",
     "defaultPass":"test",
-    "slaves": [{
-        "class": "YE-S1x",
-        "ip": "localhost"
-    }],
+    "slaves": [],
     "lunch": {"begin":41400,"end": 48600, "time": 1800},
     "pause": {"time":1200,"minimum": 360,"interval": 14400,"minimum_error": 20},
     "workDay": [{

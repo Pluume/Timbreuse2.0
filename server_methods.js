@@ -35,7 +35,7 @@ function getBaseReq() {
  * @param {Object} ireq a JSON object containing the incoming request.
  **/
 function propagate_tag(ireq) {
-    csv.writeBruteLoggingToCSV(ireq.tag, ireq.time);
+    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g,''), ireq.time);
 }
 /**
  * Send a ping to server
@@ -70,9 +70,10 @@ function tagRequest() {
         returnFnc();
         return;
     }
-    csv.writeBruteLoggingToCSV(ireq.tag, ireq.time);
+    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g,''), ireq.time);
+    console.log("The studied tag is : " + ireq.tag.replace(/\s/g,''));
     global.db.serialize(() => {
-        global.db.get(knex.select().from("users").where("tag", ireq.tag).toString(), (err, row) => {
+        global.db.get(knex.select().from("users").where("tag", ireq.tag.replace(/\s/g,'')).toString(), (err, row) => {
             if (err) {
                 log.error("Error while accessing the database...\n" + err);
                 oreq = getBaseReq();
@@ -141,6 +142,7 @@ function tagRequest() {
                             oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
                             oreq.student.user = row;
+                            delete oreq.student.user.password;
                             oreq.delayed = ireq.delayed;
                             conn.socket.write(JSON.stringify(oreq));
                             returnFnc();
@@ -194,6 +196,7 @@ function tagRequest() {
                             oreq.fnc = request.REQUEST.TAG;
                             oreq.student = row3;
                             oreq.student.user = row;
+                            delete oreq.student.user.password;
                             oreq.delayed = ireq.delayed;
                             conn.socket.write(JSON.stringify(oreq));
                             returnFnc();
@@ -433,7 +436,7 @@ function createStudent(conn, ireq) {
             dob: ireq.data.dob,
             rank: global.RANK.STUDENT,
             email: ireq.data.email,
-            tag: ireq.data.tag
+            tag: ireq.data.tag.replace(/\s/g,'')
         }).returning('*').toString(), function(err) {
             if (err) {
                 log.error("Error : " + err);
@@ -551,7 +554,7 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
                 global.db.run(knex("users").update({
                     username: ireq.data.username,
                     email: ireq.data.email,
-                    tag: ireq.data.tag,
+                    tag: ireq.data.tag.replace(/\s/g,''),
                     dob: ireq.data.dob,
                     fname: ireq.data.fname,
                     lname: ireq.data.lname,
@@ -634,8 +637,6 @@ module.exports = {
                     break;
                 case request.REQUEST.PING:
                     pingRequest(connection);
-                    break;
-                case request.REQUEST.TAG:
                     break;
                 case request.REQUEST.AUTH:
                     authenticate(connection, ireq[i]);

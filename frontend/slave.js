@@ -6,6 +6,7 @@
  */
 const electron = require('electron');
 const app = electron.app;
+const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
@@ -88,22 +89,24 @@ function tag(stag, ntime) {
 
 
 /**
- * Export all the CSV to USB key on master key
+ * Handle the incoming data from the outgoing socket
  * @method onSocketData
  * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-    for (var i = 0; i < ireq.length; i++) {
-        switch (ireq[i].fnc) {
-            case request.REQUEST.MASTER:
-                csv.exportCSV(() => {}); //TODO Function that handle master card
-                break;
-            case request.REQUEST.TAG:
-            //TODO HANDLE INCOMING
-                break;
-            default:
-                break;
-        }
+  ireq = JSON.parse(ireq.toString("utf8"));
+    if (ireq.fnc === undefined)
+        return;
+
+    switch (ireq.fnc) {
+        case request.REQUEST.MASTER:
+            csv.exportCSV(() => {}); //TODO Function that handle master card
+            break;
+        case request.REQUEST.TAG:
+            global.mwin.webContents.send("slaveStd", ireq.student);
+            break;
+        default:
+            break;
     }
 }
 
@@ -118,6 +121,7 @@ function foreverConnect() {
             return;
         connected = true;
         log.info('Connected to server!');
+        slaveconn.on("data",onSocketData);
         executePile();
 
     };

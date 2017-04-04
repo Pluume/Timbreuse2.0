@@ -13,19 +13,15 @@ function isArray(obj) {
  * @method toArray
  * @param {String} singleItem the item to turn into an arrays.
  **/
-function toArray(singleItem)
-{
-  if(isArray(singleItem))
-  {
-    return singleItem;
-  }
-  var somearray = [];
-  somearray.push(singleItem);
-  return somearray;
+function toArray(singleItem) {
+    if (isArray(singleItem)) {
+        return singleItem;
+    }
+    var somearray = [];
+    somearray.push(singleItem);
+    return somearray;
 }
-module.exports = {
-  toArray,
-  ERROR: {
+ERROR = {
     OK: 0,
     UNKNOWN: 1,
     WRONGTAG: 2,
@@ -33,8 +29,8 @@ module.exports = {
     WRONGCREDS: 4,
     NOTLOGEDIN: 5,
     USEREXISTS: 6
-},
-REQUEST: {
+};
+REQUEST ={
     EXIT: -1,
     PING: 0,
     TAG: 1,
@@ -46,13 +42,24 @@ REQUEST: {
     ADDSTUDENT: 7,
     DELSTUDENT: 8,
     EDITSTUDENT: 9
-},
-PAGES: {
-  LOGIN: 0,
-  PROFS: 1
-},
-SCOPE: {
-  UNIQUE: 1,
-  ALL: "*"
-}
+};
+PAGES ={
+    LOGIN: 0,
+    PROFS: 1,
+    SLAVE: 2
+};
+SCOPE ={
+    UNIQUE: 1,
+    ALL: "*"
+};
+global.ERROR = ERROR;
+global.REQUEST = REQUEST;
+global.PAGES = PAGES;
+global.SCOPE = SCOPE;
+module.exports = {
+    toArray,
+    ERROR: ERROR,
+    REQUEST: REQUEST,
+    PAGES: PAGES,
+    SCOPE: SCOPE
 };

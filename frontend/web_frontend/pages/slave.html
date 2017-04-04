@@ -21,44 +21,89 @@
 
     <title>Timbreuse - Slave</title>
 </head>
-<div id="testt"></div>
-<script>
-    var ProgressBar = require('../vendor/progressbarjs/progressbarjs.min.js')
-    window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
-    var slave = require('electron').remote.require("./frontend/slave.js");
-    var currentTag = "";
 
-    function tag() {
-        slave.tag(document.getElementById("tagInput").value, slave.getNow());
+<style>
+    .clock {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 10px;
     }
-    $(function() {
-        $(window).keypress(function(e) {
-            if (e.keyCode == 13) {
-                slave.tag(currentTag, slave.getNow());
-                currentTag = ""
-                return;
-            }
-            currentTag += String.fromCharCode(e.keyCode);
-        });
-    });
-    var circle = new ProgressBar.Circle('#testt', {
-        color: '#981b00'
-    });
-
-    circle.animate(0.3, {
-        duration: 800
-    });
-</script>
+</style>
 
 <body>
     <div class="page-header">
         <h1>Timbreuse <small>coded with the <i class="glyphicon glyphicon-heart"></i>.</small></h1>
     </div>
+
     <div class="row show-grid">
-        <div class="col-xs-6 col-sm-4">Bonsoir</div>
-        <div class="col-xs-6 col-sm-4">Bonsoir</div>
-        <div class="col-xs-6 col-sm-4">Bonsoir</div>
+        <div class="col-md-4" style="background-color: transparent;border: none;">
+          <div id="clockHours" class="clockSingleDiv clock"></div>
+          <div id="clockMinutes" class="clockSingleDiv clock"></div>
+          <div id="clockSeconds" class="clockSingleDiv clock"></div>
+        </div>
+        <div id="infoPane" class="col-md-8" style="background-color: transparent;border: none;">
+        </div>
     </div>
+    <script>
+        var ProgressBar = require('../vendor/progressbarjs/progressbarjs.min.js')
+        window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+        window.ERROR = require('electron').remote.getGlobal("ERROR");
+        window.STATUS = require('electron').remote.getGlobal("STATUS");
+        window.PAGES = require('electron').remote.getGlobal("PAGES");
+        console.log(window.STATUS.IN);
+        setPage(window.PAGES.SLAVE);
+        var slave = require('electron').remote.require("./frontend/slave.js");
+        var currentTag = "";
+
+        function tag() {
+            slave.tag(document.getElementById("tagInput").value, slave.getNow());
+        }
+        $(function() {
+            $(window).keypress(function(e) {
+                if (e.keyCode == 13) {
+                    slave.tag(currentTag, slave.getNow());
+                    currentTag = ""
+                    return;
+                }
+                currentTag += String.fromCharCode(e.keyCode);
+            });
+        });
+        var circleH = new ProgressBar.Circle('#clockHours', {
+            color: '#981b00'
+        });
+
+        circleH.animate(0, {
+            duration: 900
+        });
+        var circleM = new ProgressBar.Circle('#clockMinutes', {
+            color: '#981b00'
+        });
+
+        circleM.animate(0, {
+            duration: 900
+        });
+        var circleS = new ProgressBar.Circle('#clockSeconds', {
+            color: '#981b00'
+        });
+
+        circleS.animate(0, {
+            duration: 900
+        });
+        var CronJob = require('electron').remote.require("cron").CronJob;
+        new CronJob('* * * * * *', function() {
+            var d = new Date();
+            var h = d.getHours();
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+            circleH.animate(h / 24);
+            circleM.animate(m / 60);
+            circleS.animate(s / 60);
+            circleS.setText(s + "s");
+            circleM.setText(m + "m");
+            circleH.setText(h + "h");
+        }, null, true);
+    </script>
+
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -75,6 +120,7 @@
     <script src="../dist/js/bootstrap-table.js"></script>
     <script src="../dist/js/informations.js"></script>
     <script src="../dist/js/redirect.js"></script>
+    <script src="../dist/js/slave.js"></script>
     <script>
     </script>
 </body>

@@ -21,7 +21,7 @@ module.exports = {
             var data = jsonfile.readFileSync(filename);
             global.config = data;
         } catch (err) {
-            log.error("Can't read from the file, aborting...\n Filename : " + filename);
+            log.error("Can't read from the file, aborting...\n Filename : " + filename + "\nError : " + err);
             return;
         }
     },
