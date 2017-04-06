@@ -43,7 +43,7 @@ module.exports = {
             socket.end();
         });
         socket.on('data', function(data) {
-          method.sortRequest(connection,data.toString("utf8"));
+          method.compileRequest(connection,data.toString("utf8"));
         });
         socket.on('end', function() {
             removeClient(connection);

@@ -12,6 +12,17 @@ const url = require('url');
 const net = require("net");
 const request = require("../request.js");
 
+var currentCb = function(data) {}; //Proto
+var currentBuf = "";
+function incomingDataHandling(data)
+{
+  currentBuf += data;
+  if(currentBuf[currentBuf.length - 1] == "\0") {
+    currentCb(null, currentBuf.substring(0, currentBuf.length - 1).toString("utf8"));
+    currentBuf = "";
+  }
+}
+
 function connect(cb) {
     clientconn = new net.Socket();
     clientconn.once("error", (err) => {
@@ -36,6 +47,7 @@ function connect(cb) {
 
         global.clientconn = null;
     });
+    clientconn.on("data",incomingDataHandling);
     clientconn.connect({
         host: global.config.server,
         port: 703
@@ -56,13 +68,12 @@ function disconnect(cb) {
 }
 
 function send(data, cb) {
-    global.clientconn.once("data", (buf) => {
-        cb(null, buf.toString("utf8"));
-    });
+    currentCb = cb;
     global.clientconn.removeAllListeners("error");
-    global.clientconn.once("error", (err) => {
-        cb(err, null);
+    global.clientconn.on("error", (err) => {
+        currentCb(null);
     });
+    console.log("bla");
     global.clientconn.write(data);
 }
 /**

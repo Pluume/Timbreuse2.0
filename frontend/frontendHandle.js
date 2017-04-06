@@ -15,11 +15,12 @@ function getStudents(event, arg) {
     }];
     client.send(JSON.stringify(oreq), (err, data) => {
         try {
+
             var ireq = JSON.parse(data);
             event.sender.send("students", ireq);
         } catch (err1) {
             log.error("Error parsing request : " + err1);
-            event.sender.send("students", request.ERROR.UNKNOWN);
+            log.error("Error details : " + err);
         }
     });
 }
@@ -40,11 +41,11 @@ function logIn(event, arg) {
         }
         client.send(JSON.stringify(oreq), (err, data) => {
             try {
+              log.info(data);
                 var ireq = JSON.parse(data);
                 event.sender.send("login", ireq);
             } catch (err1) {
                 log.error("Error parsing request : " + err1);
-                event.sender.send("login", request.ERROR.UNKNOWN);
             }
         });
     });
@@ -75,7 +76,6 @@ function getClass(event, arg) {
             event.sender.send("class", ireq);
         } catch (err1) {
             log.error("Error parsing request : " + err1);
-            event.sender.send("class", request.ERROR.UNKNOWN);
         }
     });
 }
@@ -93,7 +93,6 @@ function createStudent(event, arg) {
             event.sender.send("createStudent", ireq);
         } catch (err1) {
             log.error("Error parsing request : " + err1);
-            event.sender.send("createStudent", request.ERROR.UNKNOWN);
         }
     });
 }
@@ -110,7 +109,6 @@ function deleteStudent(event, arg) {
             event.sender.send("deleteStudent", ireq);
         } catch (err1) {
             log.error("Error parsing request : " + err1);
-            event.sender.send("deleteStudent", request.ERROR.UNKNOWN);
         }
     });
 }
@@ -127,7 +125,6 @@ function editStudent(event, arg) {
             event.sender.send("editStudent", ireq);
         } catch (err1) {
             log.error("Error parsing request : " + err1);
-            event.sender.send("editStudent", request.ERROR.UNKNOWN);
         }
     });
 }

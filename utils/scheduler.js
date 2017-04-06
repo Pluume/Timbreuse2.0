@@ -81,12 +81,10 @@ module.exports = {
      * @method start
      **/
     start: function() {
-        job = new CronJob('* 30 16 * * 1-7', function() { //TODO * 30 23 * * *
-
+        job = new CronJob('* 00 16 * * 1-7', function() {
                 endOfDay();
-                job.stop() //TODO REMOVE
             }, function() {
-                log.warning("The end-of-day scheduler has stopped !");
+                
             },
             true);
         log.info("Scheduler started !");
