@@ -36,12 +36,12 @@ function getNow() {
  **/
 function executePile() {
     if (oreqPile.length && connected) {
-        slaveconn.write(JSON.stringify(oreqPile));
+        slaveconn.write(JSON.stringify(oreqPile) +"\0");
         oreqPile = [];
     }
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].pile.length && slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(slaves[i].pile));
+            slaves[i].conn.write(JSON.stringify(slaves[i].pile) + "\0");
             slaves[i].pile = [];
         }
 
@@ -68,7 +68,7 @@ function tag(stag, ntime) {
     };
     csv.writeBruteLoggingToCSV(stag, ntime);
     if (connected) {
-        slaveconn.write(JSON.stringify(request.toArray(oreq)));
+        slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
     } else {
         oreq.delayed = true;
         oreqPile.push(oreq);
@@ -77,7 +77,7 @@ function tag(stag, ntime) {
     soreq.fnc = request.REQUEST.PROPAGATE_TAG;
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(request.toArray(soreq)));
+            slaves[i].conn.write(JSON.stringify(request.toArray(soreq)) + "\0");
         } else {
             soreq.delayed = true;
 

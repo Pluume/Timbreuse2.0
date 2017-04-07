@@ -5,6 +5,7 @@ function displayTaggedStudent(event, std) {
     }
     var panel = document.createElement("div");
     panel.setAttribute("id","taggedStudent");
+    console.log(std);
     if (std.status == window.STATUS.IN) {
         panel.setAttribute("class", "panel panel-green");
     } else {

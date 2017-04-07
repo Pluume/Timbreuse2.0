@@ -32,6 +32,7 @@ module.exports = {
   start: () => {
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
+      connection.currentBuf = "";
       addClient(connection);
       if(global.DEBUG)
       log.info(socket.address().address + " just connected");

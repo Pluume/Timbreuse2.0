@@ -74,7 +74,7 @@ function send(data, cb) {
         currentCb(null);
     });
     console.log("bla");
-    global.clientconn.write(data);
+    global.clientconn.write(data + "\0");
 }
 /**
  * Create a windows for the client

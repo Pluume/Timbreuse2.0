@@ -594,90 +594,93 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
     });
 
 }
-module.exports = {
 
-    compileRequest: (connection, data) {
-      connection.currentBuf += data;
-      if(connection.currentBuf[connection.currentBuf.length - 1] == "\0") {
-        sortRequest(connection, connection.currentBuf.substring(0, connection.currentBuf.length - 1).toString("utf8"));
-        connection.currentBuf = "";
-      }
-    },
-    /**
-     * Sort the incoming request. Redirect the request to the correct function.
-     * @method sortRequest
-     * @param {Object} conn a JSON object containing a socket connection and an userid variable.
-     * @param {Object} data raw data from the client.
-     **/
-    sortRequest: (connection, data) => {
-        var oreq;
-        var ireq;
-        try {
-            if (global.DEBUG) {
-                log.info(data);
-            }
-            ireq = JSON.parse(data);
-        } catch (err) {
-            log.error("Request ill formed.");
+/**
+ * Sort the incoming request. Redirect the request to the correct function.
+ * @method sortRequest
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} data raw data from the client.
+ **/
+function sortRequest(connection, data) {
+    var oreq;
+    var ireq;
+    try {
+        if (global.DEBUG) {
+            log.info(data);
+        }
+        ireq = JSON.parse(data);
+    } catch (err) {
+        log.error("Request ill formed.");
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.UNKNOWN;
+        connection.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+    }
+    var toRm = [];
+    for (var i = 0; i < ireq.length; i++) {
+        if (ireq[i].fnc == request.REQUEST.TAG) {
+            tagReqList.push({
+                connection: connection,
+                ireq: ireq[i]
+            });
+            toRm.push(i);
+        }
+    }
+    for (var i = 0; i < toRm.length; i++) {
+        ireq.splice(toRm[i], 1);
+    }
+    console.log("Is started " + tagReqFncStarted);
+    if (!tagReqFncStarted)
+        tagRequest();
+    for (var i = 0; i < ireq.length; i++) {
+        if (ireq[i].fnc === undefined) {
+            log.error("fnc param not specified in request.");
             oreq = getBaseReq();
             oreq.error = request.ERROR.UNKNOWN;
             connection.socket.write(JSON.stringify(oreq) + "\0");
             return;
         }
-        var toRm = [];
-        for (var i = 0; i < ireq.length; i++) {
-            if (ireq[i].fnc == request.REQUEST.TAG) {
-                tagReqList.push({
-                    connection: connection,
-                    ireq: ireq[i]
-                });
-                toRm.push(i);
-            }
-        }
-        for (var i = 0; i < toRm.length; i++) {
-            ireq.splice(toRm[i], 1);
-        }
-        if (!tagReqFncStarted)
-            tagRequest();
-        for (var i = 0; i < ireq.length; i++) {
-            if (ireq[i].fnc === undefined) {
-                log.error("fnc param not specified in request.");
-                oreq = getBaseReq();
-                oreq.error = request.ERROR.UNKNOWN;
-                connection.socket.write(JSON.stringify(oreq) + "\0");
-                return;
-            }
 
-            switch (ireq[i].fnc) {
-                case request.REQUEST.EXIT:
-                    socketExit(connection);
-                    break;
-                case request.REQUEST.PING:
-                    pingRequest(connection);
-                    break;
-                case request.REQUEST.AUTH:
-                    authenticate(connection, ireq[i]);
-                    break;
-                case request.REQUEST.PROPAGATE_TAG:
-                    propagate_tag(ireq[i]);
-                    break;
-                case request.REQUEST.GETSTUDENT:
-                    getStudent(connection, ireq[i]);
-                    break;
-                case request.REQUEST.GETCLASS:
-                    getClass(connection, ireq[i]);
-                    break;
-                case request.REQUEST.ADDSTUDENT:
-                    createStudent(connection, ireq[i]);
-                    break;
-                case request.REQUEST.DELSTUDENT:
-                    deleteStudent(connection, ireq[i]);
-                    break;
-                case request.REQUEST.EDITSTUDENT:
-                    editStudent(connection, ireq[i]);
-                    break;
-            }
+        switch (ireq[i].fnc) {
+            case request.REQUEST.EXIT:
+                socketExit(connection);
+                break;
+            case request.REQUEST.PING:
+                pingRequest(connection);
+                break;
+            case request.REQUEST.AUTH:
+                authenticate(connection, ireq[i]);
+                break;
+            case request.REQUEST.PROPAGATE_TAG:
+                propagate_tag(ireq[i]);
+                break;
+            case request.REQUEST.GETSTUDENT:
+                getStudent(connection, ireq[i]);
+                break;
+            case request.REQUEST.GETCLASS:
+                getClass(connection, ireq[i]);
+                break;
+            case request.REQUEST.ADDSTUDENT:
+                createStudent(connection, ireq[i]);
+                break;
+            case request.REQUEST.DELSTUDENT:
+                deleteStudent(connection, ireq[i]);
+                break;
+            case request.REQUEST.EDITSTUDENT:
+                editStudent(connection, ireq[i]);
+                break;
         }
+    }
 
+}
+
+module.exports = {
+
+    compileRequest: (connection, data) => {
+      connection.currentBuf += data;
+      if(connection.currentBuf[connection.currentBuf.length - 1] == "\0") {
+        sortRequest(connection, connection.currentBuf.substring(0, connection.currentBuf.length - 1).toString("utf8"));
+        connection.currentBuf = "";
+      }
     }
 };
