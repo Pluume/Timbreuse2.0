@@ -1,2 +1,2 @@
-node test.js --server
+electron .
 pause

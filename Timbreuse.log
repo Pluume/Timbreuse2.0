@@ -1,22 +1,15 @@
-[0.904] [INFO] (test.js:7) > Loading configuration...
-[1.077] [ERROR] (utils\log.js:49) > Error: Could not locate the bindings file. Tried:
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\Debug\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\Release\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\out\Debug\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\Debug\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\out\Release\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\Release\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\default\deasync.node
- → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\compiled\7.4.0\win32\x64\deasync.node
-    at bindings (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\bindings\bindings.js:88:9)
-    at C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:34:32
-    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:76:2)
-    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:78:3)
-    at Module._compile (module.js:571:32)
-    at Object.Module._extensions..js (module.js:580:10)
-    at Module.load (module.js:488:32)
-    at tryModuleLoad (module.js:447:12)
-    at Function.Module._load (module.js:439:3)
-    at Module.require (module.js:498:17)
-[3.94] [WARNING] (utils\log.js:66) > Interruption caught !
+[0.161] [INFO] (Main.js:8) > Loading configuration...
+[1.057] [INFO] (Main.js:14) > Starting as a slave
+[1.058] [INFO] (Main.js:16) > Initializing database...
+[1.143] [INFO] (Main.js:22) > Starting server...
+[1.155] [INFO] (server_methods.js:671) > Methods initiated.
+[1.159] [INFO] (server.js:59) > The server up on the port 703
+[1.529] [INFO] (frontend\slave.js:125) > Connected to server!
+[6.132] [ERROR] (utils\log.js:49) > SyntaxError: Unexpected token e in JSON at position 0
+    at Socket.onSocketData (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\frontend\slave.js:99:15)
+    at emitOne (events.js:96:13)
+    at Socket.emit (events.js:188:7)
+    at readableAddChunk (_stream_readable.js:176:18)
+    at Socket.Readable.push (_stream_readable.js:134:10)
+    at TCP.onread (net.js:543:20)
+[23.622] [INFO] (utils\log.js:52) > Exiting with code 0

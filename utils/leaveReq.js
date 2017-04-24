@@ -148,5 +148,5 @@ function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, 
 
 }
 module.exports = {
-    isToday
+    //isToday
 };

@@ -43,6 +43,7 @@ module.exports = {
     RANK: RANK,
     REASON: REASON,
     PROOF: PROOF,
+    STATUS: STATUS,
     /**
      * Init the database
      * @method init
