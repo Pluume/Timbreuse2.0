@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Pluume/Timbreuse2.0#readme",
   "dependencies": {
+    "array": "^0.4.3",
     "array-events": "^1.0.0",
     "async": "^2.1.5",
     "console-at": "^2.0.1",

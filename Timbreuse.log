@@ -1,4 +1,22 @@
-[0.167] [INFO] (Main.js:8) > Loading configuration...
-[1.065] [INFO] (Main.js:14) > Starting as a client
-[1.066] [INFO] (Main.js:16) > Initializing database...
-[12.423] [INFO] (utils\log.js:52) > Exiting with code 0
+[0.904] [INFO] (test.js:7) > Loading configuration...
+[1.077] [ERROR] (utils\log.js:49) > Error: Could not locate the bindings file. Tried:
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\Debug\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\Release\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\out\Debug\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\Debug\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\out\Release\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\Release\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\build\default\deasync.node
+ → C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\compiled\7.4.0\win32\x64\deasync.node
+    at bindings (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\bindings\bindings.js:88:9)
+    at C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:34:32
+    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:76:2)
+    at Object.<anonymous> (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\deasync\index.js:78:3)
+    at Module._compile (module.js:571:32)
+    at Object.Module._extensions..js (module.js:580:10)
+    at Module.load (module.js:488:32)
+    at tryModuleLoad (module.js:447:12)
+    at Function.Module._load (module.js:439:3)
+    at Module.require (module.js:498:17)
+[3.94] [WARNING] (utils\log.js:66) > Interruption caught !

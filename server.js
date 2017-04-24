@@ -30,6 +30,7 @@ module.exports = {
    * @method start
    **/
   start: () => {
+    method.initialize();
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
       connection.currentBuf = "";

@@ -47,13 +47,13 @@ function endOfDay() {
         });
         if (moment(moment().format()).isSame(moment().endOf("week"), 'day')) {
             ndetails.week.push({
-                time: moment.toDate().toISOString(),
+                time: moment().toDate().toISOString(),
                 timeDiff: ntimeDiff
             });
         }
         if (moment(moment().format()).isSame(moment().endOf("month"), 'day')) {
             ndetails.month.push({
-                time: moment.toDate().toISOString(),
+                time: moment().toDate().toISOString(),
                 timeDiff: ntimeDiff
             });
         }
@@ -84,7 +84,7 @@ module.exports = {
         job = new CronJob('* 00 16 * * 1-7', function() {
                 endOfDay();
             }, function() {
-                
+
             },
             true);
         log.info("Scheduler started !");

@@ -94,7 +94,8 @@ function tag(stag, ntime) {
  * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-  ireq = JSON.parse(ireq.toString("utf8"));
+  ireq = ireq.toString("utf8").substring(0, ireq.length - 1);
+  ireq = JSON.parse(ireq);
     if (ireq.fnc === undefined)
         return;
 
@@ -200,7 +201,7 @@ function foreverConnect() {
     slaveconn.connect({
         host: global.config.server,
         port: 703
-    }, connectedToServer); //FIXME Reboot  socket by unity and not all of them
+    }, connectedToServer);
 }
 /**
  * Create the slave frontend
