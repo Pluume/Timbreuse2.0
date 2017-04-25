@@ -582,6 +582,118 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
 }
 
 /**
+ * Clean an user's account
+ * @method resetTime
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function resetTime(conn, ireq) {
+  var oreq;
+  if (conn.user === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.id === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.run(knex("students").update({
+    hadLunch: null,
+    missedPause: null,
+    lastTagTime: null,
+    timeDiffToday: null,
+    timeDiff: null,
+    status: null
+  }).where("id", "in", ireq.id).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
+      oreq = getBaseReq();
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    oreq = getBaseReq();
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+
+/**
+ * Modify the time of students
+ * @method resetTime
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function modTime(conn, ireq) {
+  var oreq;
+  if (conn.user === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.time === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+    global.db.run(knex("students").increment("timeDiff", ireq.time).where("id", "in", ireq.id).toString(), (err) => {
+      if (err) {
+        log.error("Error : " + err);
+        oreq = getBaseReq();
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      oreq = getBaseReq();
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+    });
+    return;
+}
+
+/**
+ * Set the time of students
+ * @method setTime
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function setTime(conn, ireq) {
+  var oreq;
+  if (conn.user === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.time === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  console.log("in function");
+  global.db.run(knex("students").update({
+    timeDiff: ireq.time
+  }).where("id", "in", ireq.id).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
+      oreq = getBaseReq();
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    oreq = getBaseReq();
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+
+
+
+}
+/**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -651,6 +763,15 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.EDITSTUDENT:
         editStudent(connection, ireq[i]);
+        break;
+      case request.REQUEST.RESETTIME:
+        resetTime(connection, ireq[i]);
+        break;
+      case request.REQUEST.MODTIME:
+        modTime(connection, ireq[i]);
+        break;
+      case request.REQUEST.SETTIME:
+        setTime(connection, ireq[i]);
         break;
     }
   }

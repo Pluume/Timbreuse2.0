@@ -12,14 +12,12 @@ const url = require('url');
 const net = require("net");
 const request = require("../request.js");
 
-var currentCb = function(data) {}; //Proto
+var currentCb = function(err,data) {}; //Proto
 var currentBuf = "";
 function incomingDataHandling(data)
 {
-  console.log("Test");
   currentBuf += data;
   if(currentBuf[currentBuf.length - 1] == "\0") {
-    console.log("Test2");
     currentCb(null, currentBuf.substring(0, currentBuf.length - 1).toString("utf8"));
     currentBuf = "";
   }
@@ -73,7 +71,7 @@ function send(data, cb) {
     currentCb = cb;
     global.clientconn.removeAllListeners("error");
     global.clientconn.on("error", (err) => {
-        currentCb(null);
+        currentCb(err);
     });
     global.clientconn.write(data + "\0");
 }

@@ -49,7 +49,7 @@
     window.RANK = require('../../../db/db.js').RANK;
     window.STATUS = require('../../../db/db.js').STATUS;
     setPage(window.PAGES.PROFS);
-    var stdToDelete = [];
+    var stdToApply = [];
 
     function editCb(std) {
       document.getElementById("elname").setAttribute("placeholder", std.students.user.lname == null ? "" : std.students.user.lname);
@@ -66,7 +66,9 @@
     function studentsListFormatter(val, row) {
       return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id +
         ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" + row.id +
-        ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-plus'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToDelete = [" +
+        ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button></span><span data-toggle='modal' data-target='#editStudentTimeModal'><button data-toggle='tooltip' data-placement='bottom' title='Edit time' href='#' onclick='stdToApply = [" +
+        row.id +
+        "];' class='btn btn-warning btn-circle'><i class='glyphicon glyphicon-time'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToApply = [" +
         row.id +
         "];' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button></span>";
     }
@@ -122,9 +124,10 @@
     }
 
     function submitDeleteModal() {
-      deleteStudent(stdToDelete, "stdTable");
+      deleteStudent(stdToApply, "stdTable");
       $('#delStudentModal').modal('toggle');
     }
+
 
     function submitEditModal(id) {
       editStudent(id, document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
@@ -182,6 +185,102 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" onclick="submitCreateModal();" class="btn btn-success">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editStudentTimeModal" tabindex="-1" role="dialog" aria-labelledby="editStudentTimeModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editStudentTimeModalTitle">Edit student's time</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="radio">
+              <label for="settime_group"><input id="settime_radio" group="editTime" checked type="radio" name="optradio">Set time</label>
+              <div id="settime_group">
+                <div display="inline-block">
+                  <label for="settime_hours">Hours</label>
+                  <input id="settime_hours" class="form-control" group="editTime" type="number" value="0">
+                </div>
+                <div display="inline-block">
+                  <label for="settime_minutes">Minutes</label>
+                  <input id="settime_minutes" class="form-control" group="editTime" type="number" value="0">
+                </div>
+              </div>
+            </div>
+            <div class="radio">
+              <label for="modtime_group"><input id="modtime_radio" group="editTime" type="radio" name="optradio">Add/Substract time</label>
+              <div id="modtime_group">
+                <div display="inline-block">
+                  <label for="edittime_hours">Hours</label>
+                  <input id="edittime_hours" class="form-control" disabled="true" group="editTime" type="number" value="0">
+                </div>
+                <div display="inline-block">
+                  <label for="edittime_minutes">Minutes</label>
+                  <input id="edittime_minutes" class="form-control" disabled="true" group="editTime" type="number" value="0">
+                </div>
+              </div>
+            </div>
+            <div class="radio">
+              <label for="resettime_group"><input id="resettime_radio" group="editTime" type="radio" name="optradio">Reset</label>
+            </div>
+            <br />
+            <label for="edittime_comment">Comments</label>
+            <input id="edittime_comment" class="form-control" type="text" value="">
+            <script>
+              $('input[type=radio][group=editTime]').on('change', function() {
+                switch ($(this).attr("id")) {
+                  case 'resettime_radio':
+                    $('#settime_hours').prop("disabled", true);
+                    $('#settime_minutes').prop("disabled", true);
+                    $('#edittime_hours').prop("disabled", true);
+                    $('#edittime_minutes').prop("disabled", true);
+                    break;
+                  case 'modtime_radio':
+                    $('#settime_hours').prop("disabled", true);
+                    $('#settime_minutes').prop("disabled", true);
+                    $('#edittime_hours').prop("disabled", false);
+                    $('#edittime_minutes').prop("disabled", false);
+                    break;
+                  case 'settime_radio':
+                    $('#settime_hours').prop("disabled", false);
+                    $('#settime_minutes').prop("disabled", false);
+                    $('#edittime_hours').prop("disabled", true);
+                    $('#edittime_minutes').prop("disabled", true);
+                    break;
+                }
+              });
+
+              function preSubmitEditTimeModal() {
+                $('#editStudentTimeModal').modal('toggle');
+                if (document.getElementById("resettime_radio").checked) {
+                  resetTime(stdToApply);
+                  return;
+                } else if (document.getElementById("modtime_radio").checked) {
+                  var time = parseInt(document.getElementById("edittime_hours").value, 10)*3600 + parseInt(document.getElementById("edittime_minutes").value, 10)*60;
+                  if (isNaN(time))
+                    time = 0;
+                    modTime(stdToApply,time)
+                  return;
+                } else if (document.getElementById("settime_radio").checked) {
+                  var time = parseInt(document.getElementById("settime_hours").value, 10)*3600 + parseInt(document.getElementById("settime_minutes").value, 10)*60;
+                  if (isNaN(time))
+                    time = 0;
+                    setTime(stdToApply,time)
+                  return;
+                }
+              }
+            </script>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" onclick="preSubmitEditTimeModal();" class="btn btn-success">Apply</button>
         </div>
       </div>
     </div>

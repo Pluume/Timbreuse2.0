@@ -118,7 +118,6 @@ function editStudent(event, arg) {
         error: request.ERROR.OK,
         data: arg
     }];
-    console.log(JSON.stringify(oreq));
     client.send(JSON.stringify(oreq), (err, data) => {
         try {
             var ireq = JSON.parse(data);
@@ -128,6 +127,60 @@ function editStudent(event, arg) {
         }
     });
 }
+function resetTime(event, arg)
+{
+  var oreq = [{
+      fnc: request.REQUEST.RESETTIME,
+      error: request.ERROR.OK,
+      id: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+      try {
+          var ireq = JSON.parse(data);
+          event.sender.send("resetTime", ireq);
+      } catch (err1) {
+          log.error("Error parsing request : " + err1);
+      }
+  });
+}
+function modTime(event, arg)
+{
+  var oreq = [{
+      fnc: request.REQUEST.MODTIME,
+      error: request.ERROR.OK,
+      id: arg.id,
+      time: arg.time
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+      try {
+
+          var ireq = JSON.parse(data);
+
+          event.sender.send("modTime", ireq);
+      } catch (err1) {
+          log.error("Error parsing request : " + err1);
+      }
+  });
+}
+function setTime(event, arg)
+{
+  var oreq = [{
+      fnc: request.REQUEST.SETTIME,
+      error: request.ERROR.OK,
+      id: arg.id,
+      time: arg.time
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+      try {
+
+          var ireq = JSON.parse(data);
+
+          event.sender.send("setTime", ireq);
+      } catch (err1) {
+          log.error("Error parsing request : " + err1);
+      }
+  });
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -136,3 +189,6 @@ ipcMain.on("pages", setPage);
 ipcMain.on("redirect", redirect);
 ipcMain.on("students", getStudents);
 ipcMain.on("login", logIn);
+ipcMain.on("resetTime", resetTime);
+ipcMain.on("modTime", modTime);
+ipcMain.on("setTime", setTime);

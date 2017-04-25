@@ -81,7 +81,7 @@ module.exports = {
      * @method start
      **/
     start: function() {
-        job = new CronJob('* 00 16 * * 1-7', function() {
+        job = new CronJob('00 00 23 * * 1-7', function() {
                 endOfDay();
             }, function() {
 

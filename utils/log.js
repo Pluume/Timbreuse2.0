@@ -17,7 +17,7 @@ var access = fs.createWriteStream("Timbreuse.log",{ flags: 'w' });
 var info = (msg) =>
 {
   var stack = at(1);
-  var cmsg = "[" + process.uptime() + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
   access.write(cmsg + "\n");
 };
@@ -29,7 +29,7 @@ var info = (msg) =>
 var error = (msg) =>
 {
   var stack = at(1);
-  var cmsg = "[" + process.uptime() + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
   access.write(cmsg + "\n");
 };
@@ -41,7 +41,7 @@ var error = (msg) =>
 var warning = (msg) =>
 {
   var stack = at(1);
-  var cmsg = "[" + process.uptime() + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
   access.write(cmsg + "\n");
 };

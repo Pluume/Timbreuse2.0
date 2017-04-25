@@ -87,21 +87,33 @@ function tag(stag, ntime) {
     }
 }
 
-
+/**
+ * Compile the complete request before using it
+ * @method compileRequest
+ * @param {Object} ireq The json request
+ **/
+function compileRequest(ireq)
+{
+  slaveconn.currentBuf += ireq;
+  if (slaveconn.currentBuf[slaveconn.currentBuf.length - 1] == "\0") {
+    onSocketData(slaveconn.currentBuf.substring(0, slaveconn.currentBuf.length - 1).toString("utf8"));
+    slaveconn.currentBuf = "";
+  }
+}
 /**
  * Handle the incoming data from the outgoing socket
  * @method onSocketData
  * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-  ireq = ireq.toString("utf8").substring(0, ireq.length - 1);
+  console.log(ireq);
   ireq = JSON.parse(ireq);
     if (ireq.fnc === undefined)
         return;
 
     switch (ireq.fnc) {
         case request.REQUEST.MASTER:
-            csv.exportCSV(() => {}); //TODO Function that handle master card
+            csv.exportCSV(() => {}); //TODO Function that handle master card in GUI
             break;
         case request.REQUEST.TAG:
             global.mwin.webContents.send("slaveStd", ireq.student);
@@ -117,12 +129,13 @@ function onSocketData(ireq) {
  **/
 function foreverConnect() {
     slaveconn = new net.Socket();
+    slaveconn.currentBuf = "";
     var connectedToServer = function() {
         if (connected)
             return;
         connected = true;
         log.info('Connected to server!');
-        slaveconn.on("data",onSocketData);
+        slaveconn.on("data",compileRequest);
         executePile();
 
     };
