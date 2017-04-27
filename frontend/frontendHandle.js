@@ -16,8 +16,9 @@ function getStudents(event, arg) {
   }];
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
-
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("students", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -42,8 +43,10 @@ function logIn(event, arg) {
     }
     client.send(JSON.stringify(oreq), (err, data) => {
       try {
-        log.info(data);
+
         var ireq = JSON.parse(data);
+        if (ireq.fnc != oreq[0].fnc)
+          return;
         event.sender.send("login", ireq);
       } catch (err1) {
         log.error("Error parsing request : " + err1);
@@ -74,6 +77,8 @@ function getClass(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("class", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -91,6 +96,8 @@ function createStudent(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("createStudent", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -107,6 +114,8 @@ function deleteStudent(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("deleteStudent", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -123,6 +132,8 @@ function editStudent(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("editStudent", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -140,6 +151,8 @@ function resetTime(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("resetTime", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -159,7 +172,8 @@ function modTime(event, arg) {
     try {
 
       var ireq = JSON.parse(data);
-
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("modTime", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -179,7 +193,8 @@ function setTime(event, arg) {
     try {
 
       var ireq = JSON.parse(data);
-
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       event.sender.send("setTime", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -199,6 +214,8 @@ function getLogs(event, arg) {
     try {
 
       var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
       ireq.format = log.format(ireq.data);
       event.sender.send("logs", ireq);
     } catch (err1) {

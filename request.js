@@ -45,7 +45,10 @@ REQUEST ={
     SETTIME: 10,
     MODTIME: 11,
     RESETTIME: 12,
-    LOGS: 13
+    LOGS: 13,
+    SETABSENT: 14,
+    FIXSCHEDULE: 15,
+
 };
 PAGES ={
     LOGIN: 0,
