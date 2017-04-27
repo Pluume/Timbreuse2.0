@@ -33,11 +33,11 @@
     window.SCOPE = require('../../../request.js').SCOPE;
     window.RANK = require('../../../db/db.js').RANK;
     window.STATUS = require('../../../db/db.js').STATUS;
-    setPage(window.PAGES.PROFS);
+    setPage(window.PAGES.LOGS);
     var stdToApply = [];
 
-  </script>
-  <script>
+
+
     $(document).ready(function() {
 
       var date = new Date();
@@ -48,7 +48,7 @@
         header: {
           left: 'prev,next today',
           center: 'title',
-          right: 'month,agendaWeek,agendaDay'
+          right: 'month,agendaWeek,agendaDay,list'
         },
         editable: false,
         events: [{

@@ -118,6 +118,7 @@ function tagRequest(item, index) {
           var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
           if (missedPause) {
             log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause + " time(s) !");
+            log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
           }
           global.db.serialize(() => {
             global.db.run(knex("students").update({
@@ -126,6 +127,7 @@ function tagRequest(item, index) {
               status: nstatus,
               missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
             }).where("userid", row.id).toString());
+
             global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
               if (err3) {
                 log.error("Error while accessing the database...\n" + err);
@@ -143,6 +145,7 @@ function tagRequest(item, index) {
               delete oreq.student.user.password;
               if (!ireq.delayed)
                 conn.socket.write(JSON.stringify(oreq) + "\0");
+              log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, "", row3.timeDiff, row3.timeDiffToday);
             });
           });
 
@@ -157,6 +160,7 @@ function tagRequest(item, index) {
           {
             nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
             log.warning("USRID : " + row.id + " : minimum pause rule not respected !");
+            log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
           }
 
           var now = moment(ireq.time);
@@ -199,9 +203,10 @@ function tagRequest(item, index) {
               delete oreq.student.user.password;
               if (!ireq.delayed)
                 conn.socket.write(JSON.stringify(oreq) + "\0");
+              console.log(JSON.stringify(row3));
+              log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, "", row3.timeDiff, row3.timeDiffToday);
             });
           });
-
         }
       });
     });
@@ -617,6 +622,18 @@ function resetTime(conn, ireq) {
       return;
     }
     oreq = getBaseReq();
+    for (var i = 0; i < ireq.id.length; i++) {
+      global.db.get(knex("students").select().where({
+        id: ireq.id[i]
+      }).toString(), (err, row) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          return;
+        }
+        log.save(global.LOGS.RESETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+      });
+
+    }
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }
@@ -641,18 +658,30 @@ function modTime(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-    global.db.run(knex("students").increment("timeDiff", ireq.time).where("id", "in", ireq.id).toString(), (err) => {
-      if (err) {
-        log.error("Error : " + err);
-        oreq = getBaseReq();
-        oreq.error = request.ERROR.SQLITE;
-        conn.socket.write(JSON.stringify(oreq) + "\0");
-        return;
-      }
+  global.db.run(knex("students").increment("timeDiff", ireq.time).where("id", "in", ireq.id).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
       oreq = getBaseReq();
+      oreq.error = request.ERROR.SQLITE;
       conn.socket.write(JSON.stringify(oreq) + "\0");
-    });
-    return;
+      return;
+    }
+    oreq = getBaseReq();
+    for (var i = 0; i < ireq.id.length; i++) {
+      global.db.get(knex("students").select().where({
+        id: ireq.id[i]
+      }).toString(), (err, row) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          return;
+        }
+        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+      });
+
+    }
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+  return;
 }
 
 /**
@@ -675,7 +704,6 @@ function setTime(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  console.log("in function");
   global.db.run(knex("students").update({
     timeDiff: ireq.time
   }).where("id", "in", ireq.id).toString(), (err) => {
@@ -687,12 +715,60 @@ function setTime(conn, ireq) {
       return;
     }
     oreq = getBaseReq();
+    for (var i = 0; i < ireq.id.length; i++) {
+      global.db.get(knex("students").select().where({
+        id: ireq.id[i]
+      }).toString(), (err, row) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          return;
+        }
+        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+      });
+
+    }
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
-
-
-
 }
+
+/**
+ * Get the logs of the students
+ * @method getLogs
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getLogs(conn, ireq) {
+  var oreq;
+  if (conn.user === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.id === undefined) {
+    oreq = getBaseReq();
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  log.get(ireq.id,(err,data) =>
+{
+  if(err)
+  {
+    oreq = getBaseReq();
+    oreq.error = err;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  console.log(data);
+  oreq = getBaseReq();
+  oreq.error = request.ERROR.OK;
+  oreq.data = data;
+  conn.socket.write(JSON.stringify(oreq) + "\0");
+  return;
+});
+}
+
 /**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
@@ -772,6 +848,9 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.SETTIME:
         setTime(connection, ireq[i]);
+        break;
+      case request.REQUEST.LOGS:
+        getLogs(connection, ireq[i]);
         break;
     }
   }

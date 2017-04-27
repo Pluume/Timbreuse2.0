@@ -36,14 +36,33 @@ PROOF = {
   CERTIFICATE: 2,
   CONVOCATION: 3
 };
+PROOF = {
+  NONE: 0,
+  MEDICAL: 1,
+  CERTIFICATE: 2,
+  CONVOCATION: 3
+};
+LOGS = {
+  IN:1,
+  OUT:2,
+  ABSENT:3,
+  SETTIME:4,
+  MODTIME:5,
+  RESETTIME:6,
+  MINIMUMPAUSE:7,
+  NOPAUSE:8,
+  NOLUNCH:9
+}
 global.RANK = RANK;
 global.STATUS = STATUS;
+global.LOGS = LOGS;
 module.exports = {
     handle: handle,
     RANK: RANK,
     REASON: REASON,
     PROOF: PROOF,
     STATUS: STATUS,
+    LOGS: LOGS,
     /**
      * Init the database
      * @method init
@@ -96,12 +115,13 @@ module.exports = {
             //TODO Add timediff in the log table
             handle.run(knex.schema.createTableIfNotExists("logs", function(table) { //logs table
                 table.increments("id").primary();
-                table.string("tag");
                 table.integer("studentid");
-                table.integer("nstatus");
+                table.integer("type");
                 table.string("date");
                 table.string("class");
                 table.string("description");
+                table.integer("timeDiff");
+                table.integer("timeDiffToday");
             }).toString());
 
             handle.run(knex.schema.createTableIfNotExists("notifications", function(table) { //notification table

@@ -17,6 +17,7 @@
 
   <!-- Custom Fonts -->
   <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
   <script src="../dist/js/pages.js"></script>
 </head>
 
@@ -48,6 +49,7 @@
     window.SCOPE = require('../../../request.js').SCOPE;
     window.RANK = require('../../../db/db.js').RANK;
     window.STATUS = require('../../../db/db.js').STATUS;
+    window.LOGS = require('../../../db/db.js').LOGS;
     setPage(window.PAGES.PROFS);
     var stdToApply = [];
 
@@ -64,8 +66,9 @@
     }
 
     function studentsListFormatter(val, row) {
-      return "<button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='gotoDetailStudent(" + row.id +
-        ");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" + row.id +
+      return "<span data-toggle='modal' data-target='#detailsStudentModal'><button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='showEditModal(" + row.id +
+        ",\"" + row.fname + "\",\"" + row.lname +
+        "\");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button></span><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" + row.id +
         ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button></span><span data-toggle='modal' data-target='#editStudentTimeModal'><button data-toggle='tooltip' data-placement='bottom' title='Edit time' href='#' onclick='stdToApply = [" +
         row.id +
         "];' class='btn btn-warning btn-circle'><i class='glyphicon glyphicon-time'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToApply = [" +
@@ -128,6 +131,28 @@
       $('#delStudentModal').modal('toggle');
     }
 
+    function showEditModal(id, fname, lname) {
+      document.getElementById("detailsStudentModalTitle").innerHTML = "Detail of " + fname + " " + lname;
+      getLogs(id, (data) => {
+        console.log(JSON.stringify(data));
+        $('#detailsCalendar').fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay,listWeek'
+          },
+          defaultDate: '2017-04-12',
+          navLinks: true, // can click day/week names to navigate views
+          editable: false,
+          eventLimit: true, // allow "more" link when too many events
+          events: data.format
+        });
+      });
+      //id = detailsCalendar
+      //TODO Show loading icon in the modal + implement close button at the end
+      //TODO Display all the data in the calendar
+      //TODO Display the true detail in graph below
+    }
 
     function submitEditModal(id) {
       editStudent(id, document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
@@ -141,10 +166,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addStudentModalTitle">Create a new student</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+          <h2 class="modal-title" id="addStudentModalTitle">Create a new student</h2>
         </div>
         <div class="modal-body">
           <form>
@@ -193,10 +215,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="editStudentTimeModalTitle">Edit student's time</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+          <h2 class="modal-title" id="editStudentTimeModalTitle">Edit student's time</h2>
         </div>
         <div class="modal-body">
           <form>
@@ -262,16 +281,16 @@
                   resetTime(stdToApply);
                   return;
                 } else if (document.getElementById("modtime_radio").checked) {
-                  var time = parseInt(document.getElementById("edittime_hours").value, 10)*3600 + parseInt(document.getElementById("edittime_minutes").value, 10)*60;
+                  var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                    modTime(stdToApply,time)
+                  modTime(stdToApply, time)
                   return;
                 } else if (document.getElementById("settime_radio").checked) {
-                  var time = parseInt(document.getElementById("settime_hours").value, 10)*3600 + parseInt(document.getElementById("settime_minutes").value, 10)*60;
+                  var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                    setTime(stdToApply,time)
+                  setTime(stdToApply, time)
                   return;
                 }
               }
@@ -289,10 +308,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="delStudentModalTitle">Are you sure to delete this/these student(s) ?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+          <h2 class="modal-title" id="delStudentModalTitle">Are you sure to delete this/these student(s) ?</h2>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -301,14 +317,41 @@
       </div>
     </div>
   </div>
+
+  <style>
+    .modal-dialogMax {
+      width: 98%;
+      height: 98%;
+      padding: 0;
+      margin: 1%;
+    }
+
+    .modal-contentMax {
+      height: 100%;
+      border-radius: 0;
+    }
+  </style>
+  <div class="modal fade" id="detailsStudentModal" tabindex="-1" role="dialog" aria-labelledby="detailsStudentModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialogMax" role="document">
+      <div class="modal-content modal-contentMax">
+        <div class="modal-header">
+          <h2 class="modal-title" id="detailsStudentModalTitle"></h2>
+        </div>
+        <div class="modal-body">
+          <div id="detailsCalendar"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="editStudentModalTitle">Edit this student</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+          <h2 class="modal-title" id="editStudentModalTitle">Edit this student</h2>
         </div>
         <div class="modal-body">
           <form>
@@ -379,6 +422,8 @@
   <script src="../dist/js/informations.js"></script>
   <script src="../dist/js/redirect.js"></script>
   <script src="../dist/js/utils.js"></script>
+  <script src="../vendor/moment/moment.js"></script>
+  <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
   <script>
   </script>
 </body>

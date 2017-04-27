@@ -29,6 +29,8 @@ function endOfDay() {
         }
         ntimeDiff += (row.missedPause<=0) ? 0:(row.missedPause * (-20 * 60)); //Substract time in case of missed pause
         ntimeDiff += (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
+        id(row.hadLunch)
+        log.save(global.LOGS.NOLUNCH, row.id, "SERVER", null, "", row.timeDiff, row.timeDiffToday);
         var ndetails;
         try {
             if (ndetails === undefined || ndetails === null)

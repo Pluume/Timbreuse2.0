@@ -44,7 +44,8 @@ REQUEST ={
     EDITSTUDENT: 9,
     SETTIME: 10,
     MODTIME: 11,
-    RESETTIME: 12
+    RESETTIME: 12,
+    LOGS: 13
 };
 PAGES ={
     LOGIN: 0,

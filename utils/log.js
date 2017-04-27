@@ -8,14 +8,19 @@ const moment = require("moment");
 const at = require("console-at");
 var path = require("path");
 const fs = require("fs");
-var access = fs.createWriteStream("Timbreuse.log",{ flags: 'w' });
+var access = fs.createWriteStream("Timbreuse.log", {
+  flags: 'w'
+});
+const knex = require('knex')({
+  client: 'sqlite3',
+  useNullAsDefault: true
+});
 /**
  * Print a user friendly information message to the console
  * @method info
  * @param {String} msg the message.
  **/
-var info = (msg) =>
-{
+var info = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
@@ -26,8 +31,7 @@ var info = (msg) =>
  * @method error
  * @param {String} msg the message.
  **/
-var error = (msg) =>
-{
+var error = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
@@ -38,8 +42,7 @@ var error = (msg) =>
  * @method warning
  * @param {String} msg the message.
  **/
-var warning = (msg) =>
-{
+var warning = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
@@ -48,25 +51,134 @@ var warning = (msg) =>
 process.on('uncaughtException', function(err) {
   error((err && err.stack) ? err.stack : err);
 });
-process.on("exit",(code) => {
+process.on("exit", (code) => {
   info("Exiting with code " + code);
   access.end();
 });
+
+var save = function(type, stdid, tclass, time, comments, td, tdT) {
+  global.db.run(knex("logs").insert({
+    type: type,
+    studentid: stdid,
+    date: time,
+    class: tclass,
+    description: comments,
+    timeDiff: td,
+    timeDiffToday: tdT
+  }).toString());
+};
+var get = function(stdid, cb) {
+  var obj = {};
+  global.db.all(knex("logs").select().where({
+    studentid: stdid
+  }).toString(), (err, rows) => {
+    if (err || rows == undefined || rows == []) {
+      error("SQLITE Error : " + err);
+      cb(global.ERROR.SQLITE);
+      return;
+    }
+    obj.logs = rows;
+    global.db.get(knex("students").select().where({
+      id: stdid
+    }).toString(), (err, row0) => {
+      if (err) {
+        error("SQLITE Error : " + err);
+        cb(global.ERROR.SQLITE);
+        return;
+      }
+      global.db.get(knex("users").select().where({
+        id: row0.userid
+      }).toString(), (err, row) => {
+        if (err) {
+          error("SQLITE Error : " + err);
+          cb(global.ERROR.SQLITE);
+          return;
+        }
+        obj.user = row;
+        cb(null, obj);
+      })
+    });
+
+  });
+};
+
+function format(data) {
+  var obj = [];
+  for (var i = 0; i < data.logs.length; i++) {
+    var curr = {};
+
+    switch (data.logs[i].type) {
+      case global.LOGS.IN:
+        curr.title = "IN";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.LOGS.OUT:
+        curr.title = "OUT";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.LOGS.ABS:
+        curr.title = "ABSENT";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.LOGS.SETTIME:
+        curr.title = "TIME SET";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.STATUS.MODTIME:
+        curr.title = "TIME ALTERED";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.STATUS.RESETTIME:
+        curr.title = "ACCOUNT RESET";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.STATUS.MINIMUMPAUSE:
+        curr.title = "MINIMUMPAUSE RULE BROKEN";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.STATUS.NOPAUSE:
+        curr.title = "NO PAUSE TAKEN";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+      case global.STATUS.NOLUNCH:
+        curr.title = "NO LUNCH TAKEN";
+        curr.start = data.logs[i].date;
+        curr.description = data.logs[i].comments;
+        break;
+
+      default:
+        continue;
+    }
+    obj.push(curr);
+  }
+  obj.today = moment().format("YYYY-MM-DD").toString();
+  return obj;
+}
 module.exports = {
   info,
   error,
-  warning
+  warning,
+  save,
+  get,
+  format
 };
 /**
  * On SIGINT (Ctrl + C), quit the app nicely
  * @method interruption
  **/
-function interruption()
-{
+function interruption() {
   warning("Interruption caught !");
   try {
     test.stop();
-  } catch(err) {
+  } catch (err) {
     //Don't handle error.
   }
   process.exit();
@@ -77,11 +189,11 @@ if (process.platform === "win32") {
     output: process.stdout
   });
 
-  rl.on("SIGINT", function () {
+  rl.on("SIGINT", function() {
     interruption();
   });
 }
 
-process.on("SIGINT", function () {
+process.on("SIGINT", function() {
   interruption();
 });

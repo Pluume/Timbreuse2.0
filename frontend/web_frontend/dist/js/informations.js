@@ -281,6 +281,7 @@ function modTime(id, ntime) {
     time: ntime
   });
 }
+
 function setTime(id, ntime) {
   ipcRenderer.once("setTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -304,5 +305,35 @@ function setTime(id, ntime) {
   ipcRenderer.send("setTime", {
     id: id,
     time: ntime
+  });
+}
+
+function getLogs(id, cb) {
+  ipcRenderer.once("logs", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        if (arg.data.logs == undefined)
+          cb(null);
+        else
+          cb(arg);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      case window.ERROR.SQLITE:
+        redAlert("Database error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+  ipcRenderer.send("logs", {
+    id: id
   });
 }
