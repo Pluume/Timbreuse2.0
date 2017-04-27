@@ -12,20 +12,29 @@ module.exports = {
    * @param {Date} date2 the end date.
    * @return {Integer} the difference in seconds between the date1 and the date2
    **/
-  getTimeDelta: (date1,date2) => {
-    return (Math.abs(date1 - date2)/1000);
+  getTimeDelta: (date1, date2) => {
+    return (Math.abs(date1 - date2) / 1000);
   },
   /**
    * Convert seconds to H:M:S format
    * @method secondsToHms
    **/
-  secondsToHms: function(d) {
-      d = Number(d);
-
-      var h = Math.floor(d / 3600);
-      var m = Math.floor(d % 3600 / 60);
-      var s = Math.floor(d % 3600 % 60);
-
-      return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s);
+  secondsToHms: function(nb) {
+    function addZero(nb)
+    {
+      if(Math.abs(nb<10))
+      {
+        return "0" + nb.toString();
+      } else {
+        return nb.toString();
+      }
+    }
+    var neg;
+    (nb < 0) ? neg = true: neg = false;
+    nb = Math.abs(Number(nb));
+    var h = Math.floor(nb / 3600);
+    var m = Math.floor(Math.floor(nb % 3600) / 60);
+    var s = Math.floor(nb % 60);
+    return ((neg) ? "-":"+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s);
   }
 };

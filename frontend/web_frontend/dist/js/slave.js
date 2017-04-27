@@ -16,8 +16,8 @@ function displayTaggedStudent(event, std) {
     heading.innerHTML = std.user.fname + " " + std.user.lname;
     var body = document.createElement("div");
     body.setAttribute("class","panel-body");
-    body.innerHTML = "Your daily timer is set to : " + std.timeDiffToday;
-    body.innerHTML += "\nYour total timer is set to : " + std.timeDiff;
+    body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
+    body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
     var footer = document.createElement("div");
     footer.setAttribute("class","panel-footer");
     if (std.status == window.STATUS.IN) {
