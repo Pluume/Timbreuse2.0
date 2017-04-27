@@ -760,7 +760,6 @@ function getLogs(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  console.log(data);
   oreq = getBaseReq();
   oreq.error = request.ERROR.OK;
   oreq.data = data;

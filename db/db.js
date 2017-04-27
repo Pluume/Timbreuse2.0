@@ -88,6 +88,7 @@ module.exports = {
                 table.string("dob");
                 table.string("email");
                 table.string("tag");
+                table.blob("pp");
             }).toString());
 
             handle.run(knex.schema.createTableIfNotExists("students", function(table) { //Student table
@@ -103,6 +104,7 @@ module.exports = {
                 table.integer("status");
                 table.boolean("isBlocked");
                 table.string("project");
+                table.string("firstClass");
             }).toString());
 
 

@@ -86,6 +86,7 @@ var get = function(stdid, cb) {
         cb(global.ERROR.SQLITE);
         return;
       }
+      obj.student = row0;
       global.db.get(knex("users").select().where({
         id: row0.userid
       }).toString(), (err, row) => {
@@ -111,47 +112,74 @@ function format(data) {
       case global.LOGS.IN:
         curr.title = "IN";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(25, 124, 67)";
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.OUT:
         curr.title = "OUT";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(193, 57, 43)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.ABS:
         curr.title = "ABSENT";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(78, 166, 194)"
+        curr.textColor = "rgb(0, 0, 0)"
         break;
       case global.LOGS.SETTIME:
         curr.title = "TIME SET";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(170, 13, 159)"
+        curr.textColor = "rgb(0, 0, 0)"
         break;
       case global.STATUS.MODTIME:
         curr.title = "TIME ALTERED";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(170, 13, 159)"
+        curr.textColor = "rgb(0, 0, 0)"
         break;
       case global.STATUS.RESETTIME:
         curr.title = "ACCOUNT RESET";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(170, 13, 159)"
+        curr.textColor = "rgb(0, 0, 0)"
         break;
       case global.STATUS.MINIMUMPAUSE:
         curr.title = "MINIMUMPAUSE RULE BROKEN";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(233, 119, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.STATUS.NOPAUSE:
         curr.title = "NO PAUSE TAKEN";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(233, 119, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.STATUS.NOLUNCH:
         curr.title = "NO LUNCH TAKEN";
         curr.start = data.logs[i].date;
-        curr.description = data.logs[i].comments;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(233, 119, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
 
       default:
@@ -159,7 +187,7 @@ function format(data) {
     }
     obj.push(curr);
   }
-  obj.today = moment().format("YYYY-MM-DD").toString();
+  obj.today = moment().toString();
   return obj;
 }
 module.exports = {
