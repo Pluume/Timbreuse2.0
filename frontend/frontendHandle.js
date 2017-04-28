@@ -35,7 +35,10 @@ function logIn(event, arg) {
     user: arg.user,
     pass: passhash
   }];
+  console.log("logging");
+
   client.connect((err) => {
+
     if (err !== null) {
       log.error("Error connecting to server : " + err);
       event.sender.send("login", request.ERROR.UNKNOWN);
@@ -43,7 +46,6 @@ function logIn(event, arg) {
     }
     client.send(JSON.stringify(oreq), (err, data) => {
       try {
-
         var ireq = JSON.parse(data);
         if (ireq.fnc != oreq[0].fnc)
           return;

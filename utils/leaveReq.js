@@ -18,16 +18,16 @@ const math = require("./math.js");
  * @param {String} where the place it has been made.
  **/
 function create(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) {
-    global.db.handle.run(knex("leavereq").insert({
-        studentid: studentid,
-        dateFrom: dateFrom,
-        dateTo: dateTo,
-        missedTest: missedTest,
-        reason: reason,
-        reasonDesc: reasonDesc,
-        proof: proof,
-        where: where
-    }).returning("*").toString());
+  global.db.handle.run(knex("leavereq").insert({
+    studentid: studentid,
+    dateFrom: dateFrom,
+    dateTo: dateTo,
+    missedTest: missedTest,
+    reason: reason,
+    reasonDesc: reasonDesc,
+    proof: proof,
+    where: where
+  }).returning("*").toString());
 }
 /**
  * Compare two dates
@@ -37,11 +37,11 @@ function create(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, pro
  * @return 1 if A>B, 0 if A=B and -1 if A<B
  **/
 function compareDate(dateTimeA, dateTimeB) {
-    var momentA = moment(dateTimeA, "DD/MM/YYYY");
-    var momentB = moment(dateTimeB, "DD/MM/YYYY");
-    if (momentA > momentB) return 1;
-    else if (momentA < momentB) return -1;
-    else return 0;
+  var momentA = moment(dateTimeA, "DD/MM/YYYY");
+  var momentB = moment(dateTimeB, "DD/MM/YYYY");
+  if (momentA > momentB) return 1;
+  else if (momentA < momentB) return -1;
+  else return 0;
 }
 /**
  * Get the number of second to add to the student because he had justified his missing time.
@@ -50,60 +50,60 @@ function compareDate(dateTimeA, dateTimeB) {
  * @return The number of seconds to add to this student
  **/
 function routine(res) {
-    var sync = true;
-    var diff = 0;
-    var smmt = moment(res.dateFrom);
-    var smmtMidnight = smmt.clone().startOf('day');
-    var ssecs = smmt.diff(smmtMidnight, 'seconds');
-    var emmt = moment(res.dateTo);
-    var esecs = emmt.diff(smmtMidnight, 'seconds');
-    if (esecs > 86400) //If the end time of the leavereq is more than a day
-        esecs -= emmt.diff(smmtMidnight, 'days') * 86400;
-    var today = config.loadDay(new Date().getDay());
-    if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === -1) // If for the future
-    {
-        return diff;
-    }
-    if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === 1) // If has passed
-    {
-        //TODO DELETE THIS RECORD
-        return diff;
-    }
-    if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === 1) // If has started precedently
-    {
-        ssecs = today.schedule[0].begin - 1;
-    }
-    if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === -1) // If has started precedently
-    {
-        esecs = today.schedule[today.schedule.length - 1].end + 1;
-    }
-    for (var i = 0; i < today.schedule.length; i++) { //Iterating through the schedule of the day
-
-        if (ssecs <= today.schedule[i].begin) { //The start time is before start schedule
-
-            if (esecs >= today.schedule[i].begin && esecs <= today.schedule[i].end)
-                diff += esecs - today.schedule[i].begin;
-
-            if (esecs <= today.schedule[i].end) //But the end is before this schedule end
-                break;
-            else {
-                diff += today.schedule[i].end - today.schedule[i].begin; //The begin and end of the leavereq is out of the schedule so we add all to the diff
-                continue;
-            }
-        }
-
-        if (ssecs > today.schedule[i].begin && ssecs < today.schedule[i].end) { //The start of the leavereq is superior to the schedule begin but inferior to it's end
-            if (esecs < today.schedule[i].end) { //But the end of the leavereq is inferior to the end of the schedule.
-                diff += esecs - ssecs; //So we diff from these two dates
-                break;
-            }
-            diff += today.schedule[i].end - ssecs; //However is the end of the leavereq is superior to the end of the schedule, we diff from the start of the leavereq to the end of the schedule
-            continue;
-        }
-    }
-    if (diff > today.timeToDo)
-        diff = today.timeToDo;
+  var sync = true;
+  var diff = 0;
+  var smmt = moment(res.dateFrom);
+  var smmtMidnight = smmt.clone().startOf('day');
+  var ssecs = smmt.diff(smmtMidnight, 'seconds');
+  var emmt = moment(res.dateTo);
+  var esecs = emmt.diff(smmtMidnight, 'seconds');
+  if (esecs > 86400) //If the end time of the leavereq is more than a day
+    esecs -= emmt.diff(smmtMidnight, 'days') * 86400;
+  var today = config.loadDay(new Date().getDay());
+  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === -1) // If for the future
+  {
     return diff;
+  }
+  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === 1) // If has passed
+  {
+    //TODO DELETE THE RECORD
+    return diff;
+  }
+  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === 1) // If has started precedently
+  {
+    ssecs = today.schedule[0].begin - 1;
+  }
+  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === -1) // If has started precedently
+  {
+    esecs = today.schedule[today.schedule.length - 1].end + 1;
+  }
+  for (var i = 0; i < today.schedule.length; i++) { //Iterating through the schedule of the day
+
+    if (ssecs <= today.schedule[i].begin) { //The start time is before start schedule
+
+      if (esecs >= today.schedule[i].begin && esecs <= today.schedule[i].end)
+        diff += esecs - today.schedule[i].begin;
+
+      if (esecs <= today.schedule[i].end) //But the end is before this schedule end
+        break;
+      else {
+        diff += today.schedule[i].end - today.schedule[i].begin; //The begin and end of the leavereq is out of the schedule so we add all to the diff
+        continue;
+      }
+    }
+
+    if (ssecs > today.schedule[i].begin && ssecs < today.schedule[i].end) { //The start of the leavereq is superior to the schedule begin but inferior to it's end
+      if (esecs < today.schedule[i].end) { //But the end of the leavereq is inferior to the end of the schedule.
+        diff += esecs - ssecs; //So we diff from these two dates
+        break;
+      }
+      diff += today.schedule[i].end - ssecs; //However is the end of the leavereq is superior to the end of the schedule, we diff from the start of the leavereq to the end of the schedule
+      continue;
+    }
+  }
+  if (diff > today.timeToDo)
+    diff = today.timeToDo;
+  return diff;
 }
 /**
  * Update a leave request in the database
@@ -119,18 +119,18 @@ function routine(res) {
  * @param {String} where the place it has been made.
  **/
 function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) {
-    global.db.handle.run(knex("leavereq").where({
-        id: id
-    }).update({
-        studentid: studentid,
-        dateFrom: dateFrom,
-        dateTo: dateTo,
-        missedTest: missedTest,
-        reason: reason,
-        reasonDesc: reasonDesc,
-        proof: proof,
-        where: where
-    }).toString());
+  global.db.handle.run(knex("leavereq").where({
+    id: id
+  }).update({
+    studentid: studentid,
+    dateFrom: dateFrom,
+    dateTo: dateTo,
+    missedTest: missedTest,
+    reason: reason,
+    reasonDesc: reasonDesc,
+    proof: proof,
+    where: where
+  }).toString());
 }
 /**
  * Delete a leave request in the database
@@ -138,9 +138,9 @@ function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc,
  * @param {Integer} id The id of the leavereq in the database.
  **/
 function erase(id) {
-    global.db.handle.run(knex("leavereq").where({
-        id: id
-    }).del().toString());
+  global.db.handle.run(knex("leavereq").where({
+    id: id
+  }).del().toString());
 }
 
 function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) //FIXME
@@ -148,5 +148,5 @@ function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, 
 
 }
 module.exports = {
-    //isToday
+  //isToday
 };

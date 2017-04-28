@@ -170,9 +170,8 @@ function tagRequest(item, index) {
           var missedPause = row2.missedPause;
           if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
             var pauseDelta = math.getTimeDelta(moment(ireq.time).toDate().getTime(), new Date(row2.lastTagTime).getTime());
-            if (pauseDelta >= global.config.lunch.time) {
+            if (pauseDelta >= global.config.lunch.time)
               hadLunch = 1;
-            }
           }
           var awayTime = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
           if (awayTime >= global.config.pause.time && row2.missedPause > 0) {
@@ -243,7 +242,7 @@ function authenticate(conn, ireq) {
 
       oreq.fnc = request.REQUEST.AUTH;
       oreq.error = request.ERROR.WRONGCREDS;
-      conn.socket.end(JSON.stringify(oreq));
+      conn.socket.end(JSON.stringify(oreq) + "\0");
       return;
     }
     if (row.password == ireq.pass) {
@@ -258,7 +257,7 @@ function authenticate(conn, ireq) {
 
     oreq.fnc = request.REQUEST.AUTH;
     oreq.error = request.ERROR.WRONGCREDS;
-    conn.socket.end(JSON.stringify(oreq));
+    conn.socket.end(JSON.stringify(oreq) + "\0");
     return;
   });
 }

@@ -1,82 +1,126 @@
 {
-    "class": "Client",
-    "csvFreq": 0,
-    "server": "172.21.201.254",
-    "defaultPass":"test",
-    "slaves": [],
-    "lunch": {"begin":41400,"end": 48600, "time": 1800},
-    "pause": {"time":1200,"minimum": 360,"interval": 14400,"minimum_error": 20},
-    "workDay": [{
-            "name": "sunday",
-            "timeToDo": 0,
-            "endOfDay": 0,
-            "schedule": []
+  "class": "Client",
+  "csvFreq": 0,
+  "server": "172.21.201.254",
+  "defaultPass": "test",
+  "slaves": [],
+  "lunch": {
+    "begin": 41400,
+    "end": 48600,
+    "time": 1800
+  },
+  "pause": {
+    "time": 1200,
+    "minimum": 360,
+    "interval": 14400,
+    "minimum_error": 20
+  },
+  "workDay": [{
+      "name": "sunday",
+      "timeToDo": 0,
+      "endOfDay": 0,
+      "launch": 0,
+      "schedule": [],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "monday",
+      "timeToDo": 25200,
+      "endOfDay": 60000,
+      "launch": 1,
+      "schedule": [{
+          "begin": 32400,
+          "end": 41400
         },
         {
-            "name": "monday",
-            "timeToDo": 25200,
-            "endOfDay": 60000,
-            "schedule": [{
-                    "begin": 32400,
-                    "end": 41400
-                },
-                {
-                    "begin": 48600,
-                    "end": 57600
-                }
-            ]
-        },
-        {
-            "name": "tuesday",
-            "timeToDo": 25200,
-            "endOfDay": 60000,
-            "schedule": [{
-                    "begin": 32400,
-                    "end": 41400
-                },
-                {
-                    "begin": 48600,
-                    "end": 57600
-                }
-            ]
-        },
-        {
-            "name": "wednesday",
-            "timeToDo": 0,
-            "endOfDay": 0,
-            "schedule": []
-        },
-        {
-            "name": "thursday",
-            "timeToDo": 25200,
-            "endOfDay": 60000,
-            "schedule": [{
-                    "begin": 32400,
-                    "end": 41400
-                },
-                {
-                    "begin": 48600,
-                    "end": 57600
-                }
-            ]
-        },
-        {
-            "name": "friday",
-            "timeToDo": 25200,
-            "endOfDay": 60000,
-            "schedule": [{
-                "begin": 32400,
-                "end": 41400
-            }]
-        },
-        {
-            "name": "saturday",
-            "timeToDo": 0,
-            "endOfDay": 0,
-            "schedule": [{
-                "begin": 0,
-                "end": 0
-            }]
+          "begin": 48600,
+          "end": 57600
         }
-    ]
+      ],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "tuesday",
+      "timeToDo": 25200,
+      "endOfDay": 60000,
+      "launch": 1,
+      "schedule": [{
+          "begin": 32400,
+          "end": 41400
+        },
+        {
+          "begin": 48600,
+          "end": 57600
+        }
+      ],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "wednesday",
+      "timeToDo": 0,
+      "endOfDay": 0,
+      "launch": 0,
+      "schedule": [],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "thursday",
+      "timeToDo": 25200,
+      "endOfDay": 60000,
+      "launch": 1,
+      "schedule": [{
+          "begin": 32400,
+          "end": 41400
+        },
+        {
+          "begin": 48600,
+          "end": 57600
+        }
+      ],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "friday",
+      "timeToDo": 25200,
+      "endOfDay": 60000,
+      "launch": 0,
+      "schedule": [{
+        "begin": 32400,
+        "end": 41400
+      }],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    },
+    {
+      "name": "saturday",
+      "timeToDo": 0,
+      "endOfDay": 0,
+      "launch": 0,
+      "schedule": [{
+        "begin": 0,
+        "end": 0
+      }],
+      "scheduleFix": [{
+        "begin": 0,
+        "end": 0
+      }]
+    }
+  ]
 }

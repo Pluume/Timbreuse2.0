@@ -18,6 +18,7 @@ function incomingDataHandling(data)
 {
   currentBuf += data;
   if(currentBuf[currentBuf.length - 1] == "\0") {
+    console.log(currentBuf);
     currentCb(null, currentBuf.substring(0, currentBuf.length - 1).toString("utf8"));
     currentBuf = "";
   }
@@ -26,7 +27,6 @@ function incomingDataHandling(data)
 function connect(cb) {
     clientconn = new net.Socket();
     clientconn.once("error", (err) => {
-      console.log(global.currentPage);
         if (global.currentPage != request.PAGES.LOGIN)
             global.mwin.loadURL(url.format({
                 pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
@@ -37,7 +37,6 @@ function connect(cb) {
         cb(err);
     });
     clientconn.once("close", () => {
-      console.log(global.currentPage);
         if (global.currentPage != request.PAGES.LOGIN)
             global.mwin.loadURL(url.format({
                 pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
