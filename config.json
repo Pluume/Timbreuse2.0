@@ -18,7 +18,6 @@
   "workDay": [{
       "name": "sunday",
       "timeToDo": 0,
-      "endOfDay": 0,
       "launch": 0,
       "schedule": [],
       "scheduleFix": [{
@@ -29,7 +28,6 @@
     {
       "name": "monday",
       "timeToDo": 25200,
-      "endOfDay": 60000,
       "launch": 1,
       "schedule": [{
           "begin": 32400,
@@ -48,7 +46,6 @@
     {
       "name": "tuesday",
       "timeToDo": 25200,
-      "endOfDay": 60000,
       "launch": 1,
       "schedule": [{
           "begin": 32400,
@@ -67,7 +64,6 @@
     {
       "name": "wednesday",
       "timeToDo": 0,
-      "endOfDay": 0,
       "launch": 0,
       "schedule": [],
       "scheduleFix": [{
@@ -78,7 +74,6 @@
     {
       "name": "thursday",
       "timeToDo": 25200,
-      "endOfDay": 60000,
       "launch": 1,
       "schedule": [{
           "begin": 32400,
@@ -97,7 +92,6 @@
     {
       "name": "friday",
       "timeToDo": 25200,
-      "endOfDay": 60000,
       "launch": 0,
       "schedule": [{
         "begin": 32400,
@@ -111,7 +105,6 @@
     {
       "name": "saturday",
       "timeToDo": 0,
-      "endOfDay": 0,
       "launch": 0,
       "schedule": [{
         "begin": 0,

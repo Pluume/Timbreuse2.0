@@ -1,3 +1,4 @@
+const moment = require("moment");
 /**
  * Handle mathematics functions needed by the server.
  *
@@ -14,6 +15,10 @@ module.exports = {
    **/
   getTimeDelta: (date1, date2) => {
     return (Math.abs(date1 - date2) / 1000);
+  },
+  secondsToDate: (sec) =>
+  {
+    return moment().startOf("day").add(sec, "seconds").utcOffset(moment().utcOffset()).toISOString().toString()
   },
   /**
    * Convert seconds to H:M:S format

@@ -6,6 +6,7 @@ var knex = require('knex')({
   useNullAsDefault: true
 });
 var moment = require("moment");
+var math = require("./math.js");
 const config = require("./config.js");
 
 
@@ -24,18 +25,35 @@ function endOfDay() {
     var ntimeDiff;
     if (row.status == global.STATUS.IN) {
       ntimeDiff = row.timeDiff - dayConfig.timeToDo;
-
+      log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Last status of the day was IN", row.timeDiff, row.timeDiffToday);
     } else if (row.status == global.STATUS.ABS) {
       ntimeDiff = row.timeDiff
     } else {
       ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
+
+      if (row.isBlocked) {
+
+        if (dayConfig.scheduleFix.length > 0)
+          if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.scheduleFix[0].end))) {
+            log.warning("USRID " + row.id + " : Left early");
+            log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Left early", row.timeDiff, row.timeDiffToday);
+          }
+      } else {
+
+        if (dayConfig.schedule.length > 0)
+          if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].end))) {
+            log.warning("USRID " + row.id + " : Left early");
+            log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Left early", row.timeDiff, row.timeDiffToday);
+          }
+      }
+
     }
-    if(row.status != global.STATUS.ABS)
-    {
+    if (row.status != global.STATUS.ABS) {
       ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60)); //Substract time in case of missed pause
-    ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
+      if (dayConfig.lunch)
+        ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
     }
-    if (!row.hadLunch && row.status != global.STATUS.ABS)
+    if (!row.hadLunch && row.status != global.STATUS.ABS && dayConfig.lunch)
       log.save(global.LOGS.NOLUNCH, row.id, "SERVER", null, "", row.timeDiff, row.timeDiffToday);
     var ndetails;
     try {
@@ -68,7 +86,7 @@ function endOfDay() {
 
     //TODO Notification on student's status == IN at end of day
     global.db.run(knex("students").where("id", row.id).update({
-      status: (row.status == global.STATUS.ABS) ? global.STATUS.ABS:global.STATUS.OUT,
+      status: (row.status == global.STATUS.ABS) ? global.STATUS.ABS : global.STATUS.OUT,
       timeDiff: ntimeDiff,
       timeDiffToday: 0,
       details: JSON.stringify(ndetails),

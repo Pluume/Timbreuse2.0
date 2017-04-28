@@ -181,7 +181,14 @@ function format(data) {
         curr.color = "rgb(233, 119, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-
+        case global.STATUS.TIMEERROR:
+          curr.title = "TIME RULE BROKEN";
+          curr.start = data.logs[i].date;
+          if (data.logs[i].description)
+            curr.title += " - " + data.logs[i].description
+          curr.color = "rgb(233, 119, 0)"
+          curr.textColor = "rgb(255, 255, 255)"
+          break;
       default:
         continue;
     }

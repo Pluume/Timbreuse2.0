@@ -18,6 +18,7 @@ const knex = require('knex')({
 var tagReqList = require("array")();
 var tagReqFncStarted = false;
 const moment = require("moment");
+const config = require("./utils/config.js");
 /**
  * Generate the a base for an outgoing request
  * @method getBaseReq
@@ -202,8 +203,26 @@ function tagRequest(item, index) {
               delete oreq.student.user.password;
               if (!ireq.delayed)
                 conn.socket.write(JSON.stringify(oreq) + "\0");
-              console.log(JSON.stringify(row3));
+              var d = new Date();
+              var dayConfig = config.loadDay(d.getDay());
               log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, "", row3.timeDiff, row3.timeDiffToday);
+              if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
+                if (row2.isBlocked) {
+                  if (dayConfig.scheduleFix.length > 0)
+                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin)))
+                    {
+                      log.warning("USRID " + row.id + " : Arrived late");
+                      log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                    }
+                } else {
+                  if (dayConfig.schedule.length > 0)
+                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin)))
+                    {
+                      log.warning("USRID " + row.id + " : Arrived late");
+                      log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                    }
+                }
+              }
             });
           });
         }
@@ -683,7 +702,7 @@ function modTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 
     }
@@ -731,7 +750,7 @@ function setTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 
     }
@@ -759,21 +778,19 @@ function getLogs(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  log.get(ireq.id,(err,data) =>
-{
-  if(err)
-  {
+  log.get(ireq.id, (err, data) => {
+    if (err) {
 
-    oreq.error = err;
+      oreq.error = err;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+
+    oreq.error = request.ERROR.OK;
+    oreq.data = data;
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
-  }
-
-  oreq.error = request.ERROR.OK;
-  oreq.data = data;
-  conn.socket.write(JSON.stringify(oreq) + "\0");
-  return;
-});
+  });
 }
 
 /**

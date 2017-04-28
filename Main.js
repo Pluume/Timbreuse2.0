@@ -5,10 +5,19 @@
  */
 const fh = require("./frontend/frontendHandle.js");
 const log = require("./utils/log.js");
+
+const sinon = require("sinon");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");
 config.read();
 config.getType();
+
+if(global.DEBUG)
+{
+  //clock = sinon.useFakeTimers(new Date("2017-04-28T06:10:32.571Z").getTime());
+}
+
+
 global.mwin = null;
 const slaveHandle = require("./frontend/slave.js");
 log.info("Starting as a " + global.TYPE.string);
