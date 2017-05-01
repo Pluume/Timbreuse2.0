@@ -657,7 +657,7 @@ function resetTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-        log.save(global.LOGS.RESETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.RESETTIME, ireq.id[i], "SERVER", moment().format().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 
     }
@@ -702,7 +702,7 @@ function modTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 
     }
@@ -750,7 +750,7 @@ function setTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().toISOString().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 
     }

@@ -16,19 +16,18 @@ module.exports = {
   getTimeDelta: (date1, date2) => {
     return (Math.abs(date1 - date2) / 1000);
   },
-  secondsToDate: (sec) =>
-  {
-    return moment().startOf("day").add(sec, "seconds").utcOffset(moment().utcOffset()).toISOString().toString()
+  secondsToDate: (sec) => {
+    return moment().startOf("day").add(sec, "seconds").format().toString()
   },
   /**
    * Convert seconds to H:M:S format
    * @method secondsToHms
    **/
   secondsToHms: function(nb) {
-    function addZero(nb)
-    {
-      if(Math.abs(nb<10))
-      {
+    if(nb==null)
+    return "+ 00:00:00"
+    function addZero(nb) {
+      if (Math.abs(nb < 10)) {
         return "0" + nb.toString();
       } else {
         return nb.toString();
@@ -40,6 +39,6 @@ module.exports = {
     var h = Math.floor(nb / 3600);
     var m = Math.floor(Math.floor(nb % 3600) / 60);
     var s = Math.floor(nb % 60);
-    return ((neg) ? "-":"+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s);
+    return ((neg) ? "-" : "+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s);
   }
 };

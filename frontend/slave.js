@@ -26,7 +26,7 @@ var oreqPile = [];
  * @return {String} the current time in a ISO string
  **/
 function getNow() {
-    return moment().toDate().toISOString();
+    return moment().format();
 }
 
 
