@@ -1,4 +1,4 @@
 const moment = require("moment");
-var time = moment().startOf("day").add(60000, "seconds").utcOffset(moment().utcOffset()).toISOString().toString();
+var time = moment().startOf("day").add(41400, "seconds").format();
 console.log(time);
-console.log(moment().toISOString().toString());
+console.log(moment().format());

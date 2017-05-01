@@ -83,7 +83,7 @@ function tagRequest(item, index) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      if (row.rank == global.RANK.ADMIN) { //Master card tagged
+      if (row.rank == global.RANK.PROF) { //Prof card tagged
 
         oreq.fnc = request.REQUEST.MASTER;
         conn.socket.write(JSON.stringify(oreq) + "\0");

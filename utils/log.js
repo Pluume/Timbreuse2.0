@@ -111,7 +111,7 @@ function format(data) {
     switch (data.logs[i].type) {
       case global.LOGS.IN:
         curr.title = "IN";
-        curr.start = data.logs[i].date;
+        curr.start = moment().local(data.logs[i].date);
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
         curr.color = "rgb(25, 124, 67)";

@@ -106,7 +106,6 @@ function compileRequest(ireq)
  * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-  console.log(ireq);
   ireq = JSON.parse(ireq);
     if (ireq.fnc === undefined)
         return;

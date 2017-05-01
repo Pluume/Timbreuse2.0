@@ -65,7 +65,7 @@ module.exports = {
      * @method exportCSV
      * @param {Function} cb a callback that will be called when all the file has been copied to the USB key.
      **/
-    exportCSV: (cb) => {
+    exportCSV: (cb) => { //NOTE On linux execute "sudo chmod -R a+rwx ." to make it works 
         log.info("Master key detected. Detecting USB drive...");
         drivelist.list((error, drives) => {
             if (error) {
