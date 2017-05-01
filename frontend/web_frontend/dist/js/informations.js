@@ -75,7 +75,6 @@ function getClass(cb) {
       default:
         redAlert("Ill formed request...");
     }
-    cb(null);
   });
   ipcRenderer.send("class", window.SCOPE.UNIQUE);
 }

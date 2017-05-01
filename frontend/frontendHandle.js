@@ -79,8 +79,10 @@ function getClass(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
+      console.log(data);
       if (ireq.fnc != oreq[0].fnc)
         return;
+      console.log("Passed");
       event.sender.send("class", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);

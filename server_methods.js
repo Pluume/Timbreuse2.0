@@ -146,7 +146,7 @@ function tagRequest(item, index) {
               delete oreq.student.user.password;
               if (!ireq.delayed)
                 conn.socket.write(JSON.stringify(oreq) + "\0");
-              log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, "", row3.timeDiff, row3.timeDiffToday);
+              log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
             });
           });
 
@@ -205,19 +205,17 @@ function tagRequest(item, index) {
                 conn.socket.write(JSON.stringify(oreq) + "\0");
               var d = new Date();
               var dayConfig = config.loadDay(d.getDay());
-              log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, "", row3.timeDiff, row3.timeDiffToday);
+              log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
               if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
                 if (row2.isBlocked) {
                   if (dayConfig.scheduleFix.length > 0)
-                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin)))
-                    {
+                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
                       log.warning("USRID " + row.id + " : Arrived late");
                       log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                     }
                 } else {
                   if (dayConfig.schedule.length > 0)
-                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin)))
-                    {
+                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
                       log.warning("USRID " + row.id + " : Arrived late");
                       log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                     }
@@ -383,7 +381,6 @@ function getClass(conn, ireq) {
   if (conn.user === undefined) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
-    oreq.fnc = request.REQUEST.AUTH;
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
@@ -391,7 +388,6 @@ function getClass(conn, ireq) {
     log.error("Request ill formed.");
 
     oreq.error = request.ERROR.UNKNOWN;
-    oreq.fnc = request.REQUEST.AUTH;
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
@@ -403,7 +399,6 @@ function getClass(conn, ireq) {
         log.error("Error : " + err);
 
         oreq.error = request.ERROR.SQLITE;
-        oreq.fnc = request.REQUEST.AUTH;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
@@ -411,13 +406,11 @@ function getClass(conn, ireq) {
         log.error("Error : " + err);
 
         oreq.error = request.ERROR.UNKNOWN;
-        oreq.fnc = request.REQUEST.AUTH;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
 
       oreq.class = row;
-      oreq.fnc = request.REQUEST.AUTH;
       conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     });
@@ -748,6 +741,8 @@ function setTime(conn, ireq) {
       }).toString(), (err, row) => {
         if (err) {
           log.error("Error when querrying the database : " + err);
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
         log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
@@ -792,7 +787,75 @@ function getLogs(conn, ireq) {
     return;
   });
 }
+/**
+ * Set a students as absent
+ * @method setAbsent
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function setAbsent(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
 
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.id === undefined) {
+
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.run(knex("students").update({
+    status: global.STATUS.ABS
+  }).where({
+    id: ireq.id
+  }).toString(), (err) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+
+/**
+ * Set a student as fixed. He must apply to the fixed schedule.
+ * @method setFixed
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function setFixed(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
+
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.id === undefined) {
+
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.run(knex("students").update({
+    isBlocked: true
+  }).where({
+    id: ireq.id
+  }).toString(), (err) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
 /**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
@@ -875,6 +938,12 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.LOGS:
         getLogs(connection, ireq[i]);
+        break;
+      case request.REQUEST.SETABSENT:
+        setAbsent(connection, ireq[i]);
+        break;
+      case request.REQUEST.SETFIXED:
+        setFixed(connection, ireq[i]);
         break;
     }
   }

@@ -18,7 +18,6 @@ function incomingDataHandling(data)
 {
   currentBuf += data;
   if(currentBuf[currentBuf.length - 1] == "\0") {
-    console.log(currentBuf);
     currentCb(null, currentBuf.substring(0, currentBuf.length - 1).toString("utf8"));
     currentBuf = "";
   }
