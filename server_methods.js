@@ -48,6 +48,23 @@ function pingRequest(conn) {
   //TODO
 }
 
+function sendUpdate(id, arg) {
+  var arr = lodash.filter(global.clients, function(o) {
+    try {
+      return o.user.id == id
+    } catch(err)
+    {
+      return false;
+    }
+
+  });
+  var oreq = getBaseReq(request.REQUEST.UPDATE);
+  oreq.data = arg;
+  for (var i = 0; i < arr.length; i++) {
+    arr[i].socket.write(JSON.stringify(oreq) + "\0");
+  }
+}
+
 function tagRoutine(conn, user, ireq) {
   var oreq = getBaseReq(request.REQUEST.TAG);
   if (user.rank == global.RANK.PROF) { //Prof card tagged
@@ -113,6 +130,7 @@ function tagRoutine(conn, user, ireq) {
           delete oreq.student.user.password;
           if (!ireq.delayed)
             conn.socket.write(JSON.stringify(oreq) + "\0");
+          sendUpdate(row3.profid, row3);
           log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
         });
       });
@@ -170,6 +188,7 @@ function tagRoutine(conn, user, ireq) {
           delete oreq.student.user.password;
           if (!ireq.delayed)
             conn.socket.write(JSON.stringify(oreq) + "\0");
+          sendUpdate(row3.profid, row3);
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
           log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);

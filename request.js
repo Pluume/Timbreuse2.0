@@ -47,7 +47,8 @@ REQUEST ={
     RESETTIME: 12,
     LOGS: 13,
     SETABSENT: 14,
-    SETFIXED: 15
+    SETFIXED: 15,
+    UPDATE: 16
 };
 PAGES ={
     LOGIN: 0,

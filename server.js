@@ -7,14 +7,13 @@
 const log = require("./utils/log.js");
 net = require('net');
 const method = require("./server_methods");
-var clients = [];
 /**
  * Remove a client from the client list
  * @method removeClient
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function removeClient(conn) {
-    clients.splice(clients.indexOf(conn), 1);
+    global.clients.splice(clients.indexOf(conn), 1);
 }
 /**
  * Add a client to the client list
@@ -22,7 +21,7 @@ function removeClient(conn) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function addClient(conn) {
-    clients.push(conn);
+    global.clients.push(conn);
 }
 module.exports = {
   /**
@@ -30,6 +29,7 @@ module.exports = {
    * @method start
    **/
   start: () => {
+    global.clients = [];
     method.initialize();
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};

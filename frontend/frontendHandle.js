@@ -301,3 +301,8 @@ ipcMain.on("logs", getLogs);
 ipcMain.on("absent", setAbsent);
 ipcMain.on("fixed", setFixed);
 ipcMain.on("tag", tag);
+module.exports = {
+  updateInfo: function(data){
+    ipcMain.send("update",data);
+  }
+};

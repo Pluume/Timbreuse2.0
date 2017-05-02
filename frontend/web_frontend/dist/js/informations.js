@@ -336,6 +336,7 @@ function getLogs(id, cb) {
     id: id
   });
 }
+
 function setAbsent(id, comments) {
   ipcRenderer.once("absent", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -343,7 +344,7 @@ function setAbsent(id, comments) {
     }
     switch (arg.error) {
       case window.ERROR.OK:
-      greenAlert("Student set absent !");
+        greenAlert("Student set absent !");
         break;
       case window.ERROR.NOTLOGEDIN:
         redAlert("Not logged in !");
@@ -363,15 +364,15 @@ function setAbsent(id, comments) {
     comments: comments
   });
 }
+
 function tag(id, comments) {
   ipcRenderer.once("tag", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
     }
-    console.log(arg);
     switch (arg.error) {
       case window.ERROR.OK:
-      greenAlert("Tagged successfully !");
+        greenAlert("Tagged successfully !");
         break;
       case window.ERROR.NOTLOGEDIN:
         redAlert("Not logged in !");
@@ -391,6 +392,7 @@ function tag(id, comments) {
     comments
   });
 }
+
 function setFixed(id, comments) {
   ipcRenderer.once("fixed", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -398,7 +400,7 @@ function setFixed(id, comments) {
     }
     switch (arg.error) {
       case window.ERROR.OK:
-      greenAlert("Student set fixed !");
+        greenAlert("Student set fixed !");
         break;
       case window.ERROR.NOTLOGEDIN:
         redAlert("Not logged in !");
@@ -418,3 +420,13 @@ function setFixed(id, comments) {
     comments: comments
   });
 }
+
+function onUpdate(event, arg) {
+  if (remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
+    $("stdTable").bootstrapTable('updateByUniqueId', {
+      id: arg.id,
+      row: arg
+    });
+}
+
+ipcRenderer.on("update", onUpdate);
