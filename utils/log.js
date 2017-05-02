@@ -141,7 +141,7 @@ function format(data) {
         curr.color = "rgb(170, 13, 159)"
         curr.textColor = "rgb(0, 0, 0)"
         break;
-      case global.STATUS.MODTIME:
+      case global.LOGS.MODTIME:
         curr.title = "TIME ALTERED";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
@@ -149,7 +149,7 @@ function format(data) {
         curr.color = "rgb(170, 13, 159)"
         curr.textColor = "rgb(0, 0, 0)"
         break;
-      case global.STATUS.RESETTIME:
+      case global.LOGS.RESETTIME:
         curr.title = "ACCOUNT RESET";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
@@ -157,7 +157,7 @@ function format(data) {
         curr.color = "rgb(170, 13, 159)"
         curr.textColor = "rgb(0, 0, 0)"
         break;
-      case global.STATUS.MINIMUMPAUSE:
+      case global.LOGS.MINIMUMPAUSE:
         curr.title = "MINIMUMPAUSE RULE BROKEN";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
@@ -165,7 +165,7 @@ function format(data) {
         curr.color = "rgb(233, 119, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-      case global.STATUS.NOPAUSE:
+      case global.LOGS.NOPAUSE:
         curr.title = "NO PAUSE TAKEN";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
@@ -173,7 +173,7 @@ function format(data) {
         curr.color = "rgb(233, 119, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-      case global.STATUS.NOLUNCH:
+      case global.LOGS.NOLUNCH:
         curr.title = "NO LUNCH TAKEN";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
@@ -181,14 +181,31 @@ function format(data) {
         curr.color = "rgb(233, 119, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-        case global.STATUS.TIMEERROR:
-          curr.title = "TIME RULE BROKEN";
-          curr.start = data.logs[i].date;
-          if (data.logs[i].description)
-            curr.title += " - " + data.logs[i].description
-          curr.color = "rgb(233, 119, 0)"
-          curr.textColor = "rgb(255, 255, 255)"
-          break;
+      case global.LOGS.TIMEERROR:
+        curr.title = "TIME RULE BROKEN";
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(233, 119, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
+        break;
+      case global.LOGS.BLOCKED:
+        curr.title = "SCHEDULE BLOCKED";
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(0, 0, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
+        break;
+      case global.LOGS.UNBLOCKED:
+        curr.title = "SCHEDULE UNBLOCKED";
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(0, 0, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
+        break;
+
       default:
         continue;
     }

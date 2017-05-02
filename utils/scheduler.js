@@ -68,18 +68,18 @@ function endOfDay() {
       };
     }
     ndetails.day.push({
-      time: moment().toDate().format(),
+      time: moment().format(),
       timeDiff: ntimeDiff
     });
     if (moment(moment().format()).isSame(moment().endOf("week"), 'day')) {
       ndetails.week.push({
-        time: moment().toDate().format(),
+        time: moment().format(),
         timeDiff: ntimeDiff
       });
     }
     if (moment(moment().format()).isSame(moment().endOf("month"), 'day')) {
       ndetails.month.push({
-        time: moment().toDate().format(),
+        time: moment().format(),
         timeDiff: ntimeDiff
       });
     }

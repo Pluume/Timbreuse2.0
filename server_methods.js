@@ -47,6 +47,153 @@ function pingRequest(conn) {
   socket.write("up");
   //TODO
 }
+
+function tagRoutine(conn, user, ireq) {
+  var oreq = getBaseReq(request.REQUEST.TAG);
+  if (user.rank == global.RANK.PROF) { //Prof card tagged
+
+    oreq.fnc = request.REQUEST.MASTER;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err2, row2) => {
+    if (err2) {
+      log.error("Error while accessing the database...\n" + err);
+
+      oreq.fnc = request.REQUEST.TAG;
+      oreq.error = request.ERROR.SQLITE;
+      if (!ireq.delayed)
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (row2 === undefined) {
+      log.error("No student corresponding to userid : " + user.id + "...");
+
+      oreq.fnc = request.REQUEST.TAG;
+      oreq.error = request.ERROR.SQLITE;
+      if (!ireq.delayed)
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    var nstatus;
+    var nTimeDiffToday;
+    var nlastTagTime;
+    if (row2.status == global.STATUS.IN) //Departure
+    {
+      nstatus = global.STATUS.OUT;
+      var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      nTimeDiffToday = row2.timeDiffToday + delta;
+      var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
+      if (missedPause) {
+        log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
+        log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+      }
+      global.db.serialize(() => {
+        global.db.run(knex("students").update({
+          timeDiffToday: isNaN(nTimeDiffToday) ? row2.timeDiffToday : nTimeDiffToday,
+          lastTagTime: ireq.time,
+          status: nstatus,
+          missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
+        }).where("userid", user.id).toString());
+
+        global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err3, row3) => {
+          if (err3) {
+            log.error("Error while accessing the database...\n" + err);
+
+            oreq.fnc = request.REQUEST.TAG;
+            oreq.error = request.ERROR.SQLITE;
+            if (!ireq.delayed)
+              conn.socket.write(JSON.stringify(oreq) + "\0");
+            return;
+          }
+
+          oreq.fnc = request.REQUEST.TAG;
+          oreq.student = row3;
+          oreq.student.user = user;
+          delete oreq.student.user.password;
+          if (!ireq.delayed)
+            conn.socket.write(JSON.stringify(oreq) + "\0");
+          log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+        });
+      });
+
+
+
+    } else { //Arrival
+      nstatus = global.STATUS.IN;
+      var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      var nTimeDiffToday = row2.timeDiffToday;
+      delta = isNaN(delta) ? 0 : delta;
+      if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
+      {
+        nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
+        log.warning("USRID : " + user.id + " : minimum pause rule not respected !");
+        log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+      }
+
+      var now = moment(ireq.time);
+      var nowAtMidnight = moment(ireq.time).clone().startOf('day');
+      var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
+      var hadLunch = 0;
+      var missedPause = row2.missedPause;
+      if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
+        var pauseDelta = math.getTimeDelta(moment(ireq.time).toDate().getTime(), new Date(row2.lastTagTime).getTime());
+        if (pauseDelta >= global.config.lunch.time)
+          hadLunch = 1;
+      }
+      var awayTime = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      if (awayTime >= global.config.pause.time && row2.missedPause > 0) {
+        missedPause -= Math.floor(awayTime / global.config.pause.time);
+        missedPause = (missedPause < 0) ? 0 : missedPause;
+      }
+      global.db.serialize(() => {
+        global.db.run(knex("students").update({
+          status: nstatus,
+          lastTagTime: ireq.time,
+          hadLunch: hadLunch,
+          timeDiffToday: nTimeDiffToday
+        }).where("userid", user.id).toString());
+        global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err3, row3) => {
+          if (err3) {
+            log.error("Error while accessing the database...\n" + err);
+
+            oreq.fnc = request.REQUEST.TAG;
+            oreq.error = request.ERROR.SQLITE;
+            if (!ireq.delayed)
+              conn.socket.write(JSON.stringify(oreq) + "\0");
+            return;
+          }
+
+          oreq.fnc = request.REQUEST.TAG;
+          oreq.student = row3;
+          oreq.student.user = user;
+          delete oreq.student.user.password;
+          if (!ireq.delayed)
+            conn.socket.write(JSON.stringify(oreq) + "\0");
+          var d = new Date();
+          var dayConfig = config.loadDay(d.getDay());
+          log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
+            if (row2.isBlocked) {
+              if (dayConfig.scheduleFix.length > 0)
+                if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
+                  log.warning("USRID " + user.id + " : Arrived late");
+                  log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                }
+            } else {
+              if (dayConfig.schedule.length > 0)
+                if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
+                  log.warning("USRID " + user.id + " : Arrived late");
+                  log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                }
+            }
+          }
+        });
+      });
+    }
+  });
+}
+
 /**
  * Handle a tag request (When a student arrive or leave)
  * @method tagRequest
@@ -57,15 +204,11 @@ function tagRequest(item, index) {
   var ireq = item.ireq;
   var conn = item.connection;
   tagReqList.splice(index, 1); // Remove current item
-  if (ireq.tag === undefined || ireq.time === undefined || ireq.class === undefined) {
-    log.error("Request ill formed.");
-    conn.socket.write(JSON.stringify(getBaseReq().error = request.ERROR.UNKNOWN) + "\0");
-    return;
-  }
-  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), ireq.time);
-  if (global.DEBUG)
+  if (ireq.tag != undefined && ireq.time != undefined)
+    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), ireq.time);
+  if (global.DEBUG && ireq.tag != undefined)
     console.log("[TAG] : " + ireq.tag.replace(/\s/g, ''));
-  global.db.serialize(() => {
+  if (ireq.tag != undefined) {
     global.db.get(knex.select().from("users").where("tag", ireq.tag.replace(/\s/g, '')).toString(), (err, row) => {
       if (err) {
         log.error("Error while accessing the database...\n" + err);
@@ -83,150 +226,58 @@ function tagRequest(item, index) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      if (row.rank == global.RANK.PROF) { //Prof card tagged
-
-        oreq.fnc = request.REQUEST.MASTER;
+      if (ireq.time === undefined || ireq.class === undefined) {
+        log.error("Request ill formed.");
+        oreq.error = request.ERROR.UNKNOWN;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err2, row2) => {
-        if (err2) {
+      tagRoutine(conn, row, ireq);
+    });
+  } else if (ireq.id != undefined) {
+    global.db.get(knex.select().from("students").where("id", ireq.id).toString(), (err, row0) => {
+      if (err) {
+        log.error("Error while accessing the database...\n" + err);
+        oreq.fnc = request.REQUEST.TAG;
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      if (row0 === undefined) {
+        log.error("No user with this tag...");
+
+        oreq.fnc = request.REQUEST.TAG;
+        oreq.error = request.ERROR.WRONGTAG;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      global.db.get(knex.select().from("users").where("id", row0.userid).toString(), (err, row) => {
+        if (err) {
           log.error("Error while accessing the database...\n" + err);
 
           oreq.fnc = request.REQUEST.TAG;
           oreq.error = request.ERROR.SQLITE;
-          if (!ireq.delayed)
-            conn.socket.write(JSON.stringify(oreq) + "\0");
+          conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
-        if (row2 === undefined) {
-          log.error("No student corresponding to userid : " + row.id + "...");
+        if (row === undefined) {
+          log.error("No user with this tag...");
 
           oreq.fnc = request.REQUEST.TAG;
-          oreq.error = request.ERROR.SQLITE;
-          if (!ireq.delayed)
-            conn.socket.write(JSON.stringify(oreq) + "\0");
+          oreq.error = request.ERROR.WRONGTAG;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
-        var nstatus;
-        var nTimeDiffToday;
-        var nlastTagTime;
-        if (row2.status == global.STATUS.IN) //Departure
-        {
-          nstatus = global.STATUS.OUT;
-          var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
-          nTimeDiffToday = row2.timeDiffToday + delta;
-          var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
-          if (missedPause) {
-            log.warning("USRID : " + row.id + " : regular break rule not respected " + missedPause + " time(s) !");
-            log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
-          }
-          global.db.serialize(() => {
-            global.db.run(knex("students").update({
-              timeDiffToday: isNaN(nTimeDiffToday) ? row2.timeDiffToday : nTimeDiffToday,
-              lastTagTime: ireq.time,
-              status: nstatus,
-              missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
-            }).where("userid", row.id).toString());
-
-            global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
-              if (err3) {
-                log.error("Error while accessing the database...\n" + err);
-
-                oreq.fnc = request.REQUEST.TAG;
-                oreq.error = request.ERROR.SQLITE;
-                if (!ireq.delayed)
-                  conn.socket.write(JSON.stringify(oreq) + "\0");
-                return;
-              }
-
-              oreq.fnc = request.REQUEST.TAG;
-              oreq.student = row3;
-              oreq.student.user = row;
-              delete oreq.student.user.password;
-              if (!ireq.delayed)
-                conn.socket.write(JSON.stringify(oreq) + "\0");
-              log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
-            });
-          });
-
-
-
-        } else { //Arrival
-          nstatus = global.STATUS.IN;
-          var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
-          var nTimeDiffToday = row2.timeDiffToday;
-          delta = isNaN(delta) ? 0 : delta;
-          if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
-          {
-            nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
-            log.warning("USRID : " + row.id + " : minimum pause rule not respected !");
-            log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
-          }
-
-          var now = moment(ireq.time);
-          var nowAtMidnight = moment(ireq.time).clone().startOf('day');
-          var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
-          var hadLunch = 0;
-          var missedPause = row2.missedPause;
-          if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
-            var pauseDelta = math.getTimeDelta(moment(ireq.time).toDate().getTime(), new Date(row2.lastTagTime).getTime());
-            if (pauseDelta >= global.config.lunch.time)
-              hadLunch = 1;
-          }
-          var awayTime = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
-          if (awayTime >= global.config.pause.time && row2.missedPause > 0) {
-            missedPause -= Math.floor(awayTime / global.config.pause.time);
-            missedPause = (missedPause < 0) ? 0 : missedPause;
-          }
-          global.db.serialize(() => {
-            global.db.run(knex("students").update({
-              status: nstatus,
-              lastTagTime: ireq.time,
-              hadLunch: hadLunch,
-              timeDiffToday: nTimeDiffToday
-            }).where("userid", row.id).toString());
-            global.db.get(knex.select().from("students").where("userid", row.id).toString(), (err3, row3) => {
-              if (err3) {
-                log.error("Error while accessing the database...\n" + err);
-
-                oreq.fnc = request.REQUEST.TAG;
-                oreq.error = request.ERROR.SQLITE;
-                if (!ireq.delayed)
-                  conn.socket.write(JSON.stringify(oreq) + "\0");
-                return;
-              }
-
-              oreq.fnc = request.REQUEST.TAG;
-              oreq.student = row3;
-              oreq.student.user = row;
-              delete oreq.student.user.password;
-              if (!ireq.delayed)
-                conn.socket.write(JSON.stringify(oreq) + "\0");
-              var d = new Date();
-              var dayConfig = config.loadDay(d.getDay());
-              log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
-              if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
-                if (row2.isBlocked) {
-                  if (dayConfig.scheduleFix.length > 0)
-                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
-                      log.warning("USRID " + row.id + " : Arrived late");
-                      log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
-                    }
-                } else {
-                  if (dayConfig.schedule.length > 0)
-                    if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
-                      log.warning("USRID " + row.id + " : Arrived late");
-                      log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
-                    }
-                }
-              }
-            });
-          });
-        }
+        tagRoutine(conn, row, ireq);
       });
     });
-  });
+  } else {
+    log.error("Request ill formed.");
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+
 }
 /**
  * Handle a login request
@@ -809,21 +860,22 @@ function setAbsent(conn, ireq) {
   }
   global.db.run(knex("students").update({
     status: global.STATUS.ABS
-  }).where({
-    id: ireq.id
-  }).toString(), (err) => {
+  }).where("id", "in", ireq.id).toString(), (err) => {
     if (err) {
       log.error("Error when querrying the database : " + err);
       oreq.error = request.ERROR.SQLITE;
       conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
+    for (var i = 0; i < ireq.id.length; i++) {
+      log.save(global.LOGS.ABSENT, ireq.id[i], "SERVER", moment().format(), ireq.comments, "", "");
+    }
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }
 
 /**
- * Set a student as fixed. He must apply to the fixed schedule.
+ * Toggle a student isBlocked value.
  * @method setFixed
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  * @param {Object} ireq a JSON object containing the request.
@@ -842,20 +894,52 @@ function setFixed(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  global.db.run(knex("students").update({
-    isBlocked: true
-  }).where({
-    id: ireq.id
-  }).toString(), (err) => {
+  var toggle1 = [];
+  var toggle2 = [];
+  global.db.all(knex("students").where("id", "in", ireq.id).toString(), (err, rows) => {
     if (err) {
       log.error("Error when querrying the database : " + err);
       oreq.error = request.ERROR.SQLITE;
       conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
-    conn.socket.write(JSON.stringify(oreq) + "\0");
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].isBlocked)
+        toggle1.push(rows[i].id);
+      else
+        toggle2.push(rows[i].id);
+    }
+    global.db.run(knex("students").update({
+      isBlocked: 0
+    }).where("id", "in", toggle1).toString(), (err) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      for (var i = 0; i < toggle1.length; i++) {
+        log.save(global.LOGS.UNBLOCKED, toggle1[i], "SERVER", moment().format(), ireq.comments, "", "");
+      }
+      global.db.run(knex("students").update({
+        isBlocked: 1
+      }).where("id", "in", toggle2).toString(), (err) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        for (var ii = 0; ii < toggle2.length; ii++) {
+          log.save(global.LOGS.BLOCKED, toggle2[ii], "SERVER", moment().format(), ireq.comments, "", "");
+        }
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+      });
+    });
   });
 }
+
+
 /**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest

@@ -336,3 +336,85 @@ function getLogs(id, cb) {
     id: id
   });
 }
+function setAbsent(id, comments) {
+  ipcRenderer.once("absent", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+      greenAlert("Student set absent !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      case window.ERROR.SQLITE:
+        redAlert("Database error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+  ipcRenderer.send("absent", {
+    id: id,
+    comments: comments
+  });
+}
+function tag(id, comments) {
+  ipcRenderer.once("tag", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    console.log(arg);
+    switch (arg.error) {
+      case window.ERROR.OK:
+      greenAlert("Tagged successfully !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      case window.ERROR.SQLITE:
+        redAlert("Database error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+  ipcRenderer.send("tag", {
+    id: id,
+    comments
+  });
+}
+function setFixed(id, comments) {
+  ipcRenderer.once("fixed", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+      greenAlert("Student set fixed !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      case window.ERROR.SQLITE:
+        redAlert("Database error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+  ipcRenderer.send("fixed", {
+    id: id,
+    comments: comments
+  });
+}

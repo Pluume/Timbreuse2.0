@@ -69,18 +69,21 @@
     function studentsListFormatter(val, row) {
       return "<span data-toggle='modal' data-target='#detailsStudentModal'><button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='showEditModal(" + row.id +
         ",\"" + row.fname + "\",\"" + row.lname +
-        "\");' class='btn btn-info btn-circle'><i class='fa fa-check'></i></button></span><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" + row.id +
+        "\");' class='btn btn-info btn-circle'><i class='glyphicon glyphicon-zoom-in'></i></button></span><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" +
+        row.id +
         ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button></span><span data-toggle='modal' data-target='#editStudentTimeModal'><button data-toggle='tooltip' data-placement='bottom' title='Edit time' href='#' onclick='stdToApply = [" +
         row.id +
-        "];' class='btn btn-warning btn-circle'><i class='glyphicon glyphicon-time'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToApply = [" +
+        "];' class='btn btn-warning btn-circle'><i class='glyphicon glyphicon-time'></i></button></span><span data-toggle='modal' data-target='#advancedOptionsModal'><button data-toggle='tooltip' data-placement='bottom' title='Avanced Options' href='#' onclick='stdToApply = [" +
+        row.id +
+        "];' class='btn btn-secondary btn-circle'><i class='fa fa-check'></i></button></span><span data-toggle='modal' data-target='#delStudentModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='stdToApply = [" +
         row.id +
         "];' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button></span>";
     }
 
-    function timeListFormatter(val)
-    {
-      return window.secToHMS(parseInt(val,10));
+    function timeListFormatter(val) {
+      return window.secToHMS(parseInt(val, 10));
     }
+
     function statusFormatter(val, row) {
       var status = document.createElement("div");
       switch (val) {
@@ -151,22 +154,36 @@
           events: data.format
         });
       });
-      //id = detailsCalendar
-      //TODO Show loading icon in the modal + implement close button at the end
-      //TODO Display all the data in the calendar
-      //TODO Display the true detail in graph below
     }
 
-    function closeDetailsModal()
-    {
+    function closeDetailsModal() {
       $('#detailsCalendar').fullCalendar("destroy");
     }
+
     function submitEditModal(id) {
       editStudent(id, document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
         'edob').value, document.getElementById('eproject').value, document.getElementById('epass').checked, "stdTable");
       $('#editStudentModal').modal('hide');
       emptyInput(["efname", "elname", "eusername", "etag", "eemail", "edob", "eproject"]);
       document.getElementById("epass").checked = false;
+    }
+
+    function submitAdvancedOptionsModal(id) {
+      if (document.getElementById("setabsent_radio").checked) {
+        setAbsent(stdToApply, document.getElementById("advancedoptions_comment").value);
+      } else if (document.getElementById("setfixed_radio").checked) {
+        setFixed(stdToApply, document.getElementById("advancedoptions_comment").value);
+      } else if(document.getElementById("tag_radio").checked)
+      {
+        if(stdToApply.length!=1)
+        {
+          redAlert("Can't tag multiple students at once");
+          return;
+        }
+        tag(stdToApply[0],document.getElementById("advancedoptions_comment").value);
+      }
+      document.getElementById("advancedoptions_comment").value = "";
+      $('#advancedOptionsModal').modal('hide');
     }
   </script>
   <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
@@ -307,6 +324,42 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" onclick="preSubmitEditTimeModal();" class="btn btn-success">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="advancedOptionsModal" tabindex="-1" role="dialog" aria-labelledby="advancedOptionsModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="eadvancedOptionsModalTitle">Advanced options :</h2>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="radio">
+              <label for="setabsent_radio"><input id="setabsent_radio" group="advancedoptions" name="advancedoptions" checked type="radio">Set absent</label>
+            </div>
+            <div class="radio">
+              <label for="setfixed_radio"><input id="setfixed_radio" group="advancedoptions" name="advancedoptions" type="radio">Toggle fixed</label>
+            </div>
+            <div class="radio">
+              <label for="tag_radio"><input id="tag_radio" group="advancedoptions" name="advancedoptions" type="radio">Tag</label>
+            </div>
+            <br />
+            <label for="advancedoptions_comment">Comments</label>
+            <input id="advancedoptions_comment" class="form-control" type="text" value="">
+            <script>
+              $('input[type=radio][group=advancedoptions]').on('change', function() {
+                switch ($(this).attr("id")) {
+
+                }
+              });
+            </script>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" onclick="submitAdvancedOptionsModal();" class="btn btn-success">Apply</button>
         </div>
       </div>
     </div>

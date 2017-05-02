@@ -79,10 +79,8 @@ function getClass(event, arg) {
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
-      console.log(data);
       if (ireq.fnc != oreq[0].fnc)
         return;
-      console.log("Passed");
       event.sender.send("class", ireq);
     } catch (err1) {
       log.error("Error parsing request : " + err1);
@@ -227,6 +225,67 @@ function getLogs(event, arg) {
     }
   });
 }
+
+function setAbsent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.SETABSENT,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("absent", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
+
+function setFixed(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.SETFIXED,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("fixed", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
+
+function tag(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TAG,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("tag", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
+
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -239,3 +298,6 @@ ipcMain.on("resetTime", resetTime);
 ipcMain.on("modTime", modTime);
 ipcMain.on("setTime", setTime);
 ipcMain.on("logs", getLogs);
+ipcMain.on("absent", setAbsent);
+ipcMain.on("fixed", setFixed);
+ipcMain.on("tag", tag);
