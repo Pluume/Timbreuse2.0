@@ -130,7 +130,7 @@ function tagRoutine(conn, user, ireq) {
           delete oreq.student.user.password;
           if (!ireq.delayed)
             conn.socket.write(JSON.stringify(oreq) + "\0");
-          sendUpdate(row3.profid, row3);
+          sendUpdate(row3.profid, oreq.student);
           log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
         });
       });
@@ -188,7 +188,7 @@ function tagRoutine(conn, user, ireq) {
           delete oreq.student.user.password;
           if (!ireq.delayed)
             conn.socket.write(JSON.stringify(oreq) + "\0");
-          sendUpdate(row3.profid, row3);
+          sendUpdate(row3.profid, oreq.student);
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
           log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);

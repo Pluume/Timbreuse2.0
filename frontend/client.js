@@ -11,9 +11,10 @@ const path = require('path');
 const url = require('url');
 const net = require("net");
 const request = require("../request.js");
-
+const frontendHandle = require("./frontendHandle.js");
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = "";
+var sendHandle = undefined;
 
 function clientServer(data)
 {
@@ -26,7 +27,13 @@ function clientServer(data)
   {
     switch (ireq.fnc) {
       case request.REQUEST.UPDATE:
-      global.mwin.webContents.send("update", ireq.data);
+      try {
+        sendHandle.send("update", ireq.data);
+      } catch(err)
+      {
+        //do nothing
+      }
+
         break;
       default:
       //Do nothing
@@ -139,9 +146,16 @@ function load() {
     }
   });
 }
+
+function setSender(obj)
+{
+  sendHandle = obj;
+}
+
 module.exports = {
   load,
   connect,
   disconnect,
-  send
+  send,
+  setSender
 };

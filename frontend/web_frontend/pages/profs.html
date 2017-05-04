@@ -34,7 +34,7 @@
           <th data-field="timeDiffToday" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeListFormatter" data-sortable="true">Time done today</th>
           <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeListFormatter" data-sortable="true">Time delta</th>
           <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
-          <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last tag time</th>
+          <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Last tag time</th>
           <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
         </tr>
       </thead>
@@ -83,7 +83,10 @@
     function timeListFormatter(val) {
       return window.secToHMS(parseInt(val, 10));
     }
-
+    function timeFormatter(val)
+    {
+      return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:MM:SS");
+    }
     function statusFormatter(val, row) {
       var status = document.createElement("div");
       switch (val) {

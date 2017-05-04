@@ -422,11 +422,26 @@ function setFixed(id, comments) {
 }
 
 function onUpdate(event, arg) {
-  if (remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
-    $("stdTable").bootstrapTable('updateByUniqueId', {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
+  {
+    var formatData = {
+      id: arg.id,
+      lname: arg.user.lname,
+      fname: arg.user.fname,
+      username: arg.user.username,
+      timeDiffToday: arg.timeDiffToday,
+      timeDiff: arg.timeDiff,
+      status: arg.status,
+      lastTagTime: arg.lastTagTime
+    };
+    console.log($("stdTable").html());
+    $("#stdTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,
       row: arg
     });
+  }
+
 }
 
 ipcRenderer.on("update", onUpdate);
+ipcRenderer.send("update",null);

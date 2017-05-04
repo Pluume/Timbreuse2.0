@@ -286,6 +286,10 @@ function tag(event, arg) {
   });
 }
 
+function update(event, arg) {
+  client.setSender(event.sender);
+}
+
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -301,8 +305,4 @@ ipcMain.on("logs", getLogs);
 ipcMain.on("absent", setAbsent);
 ipcMain.on("fixed", setFixed);
 ipcMain.on("tag", tag);
-module.exports = {
-  updateInfo: function(data){
-    ipcMain.send("update",data);
-  }
-};
+ipcMain.on("update", update);
