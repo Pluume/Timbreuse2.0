@@ -11,7 +11,6 @@ const path = require('path');
 const url = require('url');
 const net = require("net");
 const request = require("../request.js");
-const frontendHandle = require("./frontendHandle.js");
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = "";
 var sendHandle = undefined;
@@ -27,13 +26,10 @@ function clientServer(data)
   {
     switch (ireq.fnc) {
       case request.REQUEST.UPDATE:
-      try {
-        sendHandle.send("update", ireq.data);
-      } catch(err)
-      {
-        //do nothing
-      }
-
+        global.mwin.webContents.send("update", ireq.data);
+        break;
+        case request.REQUEST.TOGGLENOTIFICATION: //FIXME
+        sendHandle.send("toggleNotification",ireq.data)
         break;
       default:
       //Do nothing
@@ -147,15 +143,10 @@ function load() {
   });
 }
 
-function setSender(obj)
-{
-  sendHandle = obj;
-}
 
 module.exports = {
   load,
   connect,
   disconnect,
-  send,
-  setSender
+  send
 };

@@ -56,9 +56,16 @@ LOGS = {
   BLOCKED: 11,
   UNBLOCKED: 12
 }
+NOTIF = {
+  MINIMUMPAUSE: LOGS.MINIMUMPAUSE,
+  NOPAUSE: LOGS.NOPAUSE,
+  MOLUNCH: LOGS.NOLUNCH,
+  TIMEERROR: LOGS.TIMEERROR
+}
 global.RANK = RANK;
 global.STATUS = STATUS;
 global.LOGS = LOGS;
+global.NOTIF = NOTIF;
 module.exports = {
     handle: handle,
     RANK: RANK,
@@ -66,6 +73,7 @@ module.exports = {
     PROOF: PROOF,
     STATUS: STATUS,
     LOGS: LOGS,
+    NOTIF: NOTIF, 
     /**
      * Init the database
      * @method init

@@ -286,10 +286,33 @@ function tag(event, arg) {
   });
 }
 
-function update(event, arg) {
-  client.setSender(event.sender);
+function getNotifications(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETNOTIFICATIONS,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("notification", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
 }
 
+function toggleNotification(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TOGGLENOTIFICATION,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) => {});
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -305,4 +328,5 @@ ipcMain.on("logs", getLogs);
 ipcMain.on("absent", setAbsent);
 ipcMain.on("fixed", setFixed);
 ipcMain.on("tag", tag);
-ipcMain.on("update", update);
+ipcMain.on("notification", getNotifications);
+ipcMain.on("notificationToggle", toggleNotification);

@@ -48,12 +48,39 @@ function pingRequest(conn) {
   //TODO
 }
 
+function pushNotifications(profid, type, message) {
+  var now = moment().format();
+  global.db.run(knex("notifications").insert({
+    userid: profid,
+    type: type,
+    message: message,
+    date: now,
+    read: 0
+  }).toString());
+  var arr = lodash.filter(global.clients, function(o) {
+    try {
+      return o.user.id == profid
+    } catch (err) {
+      return false;
+    }
+  });
+  var oreq = getBaseReq(request.REQUEST.UPDATE);
+  oreq.data = {
+    type: type,
+    message: message,
+    date: now,
+    read: 0
+  };
+  for (var i = 0; i < arr.length; i++) {
+    arr[i].socket.write(JSON.stringify(oreq) + "\0");
+  }
+}
+
 function sendUpdate(id, arg) {
   var arr = lodash.filter(global.clients, function(o) {
     try {
       return o.user.id == id
-    } catch(err)
-    {
+    } catch (err) {
       return false;
     }
 
@@ -104,6 +131,7 @@ function tagRoutine(conn, user, ireq) {
       if (missedPause) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't take a pause in a " + delta + " session.");
       }
       global.db.serialize(() => {
         global.db.run(knex("students").update({
@@ -147,6 +175,7 @@ function tagRoutine(conn, user, ireq) {
         nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
         log.warning("USRID : " + user.id + " : minimum pause rule not respected !");
         log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+        pushNotifications(row2.profid, global.LOGS.MINIMUMPAUSE, user.fname + " " + user.lname + " has done a pause in less time than the minimum accepted.");
       }
 
       var now = moment(ireq.time);
@@ -198,12 +227,14 @@ function tagRoutine(conn, user, ireq) {
                 if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                  pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
                 }
             } else {
               if (dayConfig.schedule.length > 0)
                 if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
+                  pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
                 }
             }
           }
@@ -958,6 +989,79 @@ function setFixed(conn, ireq) {
   });
 }
 
+/**
+ * Get all the notification for a logged user
+ * @method getNotifications
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getNotifications(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+    if (conn.user === undefined) {
+
+      oreq.error = request.ERROR.NOTLOGEDIN;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    global.db.all(knex("notifications").select().where({
+      userid: conn.user.id
+    }).toString(), (err, rows) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      oreq.data = rows;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+    });
+
+}
+
+/**
+ * Change the read status of a notifications
+ * @method toggleNotification
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function toggleNotification(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
+
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  if (ireq.id === undefined) {
+
+    oreq.error = request.ERROR.UNKNOWN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.get(knex("notifications").select().where({
+    id: ireq.id
+  }).toString(), (err, row) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (row.read)
+      global.db.run(knex("notifications").update({
+        read: 0
+      }).where({
+        id: ireq.id
+      }).toString());
+    else
+      global.db.run(knex("notifications").update({
+        read: 1
+      }).where({
+        id: ireq.id
+      }).toString());
+  });
+
+}
 
 /**
  * Sort the incoming request. Redirect the request to the correct function.
@@ -1047,6 +1151,12 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.SETFIXED:
         setFixed(connection, ireq[i]);
+        break;
+      case request.REQUEST.GETNOTIFICATIONS:
+        getNotifications(connection, ireq[i]);
+        break;
+      case request.REQUEST.TOGGLENOTIFICATION:
+        toggleNotification(connection, ireq[i]);
         break;
     }
   }

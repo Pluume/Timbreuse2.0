@@ -1,7 +1,6 @@
 const {
   ipcRenderer
 } = require('electron');
-
 function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 {
   var text = "";
@@ -434,7 +433,6 @@ function onUpdate(event, arg) {
       status: arg.status,
       lastTagTime: arg.lastTagTime
     };
-    console.log($("stdTable").html());
     $("#stdTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,
       row: arg
@@ -443,5 +441,43 @@ function onUpdate(event, arg) {
 
 }
 
+function getNotifications(tableId, cb) {
+  ipcRenderer.send("notification", null);
+  ipcRenderer.once("notification", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $('#' + tableId).bootstrapTable('load', arg.data);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+function toggleNotification(id)
+{
+  ipcRenderer.send("notificationToggle", id);
+}
+
+function onNotification(event, arg) {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined) //FIXME
+  {
+    console.log(arg);
+    $("#notifTable").bootstrapTable('updateByUniqueId', {
+      id: arg.id,
+      row: arg
+    });
+  }
+
+}
 ipcRenderer.on("update", onUpdate);
-ipcRenderer.send("update",null);
+ipcRenderer.on("toggleNotification",onNotification);
