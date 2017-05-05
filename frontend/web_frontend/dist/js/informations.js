@@ -468,16 +468,24 @@ function toggleNotification(id)
   ipcRenderer.send("notificationToggle", id);
 }
 
-function onNotification(event, arg) {
-  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined) //FIXME
+function onNotificationUpdate(event, arg) {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined)
   {
-    console.log(arg);
     $("#notifTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,
       row: arg
     });
   }
-
+}
+function onNotificationInsert(event, arg) {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined)
+  {
+    var tmp = [];
+    tmp.push(arg);
+    console.log(JSON.stringify(tmp));
+    $("#notifTable").bootstrapTable('prepend', tmp);
+  }
 }
 ipcRenderer.on("update", onUpdate);
-ipcRenderer.on("toggleNotification",onNotification);
+ipcRenderer.on("toggleNotification",onNotificationUpdate);
+ipcRenderer.on("updateNotification",onNotificationInsert);

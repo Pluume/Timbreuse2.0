@@ -116,11 +116,11 @@
         ipcRenderer.on("update", (event, arg) => {
           webview.send("update", arg);
         });
-        ipcRenderer.on("notificationUpdate", (event, arg) => {
-          webview.send("notificationUpdate", arg);
+        ipcRenderer.on("toggleNotification", (event, arg) => {
+          webview.send("toggleNotification", arg);
         });
-        ipcRenderer.on("test", (event, arg) => {
-          webview.send("test", arg);
+        ipcRenderer.on("updateNotification", (event, arg) => {
+          webview.send("updateNotification", arg);
         });
       </script>
     </div>

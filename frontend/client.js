@@ -13,7 +13,6 @@ const net = require("net");
 const request = require("../request.js");
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = "";
-var sendHandle = undefined;
 
 function clientServer(data)
 {
@@ -25,11 +24,14 @@ function clientServer(data)
   if (ireq.fnc != undefined)
   {
     switch (ireq.fnc) {
-      case request.REQUEST.UPDATE:
+      case request.REQUEST.UPDATESTD:
         global.mwin.webContents.send("update", ireq.data);
         break;
-        case request.REQUEST.TOGGLENOTIFICATION: //FIXME
-        sendHandle.send("toggleNotification",ireq.data)
+        case request.REQUEST.TOGGLENOTIFICATION:
+        global.mwin.webContents.send("toggleNotification",ireq.data)
+        break;
+        case request.REQUEST.UPDATENOTIF:
+        global.mwin.webContents.send("updateNotification",ireq.data)
         break;
       default:
       //Do nothing

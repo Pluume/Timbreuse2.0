@@ -56,24 +56,51 @@ function pushNotifications(profid, type, message) {
     message: message,
     date: now,
     read: 0
-  }).toString());
-  var arr = lodash.filter(global.clients, function(o) {
-    try {
-      return o.user.id == profid
-    } catch (err) {
-      return false;
+  }).toString(), function() {
+    var arr = lodash.filter(global.clients, function(o) {
+      try {
+        return o.user.id == profid
+      } catch (err) {
+        return false;
+      }
+    });
+    var oreq = getBaseReq(request.REQUEST.UPDATENOTIF);
+    oreq.data = {
+      id: this.lastID,
+      type: type,
+      message: message,
+      date: now,
+      read: 0
+    };
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].socket.write(JSON.stringify(oreq) + "\0");
     }
   });
-  var oreq = getBaseReq(request.REQUEST.UPDATE);
-  oreq.data = {
-    type: type,
-    message: message,
-    date: now,
-    read: 0
-  };
-  for (var i = 0; i < arr.length; i++) {
-    arr[i].socket.write(JSON.stringify(oreq) + "\0");
-  }
+
+}
+
+function updateNotification(profid, notifid) {
+  global.db.get(knex("notifications").select().where({
+    id: notifid
+  }).toString(), (err, row) => {
+    if (err || row == undefined) {
+      log.error("Error querrying the database : " + err);
+      return;
+    }
+    var arr = lodash.filter(global.clients, function(o) {
+      try {
+        return o.user.id == profid
+      } catch (err) {
+        return false;
+      }
+    });
+    var oreq = getBaseReq(request.REQUEST.TOGGLENOTIFICATION);
+    oreq.data = row;
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].socket.write(JSON.stringify(oreq) + "\0");
+    }
+  });
+
 }
 
 function sendUpdate(id, arg) {
@@ -85,7 +112,7 @@ function sendUpdate(id, arg) {
     }
 
   });
-  var oreq = getBaseReq(request.REQUEST.UPDATE);
+  var oreq = getBaseReq(request.REQUEST.UPDATESTD);
   oreq.data = arg;
   for (var i = 0; i < arr.length; i++) {
     arr[i].socket.write(JSON.stringify(oreq) + "\0");
@@ -997,24 +1024,24 @@ function setFixed(conn, ireq) {
  **/
 function getNotifications(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-    if (conn.user === undefined) {
+  if (conn.user === undefined) {
 
-      oreq.error = request.ERROR.NOTLOGEDIN;
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+  global.db.all(knex("notifications").select().where({
+    userid: conn.user.id
+  }).toString(), (err, rows) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
       conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
-    global.db.all(knex("notifications").select().where({
-      userid: conn.user.id
-    }).toString(), (err, rows) => {
-      if (err) {
-        log.error("Error when querrying the database : " + err);
-        oreq.error = request.ERROR.SQLITE;
-        conn.socket.write(JSON.stringify(oreq) + "\0");
-        return;
-      }
-      oreq.data = rows;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-    });
+    oreq.data = rows;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
 
 }
 
@@ -1025,17 +1052,14 @@ function getNotifications(conn, ireq) {
  * @param {Object} ireq a JSON object containing the request.
  **/
 function toggleNotification(conn, ireq) {
-  var oreq = getBaseReq(ireq.fnc);
   if (conn.user === undefined) {
 
-    oreq.error = request.ERROR.NOTLOGEDIN;
-    conn.socket.write(JSON.stringify(oreq) + "\0");
+    log.error("Not logged in");
     return;
   }
   if (ireq.id === undefined) {
 
-    oreq.error = request.ERROR.UNKNOWN;
-    conn.socket.write(JSON.stringify(oreq) + "\0");
+    log.error("Unkown error");
     return;
   }
   global.db.get(knex("notifications").select().where({
@@ -1043,8 +1067,6 @@ function toggleNotification(conn, ireq) {
   }).toString(), (err, row) => {
     if (err) {
       log.error("Error when querrying the database : " + err);
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
     if (row.read)
@@ -1059,6 +1081,7 @@ function toggleNotification(conn, ireq) {
       }).where({
         id: ireq.id
       }).toString());
+    updateNotification(conn.user.id, ireq.id);
   });
 
 }
