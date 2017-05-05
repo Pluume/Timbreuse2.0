@@ -85,7 +85,7 @@
     }
     function timeFormatter(val)
     {
-      return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:MM:SS");
+      return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> h:mm:ss");
     }
     function statusFormatter(val, row) {
       var status = document.createElement("div");

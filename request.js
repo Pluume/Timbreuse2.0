@@ -57,7 +57,8 @@ PAGES ={
     LOGIN: 0,
     PROFS: 1,
     SLAVE: 2,
-    NOTIFICATIONS: 3
+    NOTIFICATIONS: 3,
+    HOLYDAYS: 4
 };
 SCOPE ={
     UNIQUE: 1,
