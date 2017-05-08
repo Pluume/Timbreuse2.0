@@ -24,8 +24,9 @@ module.exports = {
    * @method secondsToHms
    **/
   secondsToHms: function(nb) {
-    if(nb==null)
-    return "+ 00:00:00"
+    if (nb == null)
+      return "+ 00:00:00"
+
     function addZero(nb) {
       if (Math.abs(nb < 10)) {
         return "0" + nb.toString();
@@ -37,8 +38,14 @@ module.exports = {
     (nb < 0) ? neg = true: neg = false;
     nb = Math.abs(Number(nb));
     var h = Math.floor(nb / 3600);
+    if (Number.isNaN(h))
+      h = 0;
     var m = Math.floor(Math.floor(nb % 3600) / 60);
+    if (Number.isNaN(m))
+      m = 0;
     var s = Math.floor(nb % 60);
+    if (Number.isNaN(s))
+      s = 0;
     return ((neg) ? "-" : "+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s);
   }
 };

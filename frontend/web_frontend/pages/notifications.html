@@ -23,14 +23,14 @@
 
 <body>
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="notifTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="name" data-pagination="true" data-sort-order="desc">
+    <table id="notifTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="date" data-pagination="true" data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Prof ID</th>
           <th data-field="date" style="text-align: center; vertical-align: middle; width: 36px; "  data-formatter="timeFormatter" data-sortable="true">Date</th>
           <th data-field="type" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="notifFormatter" data-sortable="true">Type</th>
           <th data-field="message" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Message</th>
-          <th data-field="read" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="readFormatter" data-sortable="true">Read</th>
+          <th data-field="read" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="readFormatter" data-sortable="true"></th>
         </tr>
       </thead>
     </table>
@@ -54,12 +54,13 @@
 
     function readFormatter(val) {
       if (!val)
-        return "<div><i class=\"glyphicon glyphicon-asterisk\"></i></div>"
-      return val;
+        return "<div><i class=\"glyphicon glyphicon-asterisk\"></i></div>";
+      else
+      return "<div><i class=\"glyphicon glyphicon-ok\"></i></div>";
     }
 
     function timeFormatter(val) {
-      return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:MM:SS");
+      return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> h:mm:ss");
     }
 
     function notifFormatter(val, row) {

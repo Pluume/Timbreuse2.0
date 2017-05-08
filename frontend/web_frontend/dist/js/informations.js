@@ -482,7 +482,6 @@ function onNotificationInsert(event, arg) {
   {
     var tmp = [];
     tmp.push(arg);
-    console.log(JSON.stringify(tmp));
     $("#notifTable").bootstrapTable('prepend', tmp);
   }
 }

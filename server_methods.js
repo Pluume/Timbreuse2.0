@@ -152,18 +152,18 @@ function tagRoutine(conn, user, ireq) {
     if (row2.status == global.STATUS.IN) //Departure
     {
       nstatus = global.STATUS.OUT;
-      var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time:moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
       nTimeDiffToday = row2.timeDiffToday + delta;
       var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
       if (missedPause) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
-        log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+        log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time:moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
         pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't take a pause in a " + delta + " session.");
       }
       global.db.serialize(() => {
         global.db.run(knex("students").update({
           timeDiffToday: isNaN(nTimeDiffToday) ? row2.timeDiffToday : nTimeDiffToday,
-          lastTagTime: ireq.time,
+          lastTagTime: (ireq.time) ? ireq.time:moment().format().toString(),
           status: nstatus,
           missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
         }).where("userid", user.id).toString());
@@ -186,7 +186,7 @@ function tagRoutine(conn, user, ireq) {
           if (!ireq.delayed)
             conn.socket.write(JSON.stringify(oreq) + "\0");
           sendUpdate(row3.profid, oreq.student);
-          log.save(global.LOGS.OUT, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          log.save(global.LOGS.OUT, row3.id, ireq.class, (ireq.time) ? ireq.time:moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
         });
       });
 
@@ -194,28 +194,28 @@ function tagRoutine(conn, user, ireq) {
 
     } else { //Arrival
       nstatus = global.STATUS.IN;
-      var delta = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time:moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
       var nTimeDiffToday = row2.timeDiffToday;
       delta = isNaN(delta) ? 0 : delta;
       if (delta < global.config.pause.minimum && delta > global.config.pause.minimum_error) //error < delta < minimum
       {
         nTimeDiffToday -= global.config.pause.minimum - delta; //TODO notification on illegal short pause
         log.warning("USRID : " + user.id + " : minimum pause rule not respected !");
-        log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, ireq.time, "", row2.timeDiff, row2.timeDiffToday);
+        log.save(global.LOGS.MINIMUMPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time:moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
         pushNotifications(row2.profid, global.LOGS.MINIMUMPAUSE, user.fname + " " + user.lname + " has done a pause in less time than the minimum accepted.");
       }
 
-      var now = moment(ireq.time);
-      var nowAtMidnight = moment(ireq.time).clone().startOf('day');
+      var now = moment((ireq.time) ? ireq.time:moment().format().toString());
+      var nowAtMidnight = moment((ireq.time) ? ireq.time:moment().format().toString()).clone().startOf('day');
       var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
       var hadLunch = 0;
       var missedPause = row2.missedPause;
       if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
-        var pauseDelta = math.getTimeDelta(moment(ireq.time).toDate().getTime(), new Date(row2.lastTagTime).getTime());
+        var pauseDelta = math.getTimeDelta(moment((ireq.time) ? ireq.time:moment().format().toString()).toDate().getTime(), new Date(row2.lastTagTime).getTime());
         if (pauseDelta >= global.config.lunch.time)
           hadLunch = 1;
       }
-      var awayTime = math.getTimeDelta(new Date(ireq.time).getTime(), new Date(row2.lastTagTime).getTime());
+      var awayTime = math.getTimeDelta(new Date((ireq.time) ? ireq.time:moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
       if (awayTime >= global.config.pause.time && row2.missedPause > 0) {
         missedPause -= Math.floor(awayTime / global.config.pause.time);
         missedPause = (missedPause < 0) ? 0 : missedPause;
@@ -223,7 +223,7 @@ function tagRoutine(conn, user, ireq) {
       global.db.serialize(() => {
         global.db.run(knex("students").update({
           status: nstatus,
-          lastTagTime: ireq.time,
+          lastTagTime: (ireq.time) ? ireq.time:moment().format().toString(),
           hadLunch: hadLunch,
           timeDiffToday: nTimeDiffToday
         }).where("userid", user.id).toString());
@@ -247,7 +247,7 @@ function tagRoutine(conn, user, ireq) {
           sendUpdate(row3.profid, oreq.student);
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
-          log.save(global.LOGS.IN, row3.id, ireq.class, ireq.time, ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time:moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
           if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
             if (row2.isBlocked) {
               if (dayConfig.scheduleFix.length > 0)
@@ -282,7 +282,7 @@ function tagRequest(item, index) {
   var conn = item.connection;
   tagReqList.splice(index, 1); // Remove current item
   if (ireq.tag != undefined && ireq.time != undefined)
-    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), ireq.time);
+    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), (ireq.time) ? ireq.time:moment().format().toString());
   if (global.DEBUG && ireq.tag != undefined)
     console.log("[TAG] : " + ireq.tag.replace(/\s/g, ''));
   if (ireq.tag != undefined) {
@@ -823,6 +823,7 @@ function modTime(conn, ireq) {
           log.error("Error when querrying the database : " + err);
           return;
         }
+        console.log(ireq.id[i]);
         log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
 

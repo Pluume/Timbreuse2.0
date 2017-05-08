@@ -11,30 +11,55 @@ const path = require('path');
 const url = require('url');
 const net = require("net");
 const request = require("../request.js");
+const log = require("./../utils/log.js");
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = "";
 
-function clientServer(data)
-{
+function clientServer(data) {
   try {
     var ireq = JSON.parse(data);
   } catch (err) {
     return;
   }
-  if (ireq.fnc != undefined)
-  {
+  if (ireq.fnc != undefined) {
     switch (ireq.fnc) {
       case request.REQUEST.UPDATESTD:
         global.mwin.webContents.send("update", ireq.data);
         break;
-        case request.REQUEST.TOGGLENOTIFICATION:
-        global.mwin.webContents.send("toggleNotification",ireq.data)
+      case request.REQUEST.TOGGLENOTIFICATION:
+        global.mwin.webContents.send("toggleNotification", ireq.data)
         break;
-        case request.REQUEST.UPDATENOTIF:
-        global.mwin.webContents.send("updateNotification",ireq.data)
+      case request.REQUEST.UPDATENOTIF:
+        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) {
+          var title;
+          switch (ireq.data.type) {
+            case global.LOGS.MINIMUMPAUSE:
+              title = "Minimum pause";
+              break;
+            case global.LOGS.NOPAUSE:
+              title = "No pause";
+              break;
+            case global.LOGS.NOLUNCH:
+              title = "No lunch";
+              break;
+            case global.LOGS.TIMEERROR:
+              title = "Time error";
+              break;
+            default:
+              title = "ERROR";
+          }
+          log.info("Displaying notification");
+          var iconPath = path.join(__dirname, "..", "graphics", "ico.png");
+          global.tray.displayBalloon({
+            icon: iconPath,
+            title: title,
+            content: ireq.data.message
+          });
+        }
+        global.mwin.webContents.send("updateNotification", ireq.data)
         break;
       default:
-      //Do nothing
+        //Do nothing
     }
   }
 }
@@ -125,6 +150,21 @@ function createWindow() {
   global.mwin.on("ready-to-show", () => {
     global.mwin.show();
   });
+  var iconPath = path.join(__dirname, "..", "graphics", "ico.png");
+  global.tray = new electron.Tray(iconPath);
+  var showVisible = () => {
+    global.mwin.isVisible() ? global.mwin.hide() : global.mwin.show();
+  };
+  global.tray.on('click', showVisible);
+  global.tray.on('double-click', showVisible);
+  global.tray.on('balloon-click', showVisible);
+  global.mwin.on('show', () => {
+    global.tray.setHighlightMode('always')
+  });
+  global.mwin.on('hide', () => {
+    global.tray.setHighlightMode('never')
+  });
+
 }
 /**
  * Load the client interface
