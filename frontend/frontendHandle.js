@@ -35,7 +35,6 @@ function logIn(event, arg) {
     user: arg.user,
     pass: passhash
   }];
-  console.log("logging");
 
   client.connect((err) => {
 
@@ -293,7 +292,6 @@ function getNotifications(event, arg) {
   }];
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
-
       var ireq = JSON.parse(data);
       if (ireq.fnc != oreq[0].fnc)
         return;
@@ -313,6 +311,64 @@ function toggleNotification(event, arg) {
 
   client.send(JSON.stringify(oreq), (err, data) => {});
 }
+function getHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETHOLIDAYS,
+    error: request.ERROR.OK
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("getHolidays", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
+
+function addHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.ADDHOLIDAYS,
+    error: request.ERROR.OK,
+    data: {
+      title: arg.title,
+      date1: arg.date1,
+      date2: arg.date2
+    }
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("addHolidays", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
+function delHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELHOLIDAYS,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("delHolidays", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+    }
+  });
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -330,3 +386,6 @@ ipcMain.on("fixed", setFixed);
 ipcMain.on("tag", tag);
 ipcMain.on("notification", getNotifications);
 ipcMain.on("notificationToggle", toggleNotification);
+ipcMain.on("getHolidays", getHolidays);
+ipcMain.on("addHolidays", addHolidays);
+ipcMain.on("delHolidays", delHolidays);

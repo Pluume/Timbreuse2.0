@@ -1,0 +1,178 @@
+<html>
+
+<head>
+  <!-- Bootstrap Core CSS -->
+  <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- MetisMenu CSS -->
+  <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+  <link href="../dist/css/style.css" rel="stylesheet">
+  <link href="../dist/css/bootstrap-table.css" rel="stylesheet">
+
+  <!-- Morris Charts CSS -->
+  <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+  <link href="../vendor/datepicker/datepicker.css" rel="stylesheet" type="text/css" />
+  <script src="../dist/js/pages.js"></script>
+</head>
+
+<body>
+  <div id="pageContainer">
+    <style>
+      .aligned {
+        display: inline-block;
+        width: 30%;
+        min-width: 200px;
+      }
+
+      .eventNameDiv {
+        width: 30%;
+        min-width: 400px;
+      }
+
+      .centeredDiv {
+        text-align: center;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        vertical-align: middle;
+      }
+
+      .datePickerBox {
+        width: 100%;
+      }
+
+      .globalParam {
+        margin-left: 20px;
+      }
+    </style>
+    <div class="centeredDiv">
+      <div class="container">
+        <div class="aligned">
+          <label for="firstDate">Select start date</label>
+          <div class="datePickerBox input-group input-append date" id="firstDate">
+            <input type="text" class="form-control" id="firstDateText" name="date" />
+            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+          </div>
+        </div>
+        <div class="aligned">
+          <label for="lastDate">Select end date</label>
+          <div class="datePickerBox input-group input-append date" id="lastDate">
+            <input type="text" class="form-control" id="lastDateText" name="date" />
+            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+          </div>
+
+        </div>
+      </div>
+      <div class="checkbox">
+        <label><input type="checkbox" id="rangedVacation" value="" checked="true">Ranged holidays</label>
+      </div>
+      <label for="lastDate">Event name</label>
+      <div class="container">
+        <div class="aligned">
+          <div class="input-group input-append" id="lastDate">
+            <input type="text" class="form-control" id="eventName" />
+            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-save-file"></span></span>
+          </div>
+        </div>
+        <br />
+        <button type="button" onclick="addHolidays('holidaysCalendar', document.getElementById('eventName').value, document.getElementById('firstDateText').value, document.getElementById('lastDateText').value)" style="width: 20%;min-width: 150px;max-width: 250px;"
+          class="btn btn-success">Create event</button>
+      </div>
+    </div>
+    <div id="holidaysCalendar">
+    </div>
+    <!-- jQuery -->
+    <script>
+      window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+      window.secToHMS = require('../../../utils/math.js').secondsToHms;
+      window.ERROR = require('../../../request.js').ERROR;
+      window.PAGES = require('../../../request.js').PAGES;
+      window.SCOPE = require('../../../request.js').SCOPE;
+      window.RANK = require('../../../db/db.js').RANK;
+      window.STATUS = require('../../../db/db.js').STATUS;
+      window.LOGS = require('../../../db/db.js').LOGS;
+      setPage(window.PAGES.HOLIDAYS);
+      $(document).ready(function() {
+        $("body").tooltip({
+          selector: '[data-toggle=tooltip]'
+        });
+        $('#rangedVacation').change(function() {
+          if (!this.checked) {
+            $('#lastDateText').attr("disabled", "disabled");
+            document.getElementById("lastDateText").value = "";
+            $('#firstDate').datepicker("setEndDate", false);
+          } else {
+            document.getElementById("lastDateText").value = "";
+            $('#firstDate').datepicker("setEndDate", false);
+            $("#lastDateText").removeAttr("disabled");
+          }
+
+        });
+        $('#firstDate')
+          .datepicker({
+            autoclose: true,
+            format: 'dd-mm-yyyy'
+          }).on("changeDate", function(e) {
+            $('#lastDate').datepicker("setStartDate", e.date);
+          });
+        $('#lastDate')
+          .datepicker({
+            autoclose: true,
+            useCurrent: false,
+            format: 'dd-mm-yyyy'
+          }).on("changeDate", function(e) {
+            $('#firstDate').datepicker("setEndDate", e.date);
+          })
+
+        getHolidays("holidaysCalendar");
+
+      });
+    </script>
+    <div class="modal fade" id="delEventModal" tabindex="-1" role="dialog" aria-labelledby="delEventModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="delEventModalTitle">Are you sure to delete this event ?</h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" data-dismiss="modal" onclick="" id="confirmDeleteEvent" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="../vendor/raphael/raphael.min.js"></script>
+    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="../data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../dist/js/bootstrap-table.js"></script>
+    <script src="../dist/js/informations.js"></script>
+    <script src="../dist/js/redirect.js"></script>
+    <script src="../dist/js/utils.js"></script>
+    <script src="../vendor/moment/moment.js"></script>
+    <script src="../vendor/datepicker/datepicker.js"></script>
+    <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
+    </script>
+  </div>
+
+</body>
+
+</html>

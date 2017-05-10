@@ -1,6 +1,7 @@
 const {
   ipcRenderer
 } = require('electron');
+
 function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 {
   var text = "";
@@ -463,28 +464,133 @@ function getNotifications(tableId, cb) {
     }
   });
 }
-function toggleNotification(id)
-{
+
+function toggleNotification(id) {
   ipcRenderer.send("notificationToggle", id);
 }
 
 function onNotificationUpdate(event, arg) {
-  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined)
-  {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined) {
     $("#notifTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,
       row: arg
     });
   }
 }
+
 function onNotificationInsert(event, arg) {
-  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined)
-  {
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined) {
     var tmp = [];
     tmp.push(arg);
     $("#notifTable").bootstrapTable('prepend', tmp);
   }
 }
+function delHolidays(id, calId) {
+  ipcRenderer.send("delHolidays", id);
+  ipcRenderer.once("delHolidays", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $('#' + calId).fullCalendar('removeEvents', id);
+        greenAlert("Event deleted successfully.");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+function getHolidays(calendarId) {
+  ipcRenderer.send("getHolidays", null);
+  ipcRenderer.once("getHolidays", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i < arg.data.length; i++) {
+          data.push({
+            allDay: true,
+            id: arg.data[i].id,
+            title: arg.data[i].desc,
+            start: arg.data[i].date1,
+            end: arg.data[i].date2,
+          });
+        }
+        $('#' + calendarId).fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month'
+          },
+          navLinks: false, // can click day/week names to navigate views
+          editable: false,
+          defaultView: 'month',
+          weekNumbers: true,
+          eventLimit: true, // allow "more" link when too many events
+          events: data,
+          timeFormat: 'H:mm',
+          firstDay: 1,
+          weekNumbersWithinDays: true,
+          eventClick: function(calEvent, jsEvent, view) {
+            document.getElementById("confirmDeleteEvent").onclick = function() { delHolidays(calEvent.id,calendarId); };
+            $("#delEventModal").modal("show");
+          }
+        });
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+
+  });
+}
+
+function addHolidays(calendarId, title, date1, date2) {
+  ipcRenderer.send("addHolidays", {
+    title: title,
+    date1: date1,
+    date2: date2
+  });
+  ipcRenderer.once("addHolidays", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $('#' + calendarId).fullCalendar('renderEvent', {
+          allDay: true,
+          id: arg.data.id,
+          title: arg.data.desc,
+          start: arg.data.date1,
+          end: arg.data.date2
+        }, true);
+        greenAlert("Event created !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
 ipcRenderer.on("update", onUpdate);
-ipcRenderer.on("toggleNotification",onNotificationUpdate);
-ipcRenderer.on("updateNotification",onNotificationInsert);
+ipcRenderer.on("toggleNotification", onNotificationUpdate);
+ipcRenderer.on("updateNotification", onNotificationInsert);
