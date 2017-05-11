@@ -425,7 +425,7 @@ function socketExit(conn) {
  **/
 function getStudent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -506,7 +506,7 @@ function getStudent(conn, ireq) {
  **/
 function getClass(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -552,7 +552,7 @@ function getClass(conn, ireq) {
  **/
 function createStudent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -626,7 +626,7 @@ function createStudent(conn, ireq) {
  **/
 function deleteStudent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -669,7 +669,7 @@ function deleteStudent(conn, ireq) {
  **/
 function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag or username
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -742,7 +742,7 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
  **/
 function resetTime(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -794,7 +794,7 @@ function resetTime(conn, ireq) {
  **/
 function modTime(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -841,7 +841,7 @@ function modTime(conn, ireq) {
  **/
 function setTime(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -890,7 +890,7 @@ function setTime(conn, ireq) {
  **/
 function getLogs(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -924,7 +924,7 @@ function getLogs(conn, ireq) {
  **/
 function setAbsent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -960,7 +960,7 @@ function setAbsent(conn, ireq) {
  **/
 function setFixed(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -1025,7 +1025,7 @@ function setFixed(conn, ireq) {
  **/
 function getNotifications(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -1053,7 +1053,7 @@ function getNotifications(conn, ireq) {
  * @param {Object} ireq a JSON object containing the request.
  **/
 function toggleNotification(conn, ireq) {
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     log.error("Not logged in");
     return;
@@ -1094,7 +1094,7 @@ function toggleNotification(conn, ireq) {
  **/
 function getHolidays(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     log.error("Not logged in");
     return;
@@ -1123,7 +1123,7 @@ function getHolidays(conn, ireq) {
  * @param {Object} ireq a JSON object containing the request.
  **/
 function toggleNotification(conn, ireq) {
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     log.error("Not logged in");
     return;
@@ -1164,7 +1164,7 @@ function toggleNotification(conn, ireq) {
  **/
 function addHolidays(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     log.error("Not logged in");
     return;
@@ -1217,7 +1217,7 @@ function addHolidays(conn, ireq) {
  **/
 function delHolidays(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined) {
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
 
     log.error("Not logged in");
     return;

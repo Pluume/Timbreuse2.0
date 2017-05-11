@@ -1,6 +1,6 @@
 function logout()
 {
-  //TODO
+  ipcRenderer.send("logout");
   document.location.href="login.html";
 }
 function getNotificationsNumber()

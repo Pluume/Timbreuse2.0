@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>SB Admin 2 - Bootstrap Admin Theme</title>
+  <title>Admin panel</title>
 
   <!-- Bootstrap Core CSS -->
   <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -76,15 +76,9 @@
       <div class="navbar-default sidebar" role="navigation">
         <div class="sidebar-nav navbar-collapse">
           <ul class="nav" id="side-menu">
-            
+
             <li>
-              <a href="#" onclick="loadPage('profs.html');"><i class="fa fa-home fa-fw"></i> Home</a>
-            </li>
-            <li>
-              <a href="#" onclick="loadPage('notifications.html');"><i class="fa fa-bar-chart-o fa-fw"></i> Notifications</a>
-            </li>
-            <li>
-              <a href="#" onclick="loadPage('holidays.html');"><i class="fa fa-calendar-o fa-fw"></i> Holidays</span></a>
+              <a href="#" onclick="loadPage('admin.html');"><i class="fa fa-home fa-fw"></i> Home</a>
             </li>
           </ul>
         </div>
@@ -93,7 +87,7 @@
       <!-- /.navbar-static-side -->
     </nav>
     <div id="page-wrapper">
-      <webview src="profs.html" style="margin: 0;padding: 0;" frameborder="0" class="row col-lg-12 gutter-0" id="MainIFrame" nodeintegration></webview>
+      <webview src="admin.html" style="margin: 0;padding: 0;" frameborder="0" class="row col-lg-12 gutter-0" id="MainIFrame" nodeintegration></webview>
       <script>
         var webview = document.getElementById("MainIFrame");
         webview.addEventListener('console-message', function(e) { //Thanks to https://discuss.atom.io/t/cannot-see-console-log-from-webview/19974/4

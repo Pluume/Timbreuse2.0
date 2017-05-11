@@ -107,12 +107,12 @@ function connect(cb) {
   });
 }
 
-function disconnect(cb) {
+function disconnect() {
   try {
     global.clientconn.end();
-    cb(null);
+    global.clientconn = null;
   } catch (err) {
-    cb(err);
+    log.error(err);
   }
 }
 

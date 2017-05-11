@@ -59,7 +59,10 @@ function logIn(event, arg) {
 function redirect(event, arg) {
   switch (arg) {
     case request.PAGES.PROFS:
-      global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/index.html'))
+      global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/index.html'));
+      break;
+      case request.PAGES.ADMIN:
+      global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/indexAdmin.html'));
       break;
   }
 }
@@ -369,6 +372,10 @@ function delHolidays(event, arg) {
     }
   });
 }
+function logout(event, arg)
+{
+  client.disconnect();
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -389,3 +396,4 @@ ipcMain.on("notificationToggle", toggleNotification);
 ipcMain.on("getHolidays", getHolidays);
 ipcMain.on("addHolidays", addHolidays);
 ipcMain.on("delHolidays", delHolidays);
+ipcMain.on("logout", logout);

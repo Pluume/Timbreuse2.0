@@ -61,7 +61,8 @@ PAGES ={
     PROFS: 1,
     SLAVE: 2,
     NOTIFICATIONS: 3,
-    HOLIDAYS: 4
+    HOLIDAYS: 4,
+    ADMIN: 5
 };
 SCOPE ={
     UNIQUE: 1,

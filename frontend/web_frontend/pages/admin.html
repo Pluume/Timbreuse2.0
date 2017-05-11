@@ -1,0 +1,150 @@
+<html>
+
+<head>
+  <!-- Bootstrap Core CSS -->
+  <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- MetisMenu CSS -->
+  <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+  <link href="../dist/css/style.css" rel="stylesheet">
+  <link href="../dist/css/bootstrap-table.css" rel="stylesheet">
+
+  <!-- Morris Charts CSS -->
+  <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+  <link href="../vendor/datepicker/datepicker.css" rel="stylesheet" type="text/css" />
+  <script src="../dist/js/pages.js"></script>
+</head>
+
+<body>
+  <div id="pageContainer">
+    <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
+      <table id="profTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="true" data-sort-order="desc">
+        <thead>
+          <tr>
+            <th data-field="state" data-checkbox="true"></th>
+            <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Student ID</th>
+            <th data-field="lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
+            <th data-field="fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
+            <th data-field="username" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">username</th>
+            <th data-field="class" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Class</th>
+            <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="profActionFormatter"><span data-toggle='modal' data-target="#addProfModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['ctclass','cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <!-- jQuery -->
+    <script>
+      window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+      window.secToHMS = require('../../../utils/math.js').secondsToHms;
+      window.ERROR = require('../../../request.js').ERROR;
+      window.PAGES = require('../../../request.js').PAGES;
+      window.SCOPE = require('../../../request.js').SCOPE;
+      window.RANK = require('../../../db/db.js').RANK;
+      window.STATUS = require('../../../db/db.js').STATUS;
+      window.LOGS = require('../../../db/db.js').LOGS;
+      setPage(window.PAGES.ADMIN);
+      function profActionFormatter()
+      {
+
+      }
+      function submitCreateModal()
+      {
+
+      }
+      $(document).ready(function() {
+        $("body").tooltip({
+          selector: '[data-toggle=tooltip]'
+        });
+      });
+    </script>
+    <div class="modal fade" id="delProfModal" tabindex="-1" role="dialog" aria-labelledby="delProfModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="delProfModalTitle">Are you sure to delete this teacher (and <b>all</b> his students) ?</h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" data-dismiss="modal" onclick="" id="confirmDeleteEvent" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="addProfModal" tabindex="-1" role="dialog" aria-labelledby="addProfModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="addProfModalTitle">Create a new teacher</h2>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div id="fgctclass" class="form-group">
+                <label for="ctclass" class="form-control-label">Class : </label>
+                <input type="text" class="form-control" id="ctclass">
+              </div>
+              <div id="fgcfname" class="form-group">
+                <label for="cfname" class="form-control-label">First name :</label>
+                <input type="text" class="form-control" id="cfname">
+              </div>
+              <div id="fgclname" class="form-group">
+                <label for="clname" class="form-control-label">Last name:</label>
+                <input type="text" class="form-control" id="clname">
+              </div>
+              <div id="fgcusername" class="form-group">
+                <label for="cusername" class="form-control-label">Username :</label>
+                <input type="text" class="form-control" id="cusername">
+              </div>
+              <div id="fgcdob" class="form-group">
+                <label for="cdob" class="form-control-label">Date of birth:</label>
+                <input type="text" class="form-control" id="cdob">
+              </div>
+              <div id="fgcemail" class="form-group">
+                <label for="cemail" class="form-control-label">Email :</label>
+                <input type="text" class="form-control" id="cemail">
+              </div>
+              <div id="fgctag" class="form-group">
+                <label for="ctag" class="form-control-label">Tag :</label>
+                <input type="text" class="form-control" id="ctag">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" onclick="submitCreateModal();" class="btn btn-success">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="../vendor/raphael/raphael.min.js"></script>
+    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="../data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../dist/js/bootstrap-table.js"></script>
+    <script src="../dist/js/informations.js"></script>
+    <script src="../dist/js/redirect.js"></script>
+    <script src="../dist/js/utils.js"></script>
+    <script src="../vendor/moment/moment.js"></script>
+    <script src="../vendor/datepicker/datepicker.js"></script>
+    <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
+    </script>
+  </div>
+
+</body>
+
+</html>

@@ -36,12 +36,6 @@ PROOF = {
   CERTIFICATE: 2,
   CONVOCATION: 3
 };
-PROOF = {
-  NONE: 0,
-  MEDICAL: 1,
-  CERTIFICATE: 2,
-  CONVOCATION: 3
-};
 LOGS = {
   IN:1,
   OUT:2,
@@ -73,7 +67,7 @@ module.exports = {
     PROOF: PROOF,
     STATUS: STATUS,
     LOGS: LOGS,
-    NOTIF: NOTIF, 
+    NOTIF: NOTIF,
     /**
      * Init the database
      * @method init
