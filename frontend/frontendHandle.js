@@ -376,6 +376,78 @@ function logout(event, arg)
 {
   client.disconnect();
 }
+
+function getProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETPROF,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("getprof", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+function addProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CREATEPROF,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("addprof", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+function delProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELPROF,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("delprof", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+function editProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.EDITPROF,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("editprof", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -397,3 +469,7 @@ ipcMain.on("getHolidays", getHolidays);
 ipcMain.on("addHolidays", addHolidays);
 ipcMain.on("delHolidays", delHolidays);
 ipcMain.on("logout", logout);
+ipcMain.on("getprof", getProf);
+ipcMain.on("addprof", addProf);
+ipcMain.on("delprof", delProf);
+ipcMain.on("editprof", editProf);

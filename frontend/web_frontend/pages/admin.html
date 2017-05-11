@@ -25,16 +25,18 @@
 <body>
   <div id="pageContainer">
     <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-      <table id="profTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="true" data-sort-order="desc">
+      <table id="profTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="true" data-sort-order="asc">
         <thead>
           <tr>
-            <th data-field="state" data-checkbox="true"></th>
-            <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Student ID</th>
+            <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Prof ID</th>
             <th data-field="lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
             <th data-field="fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
             <th data-field="username" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">username</th>
             <th data-field="class" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Class</th>
             <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="profActionFormatter"><span data-toggle='modal' data-target="#addProfModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['ctclass','cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+            <th data-field="dob" data-visible="false"></th>
+            <th data-field="email" data-visible="false"></th>
+            <th data-field="tag" data-visible="false"></th>
           </tr>
         </thead>
       </table>
@@ -50,19 +52,67 @@
       window.STATUS = require('../../../db/db.js').STATUS;
       window.LOGS = require('../../../db/db.js').LOGS;
       setPage(window.PAGES.ADMIN);
-      function profActionFormatter()
-      {
+      var toDelete = -1;
 
+      function profActionFormatter(val, row) {
+
+        return "<button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='editCb(" + row.id +
+          ");' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button><span data-toggle='modal' data-target='#delProfModal'><button data-toggle='tooltip' data-placement='bottom' title='Delete' href='#' onclick='toDelete = " +
+          row.id +
+          ";' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button></span>";
       }
-      function submitCreateModal()
-      {
 
+      function delProfSubmit() {
+        delProf(toDelete, () => {
+          getProf("profTable", () => {});
+        });
+      }
+
+      function editProfSubmit(id) {
+        var data = {
+          id: id,
+          class: document.getElementById("etclass").value,
+          lname: document.getElementById("elname").value,
+          fname: document.getElementById("efname").value,
+          username: document.getElementById("eusername").value,
+          dob: document.getElementById("edob").value,
+          email: document.getElementById("eemail").value,
+          tag: document.getElementById("etag").value,
+          pass: (document.getElementById("epass").checked) ? 1:0
+        };
+        emptyInput(["etclass", "elname", "efname", "eusername", "edob", "eemail"]);
+        document.getElementById("epass").checked = false;
+        editProf(data, () => {
+          getProf("profTable", () => {});
+        });
+      }
+
+      function submitCreateModal() {
+        createProf(document.getElementById("cusername").value, document.getElementById("cfname").value, document.getElementById("clname").value,
+          document.getElementById("ctag").value, document.getElementById("ctclass").value,
+          document.getElementById("cdob").value, document.getElementById("cemail").value, () => {
+            getProf("profTable", () => {});
+          });
       }
       $(document).ready(function() {
         $("body").tooltip({
           selector: '[data-toggle=tooltip]'
         });
+        getProf("profTable", () => {});
       });
+
+      function editCb(id) {
+        var prof = $("#profTable").bootstrapTable('getRowByUniqueId', id);
+        document.getElementById("etclass").setAttribute("placeholder", prof.class == null ? "" : prof.class);
+        document.getElementById("elname").setAttribute("placeholder", prof.lname == null ? "" : prof.lname);
+        document.getElementById("efname").setAttribute("placeholder", prof.fname == null ? "" : prof.fname);
+        document.getElementById("eusername").setAttribute("placeholder", prof.username == null ? "" : prof.username);
+        document.getElementById("edob").setAttribute("placeholder", prof.dob == null ? "" : prof.dob);
+        document.getElementById("eemail").setAttribute("placeholder", prof.email == null ? "" : prof.email);
+        document.getElementById("etag").setAttribute("placeholder", prof.tag == null ? "" : prof.tag);
+        document.getElementById("updateSubmit").setAttribute("onclick", "editProfSubmit(" + prof.id + ");");
+        $('#editProfModal').modal('show');
+      }
     </script>
     <div class="modal fade" id="delProfModal" tabindex="-1" role="dialog" aria-labelledby="delProfModal" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -72,7 +122,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" data-dismiss="modal" onclick="" id="confirmDeleteEvent" class="btn btn-danger">Delete</button>
+            <button type="button" data-dismiss="modal" onclick="delProfSubmit();" id="confirmDeleteEvent" class="btn btn-danger">Delete</button>
           </div>
         </div>
       </div>
@@ -117,7 +167,59 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" onclick="submitCreateModal();" class="btn btn-success">Create</button>
+            <button type="button" onclick="submitCreateModal();" data-dismiss="modal" class="btn btn-success">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="editProfModal" tabindex="-1" role="dialog" aria-labelledby="editProfModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="editProfModalTitle">Edit this teacher</h2>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div id="fgetclass" class="form-group">
+                <label for="etclass" class="form-control-label">Class : </label>
+                <input type="text" class="form-control" id="etclass">
+              </div>
+              <div id="fgecfname" class="form-group">
+                <label for="efname" class="form-control-label">First name :</label>
+                <input type="text" class="form-control" id="efname">
+              </div>
+              <div id="fgelname" class="form-group">
+                <label for="elname" class="form-control-label">Last name:</label>
+                <input type="text" class="form-control" id="elname">
+              </div>
+              <div id="fgeusername" class="form-group">
+                <label for="eusername" class="form-control-label">Username :</label>
+                <input type="text" class="form-control" id="eusername">
+              </div>
+              <div id="fgedob" class="form-group">
+                <label for="edob" class="form-control-label">Date of birth:</label>
+                <input type="text" class="form-control" id="edob">
+              </div>
+              <div id="fgeemail" class="form-group">
+                <label for="eemail" class="form-control-label">Email :</label>
+                <input type="text" class="form-control" id="eemail">
+              </div>
+              <div id="fgetag" class="form-group">
+                <label for="etag" class="form-control-label">Tag :</label>
+                <input type="text" class="form-control" id="etag">
+              </div>
+              <div id="fgepass" class="form-group">
+                <div class="checkbox">
+                  <label>
+                      <input id="epass" type="checkbox" value="Reset password">Reset password
+                  </label>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" id="updateSubmit" data-dismiss="modal" class="btn btn-primary">Update</button>
           </div>
         </div>
       </div>

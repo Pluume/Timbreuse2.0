@@ -591,6 +591,118 @@ function addHolidays(calendarId, title, date1, date2) {
     }
   });
 }
+function getProf(tableId, cb) {
+  ipcRenderer.send("getprof");
+  ipcRenderer.once("getprof", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i < arg.data.length; i++) {
+          console.log(arg.data[i]);
+          data.push({
+            id: arg.data[i].id,
+            lname: arg.data[i].lname,
+            fname: arg.data[i].fname,
+            username: arg.data[i].username,
+            class: arg.data[i].class.name,
+            dob: arg.data[i].dob,
+            email: arg.data[i].email,
+            tag: arg.data[i].tag
+          });
+        }
+        $('#' + tableId).bootstrapTable('load', data);
+
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+
+  });
+}
+function createProf(username, fname, lname,tag,tclass,dob,email,cb) {
+  ipcRenderer.send("addprof", {
+    username: username,
+    fname: fname,
+    lname: lname,
+    tag: tag,
+    class: tclass,
+    dob: dob,
+    email: email
+  });
+  ipcRenderer.once("addprof", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert("Teacher created !");
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+function delProf(id,cb) {
+  ipcRenderer.send("delprof", id);
+  ipcRenderer.once("delprof", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert("Teacher deleted !");
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+function editProf(data,cb) {
+  ipcRenderer.send("editprof", data);
+  ipcRenderer.once("editprof", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert("Teacher updated !");
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
 ipcRenderer.on("update", onUpdate);
 ipcRenderer.on("toggleNotification", onNotificationUpdate);
 ipcRenderer.on("updateNotification", onNotificationInsert);

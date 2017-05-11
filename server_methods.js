@@ -19,6 +19,8 @@ var tagReqList = require("array")();
 var tagReqFncStarted = false;
 const moment = require("moment");
 const config = require("./utils/config.js");
+const db = require("./db/db.js");
+const async = require("async");
 /**
  * Generate the a base for an outgoing request
  * @method getBaseReq
@@ -619,7 +621,7 @@ function createStudent(conn, ireq) {
 
 }
 /**
- * Delete a students
+ * Delete a student
  * @method deleteStudent
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  * @param {Object} ireq a JSON object containing the request.
@@ -638,27 +640,8 @@ function deleteStudent(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  global.db.run(knex("users").where({
-    id: knex("students").where("id", "in", ireq.data).select("userid")
-  }).del().toString(), (err) => {
-    if (err) {
-      log.error("Error : " + err);
-
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
-    global.db.run(knex("students").where("id", "in", ireq.data).del().toString(), (err) => {
-      if (err) {
-        log.error("Error : " + err);
-
-        oreq.error = request.ERROR.SQLITE;
-        conn.socket.write(JSON.stringify(oreq) + "\0");
-        return;
-      }
-
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-    });
+  db.wipeStudents(ireq.data, (err) => {
+    conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }
 /**
@@ -1227,7 +1210,9 @@ function delHolidays(conn, ireq) {
     return;
   }
 
-  global.db.run(knex("timeoff").del().where({id:ireq.id}).toString(), function(err) {
+  global.db.run(knex("timeoff").del().where({
+    id: ireq.id
+  }).toString(), function(err) {
     if (err) {
       log.error("Error when querrying the database : " + err);
       oreq.error = request.ERROR.SQLITE;
@@ -1239,6 +1224,222 @@ function delHolidays(conn, ireq) {
 
 }
 
+/**
+ * Return all the teachers' info the connected administrator
+ * @method getProf
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getProf(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  oreq.data = [];
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+    log.error("Not logged in");
+    return;
+  }
+  global.db.all(knex("users").select().where({
+    rank: global.RANK.PROF
+  }).toString(), (err, rows) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (rows == undefined) {
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    global.db.all(knex("class").select().toString(), (err2, rows2) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      if (rows2 == undefined) {
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      for (var i = 0; i < rows2.length; i++) {
+        var tmp = lodash.filter(rows, {
+          "id": rows2[i].profid
+        });
+        tmp[0].class = rows2[i];
+        delete tmp[0].password;
+        oreq.data.push(tmp[0]);
+      }
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+    });
+  });
+}
+
+/**
+ * Create a new teacher
+ * @method createProf
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function createProf(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+
+    log.error("Not logged in");
+    return;
+  }
+  if (ireq.data == undefined) {
+    log.error("Ill formed request");
+    return;
+  }
+  if (ireq.data.username == undefined || ireq.data.fname == undefined || ireq.data.lname == undefined || ireq.data.tag == undefined || ireq.data.class == undefined) {
+    log.error("Ill formed request");
+    return;
+  }
+  global.db.run(knex("users").insert({
+    username: ireq.data.username,
+    fname: ireq.data.fname,
+    lname: ireq.data.lname,
+    tag: ireq.data.tag,
+    dob: ireq.data.dob,
+    email: ireq.data.email,
+    rank: global.RANK.PROF,
+    password: crypto.SHA256(global.config.defaultPass).toString(crypto.enc.utf8)
+  }).toString(), function(err) {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    var lastID = this.lastID;
+    global.db.serialize(function() {
+      global.db.run(knex("class").del().where({
+        profid: lastID
+      }).toString());
+      global.db.run(knex("class").insert({
+        profid: lastID,
+        name: ireq.data.class
+      }).toString(), (err) => {
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+      });
+    });
+
+  });
+
+}
+
+/**
+ * Delete a teacher and all his students at once
+ * @method delProf
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function delProf(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+    log.error("Not logged in");
+    return;
+  }
+  if (typeof ireq.id != "number") {
+    log.error("Ill formed request");
+    return;
+  }
+  global.db.all(knex("students").select("id").where({
+    profid: ireq.id
+  }).toString(), (err, rows) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    global.db.run(knex("users").del().where({
+      id: ireq.id
+    }).toString(), (err) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      global.db.run(knex("class").del().where({
+        profid: ireq.id
+      }).toString(), (err) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        var idList = [];
+        for (var i = 0; i < rows.length; i++)
+          idList.push(rows[i].id);
+        db.wipeStudents(idList, (err) => {
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+        });
+      });
+    });
+  });
+}
+/**
+ * Edit a teacher
+ * @method editProf
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function editProf(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+    log.error("Not logged in");
+    return;
+  }
+  if (typeof ireq.data.id != "number") {
+    log.error("Ill formed request");
+    return;
+  }
+  async.waterfall([
+    function(callback) {
+      global.db.get(knex("users").select().where({
+        id: ireq.data.id
+      }).toString(), callback);
+    },
+    function(row, callback) {
+      global.db.run(knex("users").update({
+        username: (ireq.data.username == "") ? row.username : ireq.data.username,
+        email: (ireq.data.email == "") ? row.email : ireq.data.email,
+        tag: (ireq.data.tag.replace(/\s/g, '') == "") ? row.tag : ireq.data.tag.replace(/\s/g, ''),
+        dob: (ireq.data.dob == "") ? row.dob : ireq.data.dob,
+        fname: (ireq.data.fname == "") ? row.fname : ireq.data.fname,
+        lname: (ireq.data.lname == "") ? row.lname : ireq.data.lname,
+        password: (ireq.data.pass) ? global.config.defaultPass : row.password
+      }).where({
+        id: row.id
+      }).toString(), callback);
+    },
+    function(callback) {
+      if (ireq.data.class == "") {
+        console.log("here");
+        callback();
+        return;
+      }
+      global.db.run(knex("class").update({
+        name: ireq.data.class
+      }).where({
+        profid: ireq.data.id
+      }).toString(), callback);
+    }
+  ], function(err) {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
 /**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
@@ -1342,6 +1543,18 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.DELHOLIDAYS:
         delHolidays(connection, ireq[i]);
+        break;
+      case request.REQUEST.CREATEPROF:
+        createProf(connection, ireq[i]);
+        break;
+      case request.REQUEST.DELPROF:
+        delProf(connection, ireq[i]);
+        break;
+      case request.REQUEST.EDITPROF:
+        editProf(connection, ireq[i]);
+        break;
+      case request.REQUEST.GETPROF:
+        getProf(connection, ireq[i]);
         break;
     }
   }
