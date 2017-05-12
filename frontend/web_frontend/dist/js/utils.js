@@ -21,33 +21,7 @@ function searchSubmit(event)
     //TODO Call
   }
 }
-function validate(arrId)
-{
-  var res = true;
-  for(var i = 0; i< arrId.length; i++)
-  {
-    var data = document.getElementById(arrId[i]).value;
-    if(data == undefined || data == null || data == "")
-    {
-      try {
-        document.getElementById("fg" + arrId[i]).setAttribute("class", "form-group has-error");
-        document.getElementById(arrId[i]).setAttribute("placeholder", "This field is required");
-      } catch(err)
-      {
-        //Do nothing
-      }
-      res = false;
-    } else {
-      try {
-        document.getElementById("fg" + arrId[i]).setAttribute("class", "form-group has-success");
-      } catch(err)
-      {
-        //Do nothing
-      }
-    }
-  }
-  return res;
-}
+
 function emptyInput(arrId)
 {
   for(var i = 0; i< arrId.length; i++)

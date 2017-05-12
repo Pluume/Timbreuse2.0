@@ -63,7 +63,7 @@
       document.getElementById("edob").setAttribute("placeholder", std.students.user.dob == null ? "" : std.students.user.dob);
       document.getElementById("eemail").setAttribute("placeholder", std.students.user.email == null ? "" : std.students.user.email);
       document.getElementById("etag").setAttribute("placeholder", std.students.user.tag == null ? "" : std.students.user.tag);
-      document.getElementById("updateSubmit").setAttribute("onclick", "submitEditModal(" + std.students.id + ");");
+      document.getElementById("editStudentID").setAttribute("value", std.students.id);
       $('#editStudentModal').modal('show');
     }
 
@@ -139,12 +139,9 @@
     });
 
     function submitCreateModal() {
-      if (validate(["cfname", "clname", "cusername", "ctag"])) {
         createStudent(document.getElementById('cfname').value, document.getElementById('clname').value, document.getElementById('cusername').value, document.getElementById('cemail').value, document.getElementById('ctag').value, document.getElementById(
           'ctclass').value, document.getElementById('cdob').value, document.getElementById('cproject').value, "stdTable");
         $('#addStudentModal').modal('toggle');
-        emptyInput(["cfname", "clname", "cusername", "ctag", "cemail", "cdob", "cproject"]);
-      }
     }
 
     function submitDeleteModal() {
@@ -223,49 +220,56 @@
   <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="addStudentModalTitle">Create a new student</h2>
-        </div>
-        <div class="modal-body">
-          <form>
+        <form id="addStudentForm">
+          <div class="modal-header">
+            <h2 class="modal-title" id="addStudentModalTitle">Create a new student</h2>
+          </div>
+          <div class="modal-body">
+
             <div id="fgctclass" class="form-group">
               <label for="ctclass" class="form-control-label">Class : </label>
               <input type="text" class="form-control" readonly id="ctclass">
             </div>
             <div id="fgcfname" class="form-group">
               <label for="cfname" class="form-control-label">First name :</label>
-              <input type="text" class="form-control" id="cfname">
+              <input type="text" class="form-control" name="cfname" id="cfname">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgclname" class="form-group">
               <label for="clname" class="form-control-label">Last name:</label>
-              <input type="text" class="form-control" id="clname">
+              <input type="text" class="form-control" name="clname" id="clname">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgcusername" class="form-group">
               <label for="cusername" class="form-control-label">Username :</label>
-              <input type="text" class="form-control" id="cusername">
+              <input type="text" class="form-control" name="cusername" id="cusername">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgcdob" class="form-group">
               <label for="cdob" class="form-control-label">Date of birth:</label>
-              <input type="text" class="form-control" id="cdob">
+              <input type="text" class="form-control" name="cdob" id="cdob">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgcemail" class="form-group">
               <label for="cemail" class="form-control-label">Email :</label>
-              <input type="text" class="form-control" id="cemail">
+              <input type="text" class="form-control" name="cemail" id="cemail">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgctag" class="form-group">
               <label for="ctag" class="form-control-label">Tag :</label>
-              <input type="text" class="form-control" id="ctag">
+              <input type="text" class="form-control" name="ctag" id="ctag">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgcproject" class="form-group">
               <label for="cproject" class="form-control-label">Project :</label>
               <input type="text" class="form-control" id="cproject">
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" onclick="submitCreateModal();" class="btn btn-success">Create</button>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="cancelForm('#addStudentForm');" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success">Create</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -444,44 +448,52 @@
   <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
+        <form id="editStudentForm">
         <div class="modal-header">
           <h2 class="modal-title" id="editStudentModalTitle">Edit this student</h2>
         </div>
         <div class="modal-body">
-          <form>
+
             <div id="fgetclass" class="form-group">
               <label for="etclass" class="form-control-label">Class : </label>
               <input type="text" class="form-control" readonly id="etclass">
             </div>
             <div id="fgecfname" class="form-group">
               <label for="efname" class="form-control-label">First name :</label>
-              <input type="text" class="form-control" id="efname">
+              <input type="text" class="form-control" name="efname" id="efname">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgelname" class="form-group">
               <label for="elname" class="form-control-label">Last name:</label>
-              <input type="text" class="form-control" id="elname">
+              <input type="text" class="form-control" name="elname" id="elname">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgeusername" class="form-group">
               <label for="eusername" class="form-control-label">Username :</label>
-              <input type="text" class="form-control" id="eusername">
+              <input type="text" class="form-control" name="eusername" id="eusername">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgedob" class="form-group">
               <label for="edob" class="form-control-label">Date of birth:</label>
-              <input type="text" class="form-control" id="edob">
+              <input type="text" class="form-control" name="edob" id="edob">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgeemail" class="form-group">
               <label for="eemail" class="form-control-label">Email :</label>
-              <input type="text" class="form-control" id="eemail">
+              <input type="text" class="form-control" name="eemail" id="eemail">
+              <span class="help-block" id="error"></span>
             </div>
 
 
             <div id="fgetag" class="form-group">
               <label for="etag" class="form-control-label">Tag :</label>
-              <input type="text" class="form-control" id="etag">
+              <input type="text" class="form-control" name="etag" id="etag">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgeproject" class="form-group">
               <label for="eproject" class="form-control-label">Project :</label>
               <input type="text" class="form-control" id="eproject">
+              <span class="help-block" id="error"></span>
             </div>
             <div id="fgepass" class="form-group">
               <div class="checkbox">
@@ -490,15 +502,19 @@
                               </label>
               </div>
             </div>
-          </form>
+
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" id="updateSubmit" class="btn btn-primary">Update</button>
+          <input type="hidden" id="editStudentID" value=""/>
+          <button type="button" class="btn btn-secondary" onclick="cancelForm('#editStudentForm');"data-dismiss="modal">Close</button>
+          <button type="submit" id="updateSubmit" class="btn btn-primary">Update</button>
         </div>
+        </form>
       </div>
     </div>
   </div>
+  <script>
+  </script>
   <!-- Bootstrap Core JavaScript -->
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -518,8 +534,8 @@
   <script src="../dist/js/utils.js"></script>
   <script src="../vendor/moment/moment.js"></script>
   <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
-  <script>
-  </script>
+  <script src="../vendor/validator/jquery.validate.min.js"></script>
+  <script src="../dist/js/validate.js"></script>
 </body>
 
 </html>
