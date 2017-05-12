@@ -273,7 +273,8 @@ function tag(event, arg) {
     fnc: request.REQUEST.TAG,
     error: request.ERROR.OK,
     id: arg.id,
-    comments: arg.comments
+    comments: arg.comments,
+    client: true
   }];
   client.send(JSON.stringify(oreq), (err, data) => {
     try {

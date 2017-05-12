@@ -123,6 +123,7 @@ function sendUpdate(id, arg) {
 
 function tagRoutine(conn, user, ireq) {
   var oreq = getBaseReq(request.REQUEST.TAG);
+
   if (user.rank == global.RANK.PROF) { //Prof card tagged
 
     oreq.fnc = request.REQUEST.MASTER;
@@ -135,7 +136,7 @@ function tagRoutine(conn, user, ireq) {
 
       oreq.fnc = request.REQUEST.TAG;
       oreq.error = request.ERROR.SQLITE;
-      if (!ireq.delayed)
+      if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
@@ -144,7 +145,7 @@ function tagRoutine(conn, user, ireq) {
 
       oreq.fnc = request.REQUEST.TAG;
       oreq.error = request.ERROR.SQLITE;
-      if (!ireq.delayed)
+      if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
@@ -176,7 +177,7 @@ function tagRoutine(conn, user, ireq) {
 
             oreq.fnc = request.REQUEST.TAG;
             oreq.error = request.ERROR.SQLITE;
-            if (!ireq.delayed)
+            if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
             return;
           }
@@ -185,7 +186,7 @@ function tagRoutine(conn, user, ireq) {
           oreq.student = row3;
           oreq.student.user = user;
           delete oreq.student.user.password;
-          if (!ireq.delayed)
+          if (!ireq.delayed && ireq.client == undefined)
             conn.socket.write(JSON.stringify(oreq) + "\0");
           sendUpdate(row3.profid, oreq.student);
           log.save(global.LOGS.OUT, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
@@ -235,7 +236,7 @@ function tagRoutine(conn, user, ireq) {
 
             oreq.fnc = request.REQUEST.TAG;
             oreq.error = request.ERROR.SQLITE;
-            if (!ireq.delayed)
+            if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
             return;
           }
@@ -244,7 +245,7 @@ function tagRoutine(conn, user, ireq) {
           oreq.student = row3;
           oreq.student.user = user;
           delete oreq.student.user.password;
-          if (!ireq.delayed)
+          if (!ireq.delayed && ireq.client == undefined)
             conn.socket.write(JSON.stringify(oreq) + "\0");
           sendUpdate(row3.profid, oreq.student);
           var d = new Date();
@@ -753,18 +754,15 @@ function resetTime(conn, ireq) {
       return;
     }
 
-    for (var i = 0; i < ireq.id.length; i++) {
-      global.db.get(knex("students").select().where({
-        id: ireq.id[i]
-      }).toString(), (err, row) => {
-        if (err) {
-          log.error("Error when querrying the database : " + err);
-          return;
-        }
-        log.save(global.LOGS.RESETTIME, ireq.id[i], "SERVER", moment().format().toString(), ireq.comments, row.timeDiff, row.timeDiffToday);
-      });
-
-    }
+    global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+    });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }
@@ -798,19 +796,15 @@ function modTime(conn, ireq) {
       return;
     }
 
-    for (var i = 0; i < ireq.id.length; i++) {
-      global.db.get(knex("students").select().where({
-        id: ireq.id[i]
-      }).toString(), (err, row) => {
-        if (err) {
-          log.error("Error when querrying the database : " + err);
-          return;
-        }
-        console.log(ireq.id[i]);
-        log.save(global.LOGS.MODTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
-      });
-
-    }
+    global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+    });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
   return;
@@ -847,20 +841,15 @@ function setTime(conn, ireq) {
       return;
     }
 
-    for (var i = 0; i < ireq.id.length; i++) {
-      global.db.get(knex("students").select().where({
-        id: ireq.id[i]
-      }).toString(), (err, row) => {
+      global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
         if (err) {
           log.error("Error when querrying the database : " + err);
           oreq.error = request.ERROR.SQLITE;
           conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
-        log.save(global.LOGS.SETTIME, ireq.id[i], "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+        log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
       });
-
-    }
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }

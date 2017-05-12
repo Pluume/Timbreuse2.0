@@ -153,7 +153,6 @@
     }
 
     function showDetailsModal(id, fname, lname) {
-      console.log($("#detailsCalendar").parent().innerHeight());
       document.getElementById("detailsStudentModalTitle").innerHTML = "Detail of " + fname + " " + lname;
       getLogs(id, (data) => {
         var moment = require("electron").remote.require("moment");

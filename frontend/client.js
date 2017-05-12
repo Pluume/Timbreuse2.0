@@ -109,7 +109,7 @@ function connect(cb) {
 
 function disconnect() {
   try {
-    global.clientconn.end();
+    global.clientconn.destroy();
     global.clientconn = null;
   } catch (err) {
     log.error(err);
