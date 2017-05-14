@@ -1,0 +1,59 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.6 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{momentjs}{online}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Foundation}{F.}%
+     {JS}{J.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{FJ1}
+  \strng{fullhash}{FJ1}
+  \field{sortinit}{F}
+  \field{title}{MomentJs}
+  \verb{url}
+  \verb http://momentjs.com/
+  \endverb
+  \field{version}{2.17.1}
+  \field{year}{2017}
+\endentry
+
+\entry{isodate}{online}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Wikipedia}{W.}%
+     {}{}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{W1}
+  \strng{fullhash}{W1}
+  \field{sortinit}{W}
+  \field{title}{ISO8601}
+  \verb{url}
+  \verb https://fr.wikipedia.org/wiki/ISO_8601
+  \endverb
+  \field{year}{1998}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

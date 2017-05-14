@@ -1,0 +1,62 @@
+\documentclass[10pt,a4paper,onecolumn]{article}
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry}
+\usepackage{a4wide}
+\usepackage{titling}
+\setlength{\droptitle}{-5em}
+\usepackage[version=3]{mhchem}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[english,francais]{babel}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage[pdftex]{hyperref}
+\setlength\parindent{0pt}
+\usepackage{xcolor}
+\hypersetup{colorlinks,urlcolor=blue}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\chead{Francis Le Roy}
+\lfoot{P1699/MCT}
+\cfoot{\today}
+\rfoot{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+% \bibliography{bib}
+\renewcommand{\labelenumi}{\alph{enumi}.}
+
+
+
+\title{Rapport de test \\ Création d'un nouvel élève}
+
+\author{Francis \textsc{Le Roy}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{center}
+\begin{tabular}{l r}
+Date de réalisation : & 28 Mars, 2017 \\
+Projet : & P1699 \\
+Protocole parent : & \href{run:../../../test_procedure/P1699_TP01.pdf}{P1699\_TP01}
+\end{tabular}
+\end{center}
+
+\section{Introduction}
+Le but de ce test est de vérifié que la fonction crééant les élèves fonctionne depuis le panneau des enseignants.
+\section{Résultat attendu}
+Voir le protocole parent.
+\section{Procédure de test}
+Sur la page hôte principale du panneau des enseignants, le bouton vert avec un symbole «plus» permet de créer un nouvel élève. L'utilisateur doit remplir les champs et valider sa demande.
+\section{Résultats obtenus}
+Voir protocole parent.
+\section{Conclusion}
+Cette fonctionnalité est opérationnel.
+% \printbibliography
+
+\end{document}
+
