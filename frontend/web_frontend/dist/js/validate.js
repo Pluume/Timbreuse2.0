@@ -1,10 +1,11 @@
 // JavaScript Validation For Registration Page
 window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
-function cancelForm(formName)
-{
+
+function cancelForm(formName) {
   $(formName).validate().resetForm();
   $(formName + ' span[id="error"]').html("");
 }
+
 function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation/
   $("#addStudentForm").validate({
 
@@ -76,6 +77,7 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
   });
 
 }
+
 function validateEditStd() {
   $("#editStudentForm").validate({
 
@@ -137,7 +139,8 @@ function validateEditStd() {
   });
 
 }
-$('document').ready(function() {
+
+function activateValidator() {
   // name validation
   var nameregex = /^[a-zA-Z \-]+$/;
   var moment = require("electron").remote.require("moment");
@@ -168,10 +171,12 @@ $('document').ready(function() {
   $.validator.addMethod("validTag", function(value, element) {
     return this.optional(element) || tagregex.test(value);
   });
+  if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS) {
+    validateCreateStd();
+    validateEditStd();
+  }
 
-  validateCreateStd();
-  validateEditStd();
-});
+}
 
 
 

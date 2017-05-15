@@ -65,7 +65,7 @@ module.exports = {
      * @method exportCSV
      * @param {Function} cb a callback that will be called when all the file has been copied to the USB key.
      **/
-    exportCSV: (cb) => { //NOTE On linux execute "sudo chmod -R a+rwx ." to make it works 
+    exportCSV: (cb) => { //NOTE On linux execute "sudo chmod -R a+rwx ." to make it works
         log.info("Master key detected. Detecting USB drive...");
         drivelist.list((error, drives) => {
             if (error) {
@@ -73,7 +73,7 @@ module.exports = {
                 return;
             }
             drives.forEach((drive) => {
-                if (!drive.system) {
+                if (!drive.system && drives.mountpoints[0].path!="/boot") {
                     var remotefolder = path.join(drive.mountpoints[0].path, global.config.class + "_" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
                     log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
                     if (fs.existsSync(remotefolder)) {

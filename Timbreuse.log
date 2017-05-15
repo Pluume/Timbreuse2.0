@@ -1,3 +1,11 @@
-[12/05/2017 14:25:50.037] [INFO] (Main.js:10) > Loading configuration...
-[12/05/2017 14:25:50.184] [INFO] (Main.js:23) > Starting as a client
-[12/05/2017 14:25:50.185] [INFO] (Main.js:25) > Initializing database...
+[15/05/2017 10:18:43.965] [INFO] (Main.js:10) > Loading configuration...
+[15/05/2017 10:18:45.157] [INFO] (Main.js:23) > Starting as a client
+[15/05/2017 10:18:45.157] [INFO] (Main.js:25) > Initializing database...
+[15/05/2017 12:54:14.239] [ERROR] (utils\log.js:52) > Error: kill ENOSYS
+    at exports._errnoException (util.js:1026:11)
+    at process.kill (internal/process.js:172:13)
+    at process.listener (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:86:15)
+    at emitNone (events.js:86:13)
+    at process.emit (events.js:185:7)
+    at processEmit (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:146:32)
+    at Signal.wrap.onsignal (internal/process.js:199:44)
