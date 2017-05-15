@@ -28,3 +28,21 @@ body {
     padding-right: 0;
     padding-left: 0;
 }
+
+.bigText {
+  font-size: 18px;
+}
+.centeredContainer {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+.black, .black a {
+  color: #1b0500;
+}
+.green, .green a {
+  color: #3cb80a;
+}
+.red, .red a {
+  color: #b81a0a;
+}

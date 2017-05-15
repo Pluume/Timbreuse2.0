@@ -1,11 +1,8 @@
-[15/05/2017 10:18:43.965] [INFO] (Main.js:10) > Loading configuration...
-[15/05/2017 10:18:45.157] [INFO] (Main.js:23) > Starting as a client
-[15/05/2017 10:18:45.157] [INFO] (Main.js:25) > Initializing database...
-[15/05/2017 12:54:14.239] [ERROR] (utils\log.js:52) > Error: kill ENOSYS
-    at exports._errnoException (util.js:1026:11)
-    at process.kill (internal/process.js:172:13)
-    at process.listener (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:86:15)
-    at emitNone (events.js:86:13)
-    at process.emit (events.js:185:7)
-    at processEmit (C:\Users\Francis-Lucien-Hugue\Desktop\TimbreuseLocal\node_modules\sqlite3\node_modules\node-pre-gyp\node_modules\npmlog\node_modules\gauge\node_modules\signal-exit\index.js:146:32)
-    at Signal.wrap.onsignal (internal/process.js:199:44)
+[15/05/2017 14:36:58.827] [INFO] (Main.js:10) > Loading configuration...
+[15/05/2017 14:36:58.978] [INFO] (Main.js:23) > Starting as a slave
+[15/05/2017 14:36:58.979] [INFO] (Main.js:25) > Initializing database...
+[15/05/2017 14:36:59.068] [INFO] (Main.js:31) > Starting server...
+[15/05/2017 14:36:59.075] [INFO] (server_methods.js:1564) > Methods initiated.
+[15/05/2017 14:36:59.079] [INFO] (server.js:59) > The server up on the port 703
+[15/05/2017 14:36:59.443] [INFO] (frontend\slave.js:136) > Connected to server!
+[15/05/2017 14:37:20.748] [INFO] (utils\log.js:55) > Exiting with code 0
