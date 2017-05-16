@@ -177,23 +177,3 @@ function activateValidator() {
   }
 
 }
-
-
-
-
-
-/*function submitForm(){
-
-
-			   /*$('#message').slideDown(200, function(){
-
-				   $('#message').delay(3000).slideUp(100);
-				   $("#register-form")[0].reset();
-				   $(element).closest('.form-group').find("error").removeClass("has-success");
-
-			   });
-
-			   alert('form submitted...');
-			   $("#register-form").resetForm();
-
-		   }*/

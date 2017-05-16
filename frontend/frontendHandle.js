@@ -449,6 +449,24 @@ function editProf(event, arg) {
     }
   });
 }
+function changePassword(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CHANGEPASS,
+    error: request.ERROR.OK,
+    data: crypto.SHA256(arg).toString(crypto.enc.utf8)
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("changepassword", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -474,3 +492,4 @@ ipcMain.on("getprof", getProf);
 ipcMain.on("addprof", addProf);
 ipcMain.on("delprof", delProf);
 ipcMain.on("editprof", editProf);
+ipcMain.on("changepassword", changePassword);

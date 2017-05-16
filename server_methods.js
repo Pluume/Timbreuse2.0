@@ -254,14 +254,14 @@ function tagRoutine(conn, user, ireq) {
           if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
             if (row2.isBlocked) {
               if (dayConfig.scheduleFix.length > 0)
-                if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
+                if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                   pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
                 }
             } else {
               if (dayConfig.schedule.length > 0)
-                if (new Date(row3.lastTagTime) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
+                if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                   pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
@@ -754,14 +754,14 @@ function resetTime(conn, ireq) {
       return;
     }
 
-    global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
+    global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
       if (err) {
         log.error("Error when querrying the database : " + err);
         oreq.error = request.ERROR.SQLITE;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -796,14 +796,14 @@ function modTime(conn, ireq) {
       return;
     }
 
-    global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
+    global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
       if (err) {
         log.error("Error when querrying the database : " + err);
         oreq.error = request.ERROR.SQLITE;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -841,15 +841,15 @@ function setTime(conn, ireq) {
       return;
     }
 
-      global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err, row) => {
-        if (err) {
-          log.error("Error when querrying the database : " + err);
-          oreq.error = request.ERROR.SQLITE;
-          conn.socket.write(JSON.stringify(oreq) + "\0");
-          return;
-        }
-        log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "":" - " + ireq.comments, row.timeDiff, row.timeDiffToday);
-      });
+    global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
+      if (err) {
+        log.error("Error when querrying the database : " + err);
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+    });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
 }
@@ -1430,6 +1430,31 @@ function editProf(conn, ireq) {
   });
 }
 /**
+ * Change the user's password
+ * @method changePassword
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function changePassword(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
+    log.error("Not logged in");
+    return;
+  }
+  global.db.run(knex("users").update({
+    password: ireq.data
+  }).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+/**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -1544,6 +1569,9 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.GETPROF:
         getProf(connection, ireq[i]);
+        break;
+      case request.REQUEST.CHANGEPASS:
+        changePassword(connection, ireq[i]);
         break;
     }
   }

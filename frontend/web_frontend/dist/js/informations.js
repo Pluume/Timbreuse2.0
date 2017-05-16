@@ -703,6 +703,28 @@ function editProf(data,cb) {
     }
   });
 }
+function changePassword(event, data) {
+  ipcRenderer.send("changepassword", data);
+  ipcRenderer.once("changepassword", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert("Password changed !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
 ipcRenderer.on("update", onUpdate);
 ipcRenderer.on("toggleNotification", onNotificationUpdate);
+ipcRenderer.on("changepassword_index", changePassword);
 ipcRenderer.on("updateNotification", onNotificationInsert);

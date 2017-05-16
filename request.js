@@ -58,7 +58,8 @@ REQUEST ={
     CREATEPROF: 23,
     DELPROF: 24,
     EDITPROF: 25,
-    GETPROF: 26
+    GETPROF: 26,
+    CHANGEPASS: 27
 };
 PAGES ={
     LOGIN: 0,
