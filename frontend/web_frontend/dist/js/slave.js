@@ -1,4 +1,4 @@
-function displayTaggedStudent(event, std) {
+function displayTaggedStudent(event, std) { //TODO Handle std = undefined
   var element = document.getElementById('taggedStudent');
   if (typeof(element) != 'undefined' && element != null) {
     element.parentNode.removeChild(element);
@@ -18,7 +18,7 @@ function displayTaggedStudent(event, std) {
   body.setAttribute("class", "panel-body ");
   body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
   body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
-  body.innerHTML += "<br />You have : <b>" + (std.missedPause<0 ? 0:std.missedPause)+ "</b> missed pause";
+  body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : std.missedPause) + "</b> missed pause";
   body.innerHTML += "<br /><span class='glyphicon glyphicon-cutlery black'/>  ";
   if (std.hadLunch)
     body.innerHTML += "<span class='glyphicon glyphicon-ok green'/>";
@@ -49,4 +49,49 @@ function displayTaggedStudent(event, std) {
   panel.appendChild(footer);
   document.getElementById("infoPane").appendChild(panel);
 }
+
+function displayCSV(event, val) {
+  var element = document.getElementById('taggedStudent');
+  if (typeof(element) != 'undefined' && element != null) {
+    element.parentNode.removeChild(element);
+  }
+  var panel = document.createElement("div");
+  panel.setAttribute("id", "taggedStudent");
+  panel.setAttribute("class", "panel panel-green bigText");
+
+  var heading = document.createElement("div");
+  heading.setAttribute("class", "panel-heading");
+  heading.innerHTML = "CSV";
+  var body = document.createElement("div");
+  body.setAttribute("class", "panel-body ");
+  if (val) {
+    body.innerHTML = "The CSV have been copied to the remote mass storage devices successfully";
+  } else {
+    body.innerHTML = "The CSV are being copied to the mass storage devices";
+  }
+  var footer = document.createElement("div");
+  footer.setAttribute("class", "panel-footer clearfix");
+  var statusGroup = document.createElement("div");
+  statusGroup.setAttribute("class", "btn-group pull-left");
+  if (val) {
+    statusGroup.innerHTML = "<b>Copying</b>";
+  } else {
+    statusGroup.innerHTML = "<b>Done</b>";
+  }
+  var dissmissGroup = document.createElement("div");
+  dissmissGroup.setAttribute("class", "btn-group pull-right");
+  var dissmissButton = document.createElement("a");
+  dissmissButton.setAttribute("href", "#");
+  dissmissButton.setAttribute("class", "btn btn-default btn-sm bigText");
+  dissmissButton.setAttribute("onclick", "dissmissInfoPane();");
+  dissmissButton.innerHTML = "Close";
+  dissmissGroup.appendChild(dissmissButton);
+  footer.appendChild(statusGroup);
+  footer.appendChild(dissmissGroup);
+  panel.appendChild(heading);
+  panel.appendChild(body);
+  panel.appendChild(footer);
+  document.getElementById("infoPane").appendChild(panel);
+}
+ipcRenderer.on("CSV", displayCSV);
 ipcRenderer.on("slaveStd", displayTaggedStudent);

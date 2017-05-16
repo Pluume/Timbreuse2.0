@@ -34,7 +34,7 @@ function endOfDay() {
       if (row.isBlocked) {
 
         if (dayConfig.scheduleFix.length > 0)
-          if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.scheduleFix[0].end))) {
+          if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end))) {
             log.warning("USRID " + row.id + " : Left early");
             log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Left early", row.timeDiff, row.timeDiffToday);
           }

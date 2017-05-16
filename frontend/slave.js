@@ -27,7 +27,7 @@ var oreqPile = [];
  * @return {String} the current time in a ISO string
  **/
 function getNow() {
-    return moment().format();
+  return moment().format();
 }
 
 
@@ -36,17 +36,17 @@ function getNow() {
  * @method executePile
  **/
 function executePile() {
-    if (oreqPile.length && connected) {
-        slaveconn.write(JSON.stringify(oreqPile) +"\0");
-        oreqPile = [];
+  if (oreqPile.length && connected) {
+    slaveconn.write(JSON.stringify(oreqPile) + "\0");
+    oreqPile = [];
+  }
+  for (var i = 0; i < slaves.length; i++) {
+    if (slaves[i].pile.length && slaves[i].conn.connected) {
+      slaves[i].conn.write(JSON.stringify(slaves[i].pile) + "\0");
+      slaves[i].pile = [];
     }
-    for (var i = 0; i < slaves.length; i++) {
-        if (slaves[i].pile.length && slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(slaves[i].pile) + "\0");
-            slaves[i].pile = [];
-        }
 
-    }
+  }
 
 
 }
@@ -57,35 +57,35 @@ function executePile() {
  * @param {String} ntime the current time.
  **/
 function tag(stag, ntime) {
-    if (global.DEBUG) {
-        log.info("Tag : " + stag + " Time : " + ntime);
-    }
-    var oreq = {
-        fnc: request.REQUEST.TAG,
-        error: request.ERROR.OK,
-        tag: stag,
-        time: ntime,
-        class: global.config.class
-    };
-    csv.writeBruteLoggingToCSV(stag, ntime);
-    if (connected) {
-        slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
+  if (global.DEBUG) {
+    log.info("Tag : " + stag + " Time : " + ntime);
+  }
+  var oreq = {
+    fnc: request.REQUEST.TAG,
+    error: request.ERROR.OK,
+    tag: stag,
+    time: ntime,
+    class: global.config.class
+  };
+  csv.writeBruteLoggingToCSV(stag, ntime);
+  if (connected) {
+    slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
+  } else {
+    oreq.delayed = true;
+    oreqPile.push(oreq);
+  }
+  var soreq = oreq;
+  soreq.fnc = request.REQUEST.PROPAGATE_TAG;
+  for (var i = 0; i < slaves.length; i++) {
+    if (slaves[i].conn.connected) {
+      slaves[i].conn.write(JSON.stringify(request.toArray(soreq)) + "\0");
     } else {
-        oreq.delayed = true;
-        oreqPile.push(oreq);
-    }
-    var soreq = oreq;
-    soreq.fnc = request.REQUEST.PROPAGATE_TAG;
-    for (var i = 0; i < slaves.length; i++) {
-        if (slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(request.toArray(soreq)) + "\0");
-        } else {
-            soreq.delayed = true;
+      soreq.delayed = true;
 
-            slaves[i].pile.push(soreq);
-        }
-
+      slaves[i].pile.push(soreq);
     }
+
+  }
 }
 
 /**
@@ -93,8 +93,7 @@ function tag(stag, ntime) {
  * @method compileRequest
  * @param {Object} ireq The json request
  **/
-function compileRequest(ireq)
-{
+function compileRequest(ireq) {
   slaveconn.currentBuf += ireq;
   if (slaveconn.currentBuf[slaveconn.currentBuf.length - 1] == "\0") {
     onSocketData(slaveconn.currentBuf.substring(0, slaveconn.currentBuf.length - 1).toString("utf8"));
@@ -108,19 +107,22 @@ function compileRequest(ireq)
  **/
 function onSocketData(ireq) {
   ireq = JSON.parse(ireq);
-    if (ireq.fnc === undefined)
-        return;
+  if (ireq.fnc === undefined)
+    return;
 
-    switch (ireq.fnc) {
-        case request.REQUEST.MASTER:
-            csv.exportCSV(() => {}); //TODO Function that handle master card in GUI
-            break;
-        case request.REQUEST.TAG:
-            global.mwin.webContents.send("slaveStd", ireq.student);
-            break;
-        default:
-            break;
-    }
+  switch (ireq.fnc) {
+    case request.REQUEST.MASTER:
+      global.mwin.webContents.send("CSV", false);
+      csv.exportCSV(() => {
+        global.mwin.webContents.send("CSV", true);
+      }); //TODO Function that handle master card in GUI
+      break;
+    case request.REQUEST.TAG:
+      global.mwin.webContents.send("slaveStd", ireq.student);
+      break;
+    default:
+      break;
+  }
 }
 
 /**
@@ -128,94 +130,94 @@ function onSocketData(ireq) {
  * @method foreverConnect
  **/
 function foreverConnect() {
-    slaveconn = new net.Socket();
-    slaveconn.currentBuf = "";
-    var connectedToServer = function() {
-        if (connected)
-            return;
-        connected = true;
-        log.info('Connected to server!');
-        slaveconn.on("data",compileRequest);
-        executePile();
+  slaveconn = new net.Socket();
+  slaveconn.currentBuf = "";
+  var connectedToServer = function() {
+    if (connected)
+      return;
+    connected = true;
+    log.info('Connected to server!');
+    slaveconn.on("data", compileRequest);
+    executePile();
 
-    };
-    var slavesConnect = function() {
-        if (this.connected)
-            return;
-        this.connected = true;
-        executePile();
-        log.info("The Timbreuse " + this.class + " is online.");
-    };
-    var slavesClose = function(err) {
-        this.connected = false;
-        var tsock = this;
-        tsock.removeAllListeners("connect");
-        tsock.on("connect", slavesConnect);
-        if (!goingToClose) {
-            if (err) {
-                log.warning("The connection to the Timbreuse " + this.class + " was closed with an error. Connecting back in 5 seconds");
-                setTimeout(() => {
-                    tsock.connect({
-                        host: tsock.ip,
-                        port: 703
-                    });
-                }, 5000);
-            } else {
-                log.warning("The connection to the Timbreuse " + this.class + " was closed without an error. Connecting back in 5 seconds");
-                setTimeout(() => {
-                    tsock.connect({
-                        host: tsock.ip,
-                        port: 703
-                    });
-                }, 5000);
-            }
-        } else {
-            log.info("Connection closed. (" + this.class + ")");
-        }
-    };
-    for (var i = 0; i < slaves.length; i++) {
-        slaves[i].conn = new net.Socket();
-        slaves[i].conn.class = slaves[i].class;
-        slaves[i].conn.connected = false;
-        slaves[i].conn.on("close", slavesClose);
-        slaves[i].conn.ip = slaves[i].ip;
-        slaves[i].conn.connect({
-            host: slaves[i].ip,
+  };
+  var slavesConnect = function() {
+    if (this.connected)
+      return;
+    this.connected = true;
+    executePile();
+    log.info("The Timbreuse " + this.class + " is online.");
+  };
+  var slavesClose = function(err) {
+    this.connected = false;
+    var tsock = this;
+    tsock.removeAllListeners("connect");
+    tsock.on("connect", slavesConnect);
+    if (!goingToClose) {
+      if (err) {
+        log.warning("The connection to the Timbreuse " + this.class + " was closed with an error. Connecting back in 5 seconds");
+        setTimeout(() => {
+          tsock.connect({
+            host: tsock.ip,
             port: 703
-        }, slavesConnect);
-
+          });
+        }, 5000);
+      } else {
+        log.warning("The connection to the Timbreuse " + this.class + " was closed without an error. Connecting back in 5 seconds");
+        setTimeout(() => {
+          tsock.connect({
+            host: tsock.ip,
+            port: 703
+          });
+        }, 5000);
+      }
+    } else {
+      log.info("Connection closed. (" + this.class + ")");
     }
-    slaveconn.on("close", (err) => {
-        connected = false;
+  };
+  for (var i = 0; i < slaves.length; i++) {
+    slaves[i].conn = new net.Socket();
+    slaves[i].conn.class = slaves[i].class;
+    slaves[i].conn.connected = false;
+    slaves[i].conn.on("close", slavesClose);
+    slaves[i].conn.ip = slaves[i].ip;
+    slaves[i].conn.connect({
+      host: slaves[i].ip,
+      port: 703
+    }, slavesConnect);
 
-        if (!goingToClose) {
-            if (err) {
-                log.warning("The connection with the server was closed with an error. Connecting back in 5 seconds");
-                setTimeout(() => {
-                    slaveconn.connect({
-                        host: global.config.server,
-                        port: 703
-                    }, connectedToServer);
-                }, 5000);
-            } else {
-                log.warning("The connection with the server was closed without an error. Connecting back in 5 seconds");
-                setTimeout(() => {
-                    slaveconn.connect({
-                        host: global.config.server,
-                        port: 703
-                    }, connectedToServer);
-                }, 5000);
-            }
-        } else {
-            log.info("Connection closed.");
-        }
+  }
+  slaveconn.on("close", (err) => {
+    connected = false;
 
-    });
-    log.info("Connecting to server : " + global.config.server + ":703");
-    slaveconn.connect({
-        host: global.config.server,
-        port: 703
-    }, connectedToServer);
+    if (!goingToClose) {
+      if (err) {
+        log.warning("The connection with the server was closed with an error. Connecting back in 5 seconds");
+        setTimeout(() => {
+          slaveconn.connect({
+            host: global.config.server,
+            port: 703
+          }, connectedToServer);
+        }, 5000);
+      } else {
+        log.warning("The connection with the server was closed without an error. Connecting back in 5 seconds");
+        setTimeout(() => {
+          slaveconn.connect({
+            host: global.config.server,
+            port: 703
+          }, connectedToServer);
+        }, 5000);
+      }
+    } else {
+      log.info("Connection closed.");
+    }
+
+  });
+  log.info("Connecting to server : " + global.config.server + ":703");
+  slaveconn.connect({
+    host: global.config.server,
+    port: 703
+  }, connectedToServer);
 }
 /**
  * Create the slave frontend
@@ -223,62 +225,62 @@ function foreverConnect() {
  **/
 function createWindow() {
 
-    global.mwin = new BrowserWindow({
-        width: 800,
-        height: 600,
-        show: false
-    });
-    global.mwin.setMenu(null);
-    global.mwin.hide();
-    globalShortcut.register('CommandOrControl+W', () => {
+  global.mwin = new BrowserWindow({
+    width: 800,
+    height: 600,
+    show: false
+  });
+  global.mwin.setMenu(null);
+  global.mwin.hide();
+  globalShortcut.register('CommandOrControl+W', () => {
     app.quit();
   });
   globalShortcut.register('CommandOrControl+I', () => {
-  global.mwin.openDevTools();
-});
-    global.mwin.loadURL(url.format({
-        pathname: path.join(__dirname, 'web_frontend/pages/slave.html'),
-        protocol: 'file:',
-        slashes: true
-    }));
-    global.mwin.on('closed', function() {
-        global.mwin = null;
-    });
-    global.mwin.webContents.on('did-finish-load', function() {
+    global.mwin.openDevTools();
+  });
+  global.mwin.loadURL(url.format({
+    pathname: path.join(__dirname, 'web_frontend/pages/slave.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+  global.mwin.on('closed', function() {
+    global.mwin = null;
+  });
+  global.mwin.webContents.on('did-finish-load', function() {
     global.mwin.show();
-});
-    global.mwin.on("show", () => {
-      global.mwin.maximize();
-      global.mwin.setFullScreen(true);
-        for (var i = 0; i < global.config.slaves.length; i++) {
-            if (global.config.slaves[i].class != global.config.class) {
-                slaves[i] = global.config.slaves[i];
-                slaves[i].pile = [];
-            }
-        }
-        foreverConnect();
-    });
+  });
+  global.mwin.on("show", () => {
+    global.mwin.maximize();
+    global.mwin.setFullScreen(true);
+    for (var i = 0; i < global.config.slaves.length; i++) {
+      if (global.config.slaves[i].class != global.config.class) {
+        slaves[i] = global.config.slaves[i];
+        slaves[i].pile = [];
+      }
+    }
+    foreverConnect();
+  });
 }
 /**
  * Load the slave frontend
  * @method load
  **/
 function load() {
-    app.on('ready', createWindow);
-    app.on('window-all-closed', function() {
-        if (process.platform !== 'darwin') {
-            app.quit();
-        }
-    });
-    app.on('activate', function() {
-        if (global.mwin === null) {
-            createWindow();
-        }
-    });
+  app.on('ready', createWindow);
+  app.on('window-all-closed', function() {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+  app.on('activate', function() {
+    if (global.mwin === null) {
+      createWindow();
+    }
+  });
 
 }
 module.exports = {
-    load,
-    tag,
-    getNow
+  load,
+  tag,
+  getNow
 };

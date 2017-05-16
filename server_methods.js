@@ -251,7 +251,7 @@ function tagRoutine(conn, user, ireq) {
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
           log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
-          if (moment(row2.lastTagTime).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
+          if (moment((ireq.time) ? ireq.time : moment().format().toString()).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
             if (row2.isBlocked) {
               if (dayConfig.scheduleFix.length > 0)
                 if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
@@ -261,7 +261,7 @@ function tagRoutine(conn, user, ireq) {
                 }
             } else {
               if (dayConfig.schedule.length > 0)
-                if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].begin))) {
+                if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.schedule[0].begin))) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                   pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
@@ -394,11 +394,7 @@ function authenticate(conn, ireq) {
       return;
     }
     if (row.password == ireq.pass) {
-      console.log(ireq.user);
-
-
       conn.user = row;
-console.log(JSON.stringify(conn.user));
       oreq.fnc = request.REQUEST.AUTH;
       oreq.error = request.ERROR.OK;
       oreq.rank = row.rank;
