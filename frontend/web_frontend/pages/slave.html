@@ -34,7 +34,7 @@
 </style>
 
 <body>
-  <div class="page-header">
+  <div class="page-header" style="border: 0; margin: 0; padding: 0; padding-left: 15px;">
     <h1>Timbreuse <small>coded with the <i class="glyphicon glyphicon-heart"></i>.</small></h1>
   </div>
 
@@ -51,7 +51,6 @@
     window.ERROR = require('electron').remote.getGlobal("ERROR");
     window.STATUS = require('electron').remote.getGlobal("STATUS");
     window.PAGES = require('electron').remote.getGlobal("PAGES");
-    console.log(window.STATUS.IN);
     setPage(window.PAGES.SLAVE);
     var slave = require('electron').remote.require("./frontend/slave.js");
     var currentTag = "";
@@ -82,15 +81,15 @@
     });
     var circleH = new ProgressBar.Circle('#clockHours', {
       color: '#1b0500',
-      strokeWidth: 15,
+      strokeWidth: 12,
       trailColor: '#eee',
-      trailWidth: 15,
+      trailWidth: 12,
       easing: 'easeInOut',
       duration: 1000,
       svgStyle: null,
       text: {
         style: {
-          fontSize: '28px',
+          fontSize: '20px',
           position: 'absolute',
           left: '50%',
           top: '50%',
@@ -107,15 +106,15 @@
     circleH.animate(0, {});
     var circleM = new ProgressBar.Circle('#clockMinutes', {
       color: '#1b0500',
-      strokeWidth: 15,
+      strokeWidth: 12,
       trailColor: '#eee',
-      trailWidth: 15,
+      trailWidth: 12,
       easing: 'easeInOut',
       duration: 1000,
       svgStyle: null,
       text: {
         style: {
-          fontSize: '28px',
+          fontSize: '20px',
           position: 'absolute',
           left: '50%',
           top: '50%',
@@ -132,15 +131,15 @@
     circleM.animate(0, {});
     var circleS = new ProgressBar.Circle('#clockSeconds', {
       color: '#1b0500',
-      strokeWidth: 15,
+      strokeWidth: 12,
       trailColor: '#eee',
-      trailWidth: 15,
+      trailWidth: 12,
       easing: 'easeInOut',
       duration: 1000,
       svgStyle: null,
       text: {
         style: {
-          fontSize: '28px',
+          fontSize: '20px',
           position: 'absolute',
           left: '50%',
           top: '50%',

@@ -3,7 +3,10 @@
   "csvFreq": 0,
   "server": "172.21.201.254",
   "defaultPass": "test",
-  "slaves": [],
+  "slaves": [
+  {"ip":"172.21.201.255","name":"YE-S1c"
+  }
+  ],
   "lunch": {
     "begin": 41400,
     "end": 48600,

@@ -11,6 +11,7 @@ var knex = require('knex')({
 var sqlite = require("sqlite3");
 var handle;
 const async = require("async");
+const path = require("path");
 RANK = {
   STUDENT: 0,
   PROF: 1,
@@ -105,7 +106,7 @@ module.exports = {
    * @method init
    **/
   init: function() {
-    handle = new sqlite.Database("Data.db");
+    handle = new sqlite.Database(path.join(__dirname,"..","Data.db"));
     global.db = handle;
     global.db.prototype = {};
     global.db.prototype.all = function(sql, stdCallback) {

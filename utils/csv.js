@@ -73,7 +73,7 @@ module.exports = {
                 return;
             }
             drives.forEach((drive) => {
-                if (!drive.system && drives.mountpoints[0].path!="/boot") {
+                if (!drive.system && drive.mountpoints[0].path!="/boot") {
                     var remotefolder = path.join(drive.mountpoints[0].path, global.config.class + "_" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
                     log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
                     if (fs.existsSync(remotefolder)) {

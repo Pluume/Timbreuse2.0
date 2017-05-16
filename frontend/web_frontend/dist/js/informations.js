@@ -601,7 +601,6 @@ function getProf(tableId, cb) {
       case window.ERROR.OK:
         var data = [];
         for (var i = 0; i < arg.data.length; i++) {
-          console.log(arg.data[i]);
           data.push({
             id: arg.data[i].id,
             lname: arg.data[i].lname,

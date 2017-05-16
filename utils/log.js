@@ -8,7 +8,7 @@ const moment = require("moment");
 const at = require("console-at");
 var path = require("path");
 const fs = require("fs");
-var access = fs.createWriteStream("Timbreuse.log", {
+var access = fs.createWriteStream(path.join(__dirname,"..","Timbreuse.log"), {
   flags: 'w'
 });
 const knex = require('knex')({

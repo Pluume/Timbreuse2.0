@@ -394,8 +394,11 @@ function authenticate(conn, ireq) {
       return;
     }
     if (row.password == ireq.pass) {
-      conn.user = row;
+      console.log(ireq.user);
 
+
+      conn.user = row;
+console.log(JSON.stringify(conn.user));
       oreq.fnc = request.REQUEST.AUTH;
       oreq.error = request.ERROR.OK;
       oreq.rank = row.rank;
@@ -445,7 +448,7 @@ function getStudent(conn, ireq) {
   oreq.student = [];
   if (ireq.scope == request.SCOPE.ALL) {
     var index = 0;
-    global.db.all(knex("students").select().toString(), (err, rows) => //Get the students
+    global.db.all(knex("students").select().where({profid:conn.user.id}).toString(), (err, rows) => //Get the students
       {
         if (err) {
           log.error("Error : " + err);
@@ -464,6 +467,7 @@ function getStudent(conn, ireq) {
             if (tmp[0] === undefined)
               continue;
             tmp[0].user = rows2[ii];
+            delete tmp[0].user.password;
             finalArray.push(tmp[0]);
           }
 

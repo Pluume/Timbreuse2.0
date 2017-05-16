@@ -31,8 +31,7 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
         validEmail: true
       },
       ctag: {
-        required: true,
-        validTag: true
+        required: true
       }
     },
     messages: {
@@ -56,8 +55,7 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
         validEmail: "Please enter as the following format : test@test.com"
       },
       ctag: {
-        required: "Please enter a tag",
-        validTag: "Only a-z 1-9 and space char are allowed"
+        required: "Please enter a tag"
       }
     },
     errorPlacement: function(error, element) {
@@ -96,9 +94,6 @@ function validateEditStd() {
       },
       eemail: {
         validEmail: true
-      },
-      etag: {
-        validTag: true
       }
     },
     messages: {
@@ -116,9 +111,6 @@ function validateEditStd() {
       },
       eemail: {
         validEmail: "Please enter as the following format : test@test.com"
-      },
-      etag: {
-        validTag: "Only a-z 1-9 and space char are allowed"
       }
     },
     errorPlacement: function(error, element) {
@@ -167,10 +159,6 @@ function activateValidator() {
     return this.optional(element) || usernameregex.test(value);
   });
 
-  var tagregex = /^[a-z1-9 ]+$/;
-  $.validator.addMethod("validTag", function(value, element) {
-    return this.optional(element) || tagregex.test(value);
-  });
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS) {
     validateCreateStd();
     validateEditStd();

@@ -8,6 +8,7 @@ const electron = require('electron');
 const app = electron.app;
 const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
+const globalShortcut = electron.globalShortcut;
 const path = require('path');
 const url = require('url');
 const net = require("net");
@@ -73,7 +74,7 @@ function tag(stag, ntime) {
         oreq.delayed = true;
         oreqPile.push(oreq);
     }
-    var soreq = {};
+    var soreq = oreq;
     soreq.fnc = request.REQUEST.PROPAGATE_TAG;
     for (var i = 0; i < slaves.length; i++) {
         if (slaves[i].conn.connected) {
@@ -210,6 +211,7 @@ function foreverConnect() {
         }
 
     });
+    log.info("Connecting to server : " + global.config.server + ":703");
     slaveconn.connect({
         host: global.config.server,
         port: 703
@@ -220,24 +222,34 @@ function foreverConnect() {
  * @method createWindow
  **/
 function createWindow() {
+
     global.mwin = new BrowserWindow({
         width: 800,
         height: 600,
         show: false
     });
+    global.mwin.setMenu(null);
+    global.mwin.hide();
+    globalShortcut.register('CommandOrControl+W', () => {
+    app.quit();
+  });
+  globalShortcut.register('CommandOrControl+I', () => {
+  global.mwin.openDevTools();
+});
     global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, 'web_frontend/pages/slave.html'),
         protocol: 'file:',
         slashes: true
     }));
-    global.mwin.webContents.openDevTools();
     global.mwin.on('closed', function() {
         global.mwin = null;
     });
-    global.mwin.on("ready-to-show", () => {
-        global.mwin.show();
-    });
+    global.mwin.webContents.on('did-finish-load', function() {
+    global.mwin.show();
+});
     global.mwin.on("show", () => {
+      global.mwin.maximize();
+      global.mwin.setFullScreen(true);
         for (var i = 0; i < global.config.slaves.length; i++) {
             if (global.config.slaves[i].class != global.config.class) {
                 slaves[i] = global.config.slaves[i];
