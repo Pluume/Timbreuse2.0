@@ -279,8 +279,13 @@ function load() {
   });
 
 }
+function delCSV()
+{
+  csv.deleteAllCSV();
+}
 module.exports = {
   load,
   tag,
-  getNow
+  getNow,
+  delCSV
 };

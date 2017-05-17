@@ -69,6 +69,18 @@
       }
 
     }
+    function delCSV()
+    {
+      try {
+        slave.delCSV();
+        $("#taggedStudent").hide('slow', function() {
+          $("#taggedStudent").remove();
+        });
+      } catch (err) {
+        console.log("Oups ! Can't delete an undefined element");
+      }
+
+    }
     $(function() {
       $(window).keypress(function(e) {
         if (e.keyCode == 13) {

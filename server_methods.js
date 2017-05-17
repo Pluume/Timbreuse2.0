@@ -399,6 +399,20 @@ function authenticate(conn, ireq) {
       oreq.error = request.ERROR.OK;
       oreq.rank = row.rank;
       conn.socket.write(JSON.stringify(oreq) + "\0");
+      if (conn.user.rank == global.RANK.PROF) {
+        global.db.get(knex("class").select().where({
+          profid: row.id
+        }).toString(), (err, row1) => {
+          if (err) {
+            log.error("SQLITE Error : " + err);
+            return;
+          }
+          if (row1 == undefined)
+            return;
+          else
+            conn.user.class = row1;
+        });
+      }
       return;
     }
 
@@ -444,7 +458,9 @@ function getStudent(conn, ireq) {
   oreq.student = [];
   if (ireq.scope == request.SCOPE.ALL) {
     var index = 0;
-    global.db.all(knex("students").select().where({profid:conn.user.id}).toString(), (err, rows) => //Get the students
+    global.db.all(knex("students").select().where({
+        profid: conn.user.id
+      }).toString(), (err, rows) => //Get the students
       {
         if (err) {
           log.error("Error : " + err);
@@ -603,7 +619,8 @@ function createStudent(conn, ireq) {
       global.db.run(knex('students').insert({
         userid: this.lastID,
         profid: conn.user.id,
-        project: ireq.data.project
+        project: ireq.data.project,
+        firstClass: (conn.user.class != undefined) ? conn.user.class.name : "";
       }).returning('*').toString(), (err) => {
         if (err) {
           log.error("Error : " + err);
@@ -612,8 +629,6 @@ function createStudent(conn, ireq) {
           conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
-
-
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       });

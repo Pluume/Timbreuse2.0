@@ -80,6 +80,11 @@ function displayCSV(event, val) {
   }
   var dissmissGroup = document.createElement("div");
   dissmissGroup.setAttribute("class", "btn-group pull-right");
+  var deleteButton = document.createElement("a");
+  deleteButton.setAttribute("href", "#");
+  deleteButton.setAttribute("class", "btn btn-danger btn-sm bigText");
+  deleteButton.setAttribute("onclick", "delCSV();");
+  deleteButton.innerHTML = "Delete CSV";
   var dissmissButton = document.createElement("a");
   dissmissButton.setAttribute("href", "#");
   dissmissButton.setAttribute("class", "btn btn-default btn-sm bigText");
