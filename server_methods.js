@@ -16,7 +16,7 @@ const knex = require('knex')({
   useNullAsDefault: true
 });
 var tagReqList = require("array")();
-var tagReqFncStarted = false;
+var EventedArray = require('array-events');
 const moment = require("moment");
 const config = require("./utils/config.js");
 const db = require("./db/db.js");
@@ -121,13 +121,14 @@ function sendUpdate(id, arg) {
   }
 }
 
-function tagRoutine(conn, user, ireq) {
+function tagRoutine(conn, user, ireq, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
 
   if (user.rank == global.RANK.PROF) { //Prof card tagged
 
     oreq.fnc = request.REQUEST.MASTER;
     conn.socket.write(JSON.stringify(oreq) + "\0");
+    done();
     return;
   }
   global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err2, row2) => {
@@ -138,6 +139,7 @@ function tagRoutine(conn, user, ireq) {
       oreq.error = request.ERROR.SQLITE;
       if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
       return;
     }
     if (row2 === undefined) {
@@ -147,6 +149,7 @@ function tagRoutine(conn, user, ireq) {
       oreq.error = request.ERROR.SQLITE;
       if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
       return;
     }
     var nstatus;
@@ -179,6 +182,7 @@ function tagRoutine(conn, user, ireq) {
             oreq.error = request.ERROR.SQLITE;
             if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
+              done();
             return;
           }
 
@@ -190,6 +194,7 @@ function tagRoutine(conn, user, ireq) {
             conn.socket.write(JSON.stringify(oreq) + "\0");
           sendUpdate(row3.profid, oreq.student);
           log.save(global.LOGS.OUT, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          done();
         });
       });
 
@@ -238,6 +243,7 @@ function tagRoutine(conn, user, ireq) {
             oreq.error = request.ERROR.SQLITE;
             if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
+              done();
             return;
           }
 
@@ -268,6 +274,7 @@ function tagRoutine(conn, user, ireq) {
                 }
             }
           }
+          done();
         });
       });
     }
@@ -278,8 +285,7 @@ function tagRoutine(conn, user, ireq) {
  * Handle a tag request (When a student arrive or leave)
  * @method tagRequest
  **/
-function tagRequest(item, index) {
-
+function tagRequest(item, index, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
   var ireq = item.ireq;
   var conn = item.connection;
@@ -296,6 +302,7 @@ function tagRequest(item, index) {
         oreq.fnc = request.REQUEST.TAG;
         oreq.error = request.ERROR.SQLITE;
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
         return;
       }
       if (row === undefined) {
@@ -304,15 +311,17 @@ function tagRequest(item, index) {
         oreq.fnc = request.REQUEST.TAG;
         oreq.error = request.ERROR.WRONGTAG;
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
         return;
       }
       if (ireq.time === undefined || ireq.class === undefined) {
         log.error("Request ill formed.");
         oreq.error = request.ERROR.UNKNOWN;
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
         return;
       }
-      tagRoutine(conn, row, ireq);
+      tagRoutine(conn, row, ireq, done);
     });
   } else if (ireq.id != undefined) {
     global.db.get(knex.select().from("students").where("id", ireq.id).toString(), (err, row0) => {
@@ -321,6 +330,7 @@ function tagRequest(item, index) {
         oreq.fnc = request.REQUEST.TAG;
         oreq.error = request.ERROR.SQLITE;
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
         return;
       }
       if (row0 === undefined) {
@@ -329,6 +339,7 @@ function tagRequest(item, index) {
         oreq.fnc = request.REQUEST.TAG;
         oreq.error = request.ERROR.WRONGTAG;
         conn.socket.write(JSON.stringify(oreq) + "\0");
+        done();
         return;
       }
       global.db.get(knex.select().from("users").where("id", row0.userid).toString(), (err, row) => {
@@ -338,6 +349,7 @@ function tagRequest(item, index) {
           oreq.fnc = request.REQUEST.TAG;
           oreq.error = request.ERROR.SQLITE;
           conn.socket.write(JSON.stringify(oreq) + "\0");
+          done();
           return;
         }
         if (row === undefined) {
@@ -346,15 +358,17 @@ function tagRequest(item, index) {
           oreq.fnc = request.REQUEST.TAG;
           oreq.error = request.ERROR.WRONGTAG;
           conn.socket.write(JSON.stringify(oreq) + "\0");
+          done();
           return;
         }
-        tagRoutine(conn, row, ireq);
+        tagRoutine(conn, row, ireq, done);
       });
     });
   } else {
     log.error("Request ill formed.");
     oreq.error = request.ERROR.UNKNOWN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
+    done();
     return;
   }
 
@@ -421,6 +435,7 @@ function authenticate(conn, ireq) {
     conn.socket.end(JSON.stringify(oreq) + "\0");
     return;
   });
+
 }
 /**
  * End the provided socket
@@ -620,7 +635,7 @@ function createStudent(conn, ireq) {
         userid: this.lastID,
         profid: conn.user.id,
         project: ireq.data.project,
-        firstClass: (conn.user.class != undefined) ? conn.user.class.name : "";
+        firstClass: (conn.user.class != undefined) ? conn.user.class.name : ""
       }).returning('*').toString(), (err) => {
         if (err) {
           log.error("Error : " + err);
@@ -1503,6 +1518,7 @@ function sortRequest(connection, data) {
   for (var i = 0; i < toRm.length; i++) {
     ireq.splice(toRm[i], 1);
   }
+  serializedTagRequest();
   for (var i = 0; i < ireq.length; i++) {
     if (ireq[i].fnc === undefined) {
       log.error("fnc param not specified in request.");
@@ -1592,7 +1608,11 @@ function sortRequest(connection, data) {
   }
 
 }
-
+function serializedTagRequest()
+{
+  tagReqList.sort('ireq.time', 'ascending');
+  new EventedArray(tagReqList.toArray()).forEachEmission(tagRequest);
+}
 module.exports = {
 
   compileRequest: (connection, data) => {
@@ -1603,7 +1623,6 @@ module.exports = {
     }
   },
   initialize: () => {
-    tagReqList.on("add", tagRequest);
     log.info("Methods initiated.");
   }
 };

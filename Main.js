@@ -11,7 +11,7 @@ log.info("Loading configuration...");
 const config = require("./utils/config.js");
 config.read();
 config.getType();
-
+global.mainPath = __dirname;
 if(global.DEBUG)
 {
   //clock = sinon.useFakeTimers(new Date("2017-04-28T06:10:32.571Z").getTime());

@@ -61,8 +61,8 @@
 
     function dissmissInfoPane() {
       try {
-        $("#taggedStudent").hide('slow', function() {
-          $("#taggedStudent").remove();
+        $("#infoPanel").hide('slow', function() {
+          $("#infoPanel").remove();
         });
       } catch (err) {
         console.log("Oups ! Can't delete an undefined element");
@@ -73,8 +73,8 @@
     {
       try {
         slave.delCSV();
-        $("#taggedStudent").hide('slow', function() {
-          $("#taggedStudent").remove();
+        $("#infoPanel").hide('slow', function() {
+          $("#infoPanel").remove();
         });
       } catch (err) {
         console.log("Oups ! Can't delete an undefined element");

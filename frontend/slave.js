@@ -16,6 +16,7 @@ const log = require("./../utils/log.js");
 const csv = require("./../utils/csv.js");
 const request = require("./../request.js");
 const moment = require("moment");
+var clone = require('clone');
 var goingToClose = false;
 var connected = false;
 var slaveconn;
@@ -74,7 +75,7 @@ function tag(stag, ntime) {
     oreq.delayed = true;
     oreqPile.push(oreq);
   }
-  var soreq = oreq;
+  var soreq = clone(oreq);
   soreq.fnc = request.REQUEST.PROPAGATE_TAG;
   for (var i = 0; i < slaves.length; i++) {
     if (slaves[i].conn.connected) {
@@ -136,6 +137,7 @@ function foreverConnect() {
     if (connected)
       return;
     connected = true;
+    global.mwin.webContents.send("onlineServer", true);
     log.info('Connected to server!');
     slaveconn.on("data", compileRequest);
     executePile();
@@ -189,7 +191,7 @@ function foreverConnect() {
   }
   slaveconn.on("close", (err) => {
     connected = false;
-
+    global.mwin.webContents.send("onlineServer", false);
     if (!goingToClose) {
       if (err) {
         log.warning("The connection with the server was closed with an error. Connecting back in 5 seconds");
@@ -218,6 +220,7 @@ function foreverConnect() {
     host: global.config.server,
     port: 703
   }, connectedToServer);
+
 }
 /**
  * Create the slave frontend
@@ -279,8 +282,8 @@ function load() {
   });
 
 }
-function delCSV()
-{
+
+function delCSV() {
   csv.deleteAllCSV();
 }
 module.exports = {
