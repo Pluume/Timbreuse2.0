@@ -80,7 +80,7 @@ function getClass(cb) {
 }
 
 function getStudents(tableId, cb) {
-  ipcRenderer.send("students", window.SCOPE.ALL);
+  ipcRenderer.send("students", window.SCOPE.UNIQUE);
   ipcRenderer.once("students", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -168,6 +168,9 @@ function createStudent(fname, lname, username, email, tag, tclass, dob, project,
       case window.ERROR.USEREXISTS:
         redAlert("User already exists with this username...");
         break;
+        case window.ERROR.TAGEXISTS:
+          redAlert("User already exists with this tag...");
+          break;
       default:
         redAlert("Ill formed request...");
     }

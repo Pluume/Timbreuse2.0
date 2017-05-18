@@ -28,7 +28,8 @@ ERROR = {
     SQLITE: 3,
     WRONGCREDS: 4,
     NOTLOGEDIN: 5,
-    USEREXISTS: 6
+    USEREXISTS: 6,
+    TAGEXISTS: 7
 };
 REQUEST ={
     EXIT: -1,
@@ -70,7 +71,7 @@ PAGES ={
     ADMIN: 5
 };
 SCOPE ={
-    UNIQUE: 1,
+    UNIQUE: -1,
     ALL: "*"
 };
 global.ERROR = ERROR;

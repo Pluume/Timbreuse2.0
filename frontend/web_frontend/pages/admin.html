@@ -70,6 +70,7 @@
       }
 
       function editProfSubmit(id) {
+        id = Number(id);
         var data = {
           id: id,
           class: document.getElementById("etclass").value,
@@ -79,10 +80,10 @@
           dob: document.getElementById("edob").value,
           email: document.getElementById("eemail").value,
           tag: document.getElementById("etag").value,
-          pass: (document.getElementById("epass").checked) ? 1:0
+          pass: (document.getElementById("epass").checked) ? 1 : 0
         };
-        emptyInput(["etclass", "elname", "efname", "eusername", "edob", "eemail"]);
         document.getElementById("epass").checked = false;
+        console.log(JSON.stringify(data));
         editProf(data, () => {
           getProf("profTable", () => {});
         });
@@ -99,6 +100,7 @@
         $("body").tooltip({
           selector: '[data-toggle=tooltip]'
         });
+        activateValidator();
         getProf("profTable", () => {});
       });
 
@@ -111,7 +113,7 @@
         document.getElementById("edob").setAttribute("placeholder", prof.dob == null ? "" : prof.dob);
         document.getElementById("eemail").setAttribute("placeholder", prof.email == null ? "" : prof.email);
         document.getElementById("etag").setAttribute("placeholder", prof.tag == null ? "" : prof.tag);
-        document.getElementById("updateSubmit").setAttribute("onclick", "editProfSubmit(" + prof.id + ");");
+        document.getElementById("editProfId").setAttribute("value", prof.id);
         $('#editProfModal').modal('show');
       }
     </script>
@@ -131,83 +133,100 @@
     <div class="modal fade" id="addProfModal" tabindex="-1" role="dialog" aria-labelledby="addProfModal" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h2 class="modal-title" id="addProfModalTitle">Create a new teacher</h2>
-          </div>
-          <div class="modal-body">
-            <form>
+          <form id="addProfModalForm">
+            <div class="modal-header">
+              <h2 class="modal-title" id="addProfModalTitle">Create a new teacher</h2>
+            </div>
+            <div class="modal-body">
+
               <div id="fgctclass" class="form-group">
                 <label for="ctclass" class="form-control-label">Class : </label>
-                <input type="text" class="form-control" id="ctclass">
+                <input type="text" class="form-control" name="ctclass" id="ctclass">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgcfname" class="form-group">
                 <label for="cfname" class="form-control-label">First name :</label>
-                <input type="text" class="form-control" id="cfname">
+                <input type="text" class="form-control" name="cfname" id="cfname">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgclname" class="form-group">
                 <label for="clname" class="form-control-label">Last name:</label>
-                <input type="text" class="form-control" id="clname">
+                <input type="text" class="form-control" name="clname" id="clname">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgcusername" class="form-group">
                 <label for="cusername" class="form-control-label">Username :</label>
-                <input type="text" class="form-control" id="cusername">
+                <input type="text" class="form-control" name="cusername" id="cusername">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgcdob" class="form-group">
                 <label for="cdob" class="form-control-label">Date of birth:</label>
-                <input type="text" class="form-control" id="cdob">
+                <input type="text" class="form-control" name="cdob" id="cdob">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgcemail" class="form-group">
                 <label for="cemail" class="form-control-label">Email :</label>
-                <input type="text" class="form-control" id="cemail">
+                <input type="text" class="form-control" name="cemail" id="cemail">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgctag" class="form-group">
                 <label for="ctag" class="form-control-label">Tag :</label>
-                <input type="text" class="form-control" id="ctag">
+                <input type="text" class="form-control" name="ctag" id="ctag">
+                <span class="help-block" id="error"></span>
               </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" onclick="submitCreateModal();" data-dismiss="modal" class="btn btn-success">Create</button>
-          </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success">Create</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
     <div class="modal fade" id="editProfModal" tabindex="-1" role="dialog" aria-labelledby="editProfModal" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h2 class="modal-title" id="editProfModalTitle">Edit this teacher</h2>
-          </div>
-          <div class="modal-body">
-            <form>
+          <form id="editProfModalForm">
+            <div class="modal-header">
+              <h2 class="modal-title" id="editProfModalTitle">Edit this teacher</h2>
+            </div>
+            <div class="modal-body">
+
               <div id="fgetclass" class="form-group">
                 <label for="etclass" class="form-control-label">Class : </label>
                 <input type="text" class="form-control" id="etclass">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgecfname" class="form-group">
                 <label for="efname" class="form-control-label">First name :</label>
                 <input type="text" class="form-control" id="efname">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgelname" class="form-group">
                 <label for="elname" class="form-control-label">Last name:</label>
                 <input type="text" class="form-control" id="elname">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgeusername" class="form-group">
                 <label for="eusername" class="form-control-label">Username :</label>
                 <input type="text" class="form-control" id="eusername">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgedob" class="form-group">
                 <label for="edob" class="form-control-label">Date of birth:</label>
                 <input type="text" class="form-control" id="edob">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgeemail" class="form-group">
                 <label for="eemail" class="form-control-label">Email :</label>
                 <input type="text" class="form-control" id="eemail">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgetag" class="form-group">
                 <label for="etag" class="form-control-label">Tag :</label>
                 <input type="text" class="form-control" id="etag">
+                <span class="help-block" id="error"></span>
               </div>
               <div id="fgepass" class="form-group">
                 <div class="checkbox">
@@ -216,12 +235,13 @@
                   </label>
                 </div>
               </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" id="updateSubmit" data-dismiss="modal" class="btn btn-primary">Update</button>
-          </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <input type="hidden" id="editProfId" value=""/>
+              <button type="submit" id="updateSubmit" class="btn btn-primary">Update</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -242,6 +262,8 @@
     <script src="../dist/js/informations.js"></script>
     <script src="../dist/js/redirect.js"></script>
     <script src="../dist/js/utils.js"></script>
+    <script src="../dist/js/validate.js"></script>
+    <script src="../vendor/validator/jquery.validate.min.js"></script>
     <script src="../vendor/moment/moment.js"></script>
     <script src="../vendor/datepicker/datepicker.js"></script>
     <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>

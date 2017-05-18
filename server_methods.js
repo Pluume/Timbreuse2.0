@@ -139,7 +139,7 @@ function tagRoutine(conn, user, ireq, done) {
       oreq.error = request.ERROR.SQLITE;
       if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
-        done();
+      done();
       return;
     }
     if (row2 === undefined) {
@@ -149,7 +149,7 @@ function tagRoutine(conn, user, ireq, done) {
       oreq.error = request.ERROR.SQLITE;
       if (!ireq.delayed && ireq.client == undefined)
         conn.socket.write(JSON.stringify(oreq) + "\0");
-        done();
+      done();
       return;
     }
     var nstatus;
@@ -182,7 +182,7 @@ function tagRoutine(conn, user, ireq, done) {
             oreq.error = request.ERROR.SQLITE;
             if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
-              done();
+            done();
             return;
           }
 
@@ -217,6 +217,8 @@ function tagRoutine(conn, user, ireq, done) {
       var nowAtMidnight = moment((ireq.time) ? ireq.time : moment().format().toString()).clone().startOf('day');
       var nowFromMidnight = now.diff(nowAtMidnight, 'seconds');
       var hadLunch = 0;
+      if (row2.hadLunch)
+        hadLunch = 1;
       var missedPause = row2.missedPause;
       if (nowFromMidnight > (global.config.lunch.begin + global.config.lunch.time) && nowFromMidnight < global.config.lunch.end) {
         var pauseDelta = math.getTimeDelta(moment((ireq.time) ? ireq.time : moment().format().toString()).toDate().getTime(), new Date(row2.lastTagTime).getTime());
@@ -243,7 +245,7 @@ function tagRoutine(conn, user, ireq, done) {
             oreq.error = request.ERROR.SQLITE;
             if (!ireq.delayed && ireq.client == undefined)
               conn.socket.write(JSON.stringify(oreq) + "\0");
-              done();
+            done();
             return;
           }
 
@@ -335,7 +337,6 @@ function tagRequest(item, index, done) {
       }
       if (row0 === undefined) {
         log.error("No user with this tag...");
-
         oreq.fnc = request.REQUEST.TAG;
         oreq.error = request.ERROR.WRONGTAG;
         conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -471,11 +472,43 @@ function getStudent(conn, ireq) {
   }
 
   oreq.student = [];
-  if (ireq.scope == request.SCOPE.ALL) {
+  if (ireq.scope == request.SCOPE.UNIQUE) {
     var index = 0;
     global.db.all(knex("students").select().where({
         profid: conn.user.id
       }).toString(), (err, rows) => //Get the students
+      {
+        if (err) {
+          log.error("Error : " + err);
+
+          oreq.error = request.ERROR.SQLITE;
+          oreq.fnc = request.REQUEST.GETSTUDENT;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        var finalArray = [];
+        global.db.all(knex("users").select("id", "username", "rank", "fname", "lname", "dob", "email", "tag").toString(), (err, rows2) => {
+          for (var ii = 0; ii < rows2.length; ii++) {
+            var tmp = lodash.filter(rows, {
+              "userid": rows2[ii].id
+            });
+            if (tmp[0] === undefined)
+              continue;
+            tmp[0].user = rows2[ii];
+            delete tmp[0].user.password;
+            finalArray.push(tmp[0]);
+          }
+
+          oreq.error = request.ERROR.OK;
+          oreq.students = finalArray;
+          oreq.fnc = request.REQUEST.GETSTUDENT;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        });
+      });
+  } else if (ireq.scope == request.SCOPE.ALL) {
+    var index = 0;
+    global.db.all(knex("students").select().toString(), (err, rows) => //Get ALL the students
       {
         if (err) {
           log.error("Error : " + err);
@@ -598,9 +631,10 @@ function createStudent(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
+  ireq.data.tag = ireq.data.tag.replace(/\s/g,'');
   global.db.get(knex("users").select().where({
     username: ireq.data.username
-  }).toString(), (err, res) => {
+  }).orWhere({tag: ireq.data.tag}).toString(), (err, res) => {
     if (err) {
       log.error("Error : " + err);
 
@@ -609,10 +643,17 @@ function createStudent(conn, ireq) {
       return;
     }
     if (res != undefined) {
+      if(res.username == ireq.data.username)
+      {
+        oreq.error = request.ERROR.USEREXISTS;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      } else {
+        oreq.error = request.ERROR.TAGEXISTS;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
 
-      oreq.error = request.ERROR.USEREXISTS;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
     }
     global.db.run(knex('users').insert({
       username: ireq.data.username,
@@ -623,6 +664,7 @@ function createStudent(conn, ireq) {
       rank: global.RANK.STUDENT,
       email: ireq.data.email,
       tag: ireq.data.tag.replace(/\s/g, '')
+
     }).returning('*').toString(), function(err) {
       if (err) {
         log.error("Error : " + err);
@@ -635,7 +677,9 @@ function createStudent(conn, ireq) {
         userid: this.lastID,
         profid: conn.user.id,
         project: ireq.data.project,
-        firstClass: (conn.user.class != undefined) ? conn.user.class.name : ""
+        firstClass: (conn.user.class != undefined) ? conn.user.class.name : "",
+        timeDiff: 0,
+        timeDiffToday: 0
       }).returning('*').toString(), (err) => {
         if (err) {
           log.error("Error : " + err);
@@ -769,12 +813,12 @@ function resetTime(conn, ireq) {
     return;
   }
   global.db.run(knex("students").update({
-    hadLunch: null,
-    missedPause: null,
-    lastTagTime: null,
-    timeDiffToday: null,
-    timeDiff: null,
-    status: null
+    hadLunch: 0,
+    missedPause: 0,
+    lastTagTime: 0,
+    timeDiffToday: 0,
+    timeDiff: 0,
+    status: 0
   }).where("id", "in", ireq.id).toString(), (err) => {
     if (err) {
       log.error("Error : " + err);
@@ -791,7 +835,7 @@ function resetTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -799,7 +843,7 @@ function resetTime(conn, ireq) {
 
 /**
  * Modify the time of students
- * @method resetTime
+ * @method modTime
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  * @param {Object} ireq a JSON object containing the request.
  **/
@@ -811,7 +855,7 @@ function modTime(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  if (ireq.time === undefined) {
+  if (ireq.time == undefined) {
 
     oreq.error = request.ERROR.UNKNOWN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -833,7 +877,7 @@ function modTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -878,7 +922,7 @@ function setTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined) ? "" : " - " + ireq.comments, row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -1437,7 +1481,6 @@ function editProf(conn, ireq) {
     },
     function(callback) {
       if (ireq.data.class == "") {
-        console.log("here");
         callback();
         return;
       }
@@ -1608,8 +1651,8 @@ function sortRequest(connection, data) {
   }
 
 }
-function serializedTagRequest()
-{
+
+function serializedTagRequest() {
   tagReqList.sort('ireq.time', 'ascending');
   new EventedArray(tagReqList.toArray()).forEachEmission(tagRequest);
 }
