@@ -349,7 +349,7 @@
                   var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                  modTime(stdToApply, time)
+                  modTime(stdToApply, time, "Comments not included for now");
                   return;
                 } else if (document.getElementById("settime_radio").checked) {
                   var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;

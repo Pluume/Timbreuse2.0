@@ -117,8 +117,6 @@ function showOnline(event, val) {
     var loading = document.createElement("img");
     var imgPath = require('electron').remote.require("path").join(require('electron').remote.getGlobal('mainPath'),"graphics","unpluged.png");
     loading.setAttribute("src",imgPath);
-    console.log(require('electron').remote.getGlobal('mainPath'));
-    console.log(imgPath);
     body.appendChild(loading);
     var footer = document.createElement("div");
     footer.setAttribute("class", "panel-footer clearfix");

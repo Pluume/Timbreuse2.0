@@ -258,7 +258,7 @@ function resetTime(id) {
   ipcRenderer.send("resetTime", id);
 }
 
-function modTime(id, ntime) {
+function modTime(id, ntime, comments) {
   ipcRenderer.once("modTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -280,7 +280,8 @@ function modTime(id, ntime) {
   });
   ipcRenderer.send("modTime", {
     id: id,
-    time: ntime
+    time: ntime,
+    comments: comments
   });
 }
 
