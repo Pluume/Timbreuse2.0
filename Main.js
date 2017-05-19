@@ -12,9 +12,10 @@ const config = require("./utils/config.js");
 config.read();
 config.getType();
 global.mainPath = __dirname;
-if(global.DEBUG)
+if(global.DEBUG && global.TYPE.int === config.TYPE.SERVER.int)
 {
-  //clock = sinon.useFakeTimers(new Date("2017-04-28T06:10:32.571Z").getTime());
+  // clock = sinon.useFakeTimers(new Date("2017-05-19T09:10:32.571Z").getTime());
+  console.log("Today date is : " + new Date());
 }
 
 

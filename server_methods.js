@@ -127,14 +127,16 @@ function tagRoutine(conn, user, ireq, done) {
   if (user.rank == global.RANK.PROF) { //Prof card tagged
 
     oreq.fnc = request.REQUEST.MASTER;
-    conn.socket.write(JSON.stringify(oreq) + "\0");
+    if (oreq.delayed)
+      return;
+    else
+      conn.socket.write(JSON.stringify(oreq) + "\0");
     done();
     return;
   }
   global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err2, row2) => {
     if (err2) {
       log.error("Error while accessing the database...\n" + err);
-
       oreq.fnc = request.REQUEST.TAG;
       oreq.error = request.ERROR.SQLITE;
       if (!ireq.delayed && ireq.client == undefined)
@@ -188,6 +190,7 @@ function tagRoutine(conn, user, ireq, done) {
 
           oreq.fnc = request.REQUEST.TAG;
           oreq.student = row3;
+          oreq.student.timeToDo = config.loadDay(new Date().getDay()).timeToDo;
           oreq.student.user = user;
           delete oreq.student.user.password;
           if (!ireq.delayed && ireq.client == undefined)
@@ -251,6 +254,7 @@ function tagRoutine(conn, user, ireq, done) {
 
           oreq.fnc = request.REQUEST.TAG;
           oreq.student = row3;
+          oreq.student.timeToDo = config.loadDay(new Date().getDay()).timeToDo;
           oreq.student.user = user;
           delete oreq.student.user.password;
           if (!ireq.delayed && ireq.client == undefined)
@@ -259,7 +263,7 @@ function tagRoutine(conn, user, ireq, done) {
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
           log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
-          if (moment((ireq.time) ? ireq.time : moment().format().toString()).isBefore(moment(row3.lastTagTime), "day")) { //First tag of the day
+          if (moment((ireq.time) ? ireq.time : moment().format().toString()).isAfter(moment(row2.lastTagTime), "day")) { //First tag of the day
             if (row2.isBlocked) {
               if (dayConfig.scheduleFix.length > 0)
                 if (new Date((ireq.time) ? ireq.time : moment().format().toString()) > new Date(math.secondsToDate(dayConfig.scheduleFix[0].begin))) {
@@ -631,10 +635,12 @@ function createStudent(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  ireq.data.tag = ireq.data.tag.replace(/\s/g,'');
+  ireq.data.tag = ireq.data.tag.replace(/\s/g, '');
   global.db.get(knex("users").select().where({
     username: ireq.data.username
-  }).orWhere({tag: ireq.data.tag}).toString(), (err, res) => {
+  }).orWhere({
+    tag: ireq.data.tag
+  }).toString(), (err, res) => {
     if (err) {
       log.error("Error : " + err);
 
@@ -643,8 +649,7 @@ function createStudent(conn, ireq) {
       return;
     }
     if (res != undefined) {
-      if(res.username == ireq.data.username)
-      {
+      if (res.username == ireq.data.username) {
         oreq.error = request.ERROR.USEREXISTS;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;

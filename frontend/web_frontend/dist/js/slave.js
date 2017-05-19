@@ -5,31 +5,49 @@ function displayTaggedStudent(event, std) { //TODO Handle std = undefined
   }
   var panel = document.createElement("div");
   panel.setAttribute("id", "infoPanel");
-  console.log(std);
-  if (std.status == window.STATUS.IN) {
+  if (std == null) {
+    panel.setAttribute("class", "panel panel-danger bigText");
+  } else if (std.status == window.STATUS.IN) {
     panel.setAttribute("class", "panel panel-green bigText");
   } else {
     panel.setAttribute("class", "panel panel-red bigText");
   }
-  var heading = document.createElement("div");
+  if(std == null)
+  {
+    var heading = document.createElement("div");
+    heading.setAttribute("class", "panel-heading");
+    heading.innerHTML = "No user with this tag";
+    var body = document.createElement("div");
+    body.setAttribute("class", "panel-body ");
+    body.innerHTML = "This tag doesn't belong to any students. If you're sure that this tag belong to a student, then try again.</b>";
+  } else {
+    var heading = document.createElement("div");
   heading.setAttribute("class", "panel-heading");
   heading.innerHTML = std.user.fname + " " + std.user.lname;
   var body = document.createElement("div");
+  var remaining = std.timeToDo - std.timeDiffToday;
+  if (remaining < 0)
+    remaining = 0;
   body.setAttribute("class", "panel-body ");
   body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
   body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
   body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : std.missedPause) + "</b> missed pause";
+  body.innerHTML += "<br />Remaining time to do today : <b>" + require("../../../utils/math.js").secondsToHms(remaining);
   body.innerHTML += "<br /><span class='glyphicon glyphicon-cutlery black'/>  ";
   if (std.hadLunch)
     body.innerHTML += "<span class='glyphicon glyphicon-ok green'/>";
   else
     body.innerHTML += "<span class='glyphicon glyphicon-remove red'/>";
+  }
+
 
   var footer = document.createElement("div");
   footer.setAttribute("class", "panel-footer clearfix");
   var statusGroup = document.createElement("div");
   statusGroup.setAttribute("class", "btn-group pull-left");
-  if (std.status == window.STATUS.IN) {
+  if (std == null) {
+    statusGroup.innerHTML = "<b>Error</b>";
+  } else if (std.status == window.STATUS.IN) {
     statusGroup.innerHTML = "<b>Arriving</b>";
   } else {
     statusGroup.innerHTML = "<b>Leaving</b>";
@@ -98,9 +116,9 @@ function displayCSV(event, val) {
   panel.appendChild(footer);
   document.getElementById("infoPane").appendChild(panel);
 }
+
 function showOnline(event, val) {
-  if(!val)
-  {
+  if (!val) {
     var element = document.getElementById('infoPanel');
     if (typeof(element) != 'undefined' && element != null) {
       element.parentNode.removeChild(element);
@@ -115,14 +133,16 @@ function showOnline(event, val) {
     var body = document.createElement("div");
     body.setAttribute("class", "panel-body ");
     var loading = document.createElement("img");
-    var imgPath = require('electron').remote.require("path").join(require('electron').remote.getGlobal('mainPath'),"graphics","unpluged.png");
-    loading.setAttribute("src",imgPath);
+    var imgPath = require('electron').remote.require("path").join(require('electron').remote.getGlobal('mainPath'), "graphics", "unplugedCage.png");
+    loading.setAttribute("src", imgPath);
+    loading.setAttribute("width", "327px");
+    loading.setAttribute("height", "250px");
     body.appendChild(loading);
     var footer = document.createElement("div");
     footer.setAttribute("class", "panel-footer clearfix");
     var statusGroup = document.createElement("div");
     statusGroup.setAttribute("class", "btn-group pull-left");
-      statusGroup.innerHTML = "<b>Disconnected from server</b>";
+    statusGroup.innerHTML = "<b>Disconnected from server</b>";
     footer.appendChild(statusGroup);
     panel.appendChild(heading);
     panel.appendChild(body);

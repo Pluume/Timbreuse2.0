@@ -90,6 +90,9 @@
         }
         currentTag += String.fromCharCode(e.keyCode);
       });
+      $('body').click(function() {
+   dissmissInfoPane();
+});
     });
     var circleH = new ProgressBar.Circle('#clockHours', {
       color: '#1b0500',
