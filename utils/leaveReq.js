@@ -62,27 +62,27 @@ function routine(res) {
   var today = config.loadDay(new Date().getDay());
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === -1) // If for the future
   {
-    return diff;
+    return diff; //Return nothing
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === 1) // If has passed
   {
     //TODO DELETE THE RECORD
-    return diff;
+    return diff; //Return nothing
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === 1) // If has started precedently
   {
-    ssecs = today.schedule[0].begin - 1;
+    ssecs = today.schedule[0].begin - 1; //Set the start date just before the schedule's begin
   }
-  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === -1) // If has started precedently
+  if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === -1) // If it will not end today but in the future
   {
-    esecs = today.schedule[today.schedule.length - 1].end + 1;
+    esecs = today.schedule[today.schedule.length - 1].end + 1; //Set the end date just after the schedule's end
   }
   for (var i = 0; i < today.schedule.length; i++) { //Iterating through the schedule of the day
 
     if (ssecs <= today.schedule[i].begin) { //The start time is before start schedule
 
-      if (esecs >= today.schedule[i].begin && esecs <= today.schedule[i].end)
-        diff += esecs - today.schedule[i].begin;
+      if (esecs >= today.schedule[i].begin && esecs <= today.schedule[i].end) //End time in schedule
+        diff += esecs - today.schedule[i].begin; //diff equal from the schedule between to esecs
 
       if (esecs <= today.schedule[i].end) //But the end is before this schedule end
         break;
@@ -102,7 +102,7 @@ function routine(res) {
     }
   }
   if (diff > today.timeToDo)
-    diff = today.timeToDo;
+    diff = today.timeToDo; //Never give more than the maximum
   return diff;
 }
 /**
@@ -148,5 +148,5 @@ function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, 
 
 }
 module.exports = {
-  //isToday
+  routine
 };

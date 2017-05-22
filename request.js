@@ -60,7 +60,9 @@ REQUEST ={
     DELPROF: 24,
     EDITPROF: 25,
     GETPROF: 26,
-    CHANGEPASS: 27
+    CHANGEPASS: 27,
+    GETCLASSLIST: 28,
+    CHANGECLASS: 29
 };
 PAGES ={
     LOGIN: 0,
@@ -68,7 +70,8 @@ PAGES ={
     SLAVE: 2,
     NOTIFICATIONS: 3,
     HOLIDAYS: 4,
-    ADMIN: 5
+    ADMIN: 5,
+    CLASS: 6
 };
 SCOPE ={
     UNIQUE: -1,

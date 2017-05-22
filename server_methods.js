@@ -461,7 +461,7 @@ function socketExit(conn) {
  **/
 function getStudent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
+  if (conn.user === undefined || (conn.user.rank != global.RANK.PROF && conn.user.rank != global.RANK.ADMIN)) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -1533,6 +1533,98 @@ function changePassword(conn, ireq) {
   });
 }
 /**
+ * Return a list of the existing class to the professor
+ * @method getClassList
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getClassList(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+    log.error("Not logged in");
+    return;
+  }
+  var classData = [];
+
+  global.db.all(knex("class").select().toString(), (err, rows) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (rows == undefined) {
+      oreq.class = null;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+
+    global.db.each(knex("users").where("id", "in", lodash.map(rows, "profid")).toString(), (err, row) => {
+        if (err) {
+          log.error("Error : " + err);
+
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        var classObj = lodash.filter(rows, ['profid', row.id]);
+        classObj[0].prof = row;
+        delete classObj[0].prof.password;
+        classData.push(classObj[0]);
+      },
+      (err) => {
+
+        if (err) {
+          log.error("Error : " + err);
+
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        oreq.class = classData;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      });
+  });
+}
+/**
+ * Change the class of a student
+ * @method changeStudentClass
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function changeStudentClass(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.ADMIN) {
+    log.error("Not logged in");
+    return;
+  }
+  if (ireq.stdid == undefined || ireq.profid == undefined) {
+    log.error("Ill formed request");
+    return;
+  }
+  console.log(knex("students").update({
+    profid: ireq.profid
+  }).where({
+    id: ireq.stdid
+  }).toString());
+  global.db.run(knex("students").update({
+    profid: ireq.profid
+  }).where({
+    id: ireq.stdid
+  }).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    } else
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+/**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -1651,6 +1743,12 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.CHANGEPASS:
         changePassword(connection, ireq[i]);
+        break;
+      case request.REQUEST.GETCLASSLIST:
+        getClassList(connection, ireq[i]);
+        break;
+      case request.REQUEST.CHANGECLASS:
+        changeStudentClass(connection, ireq[i]);
         break;
     }
   }

@@ -467,6 +467,43 @@ function changePassword(event, arg) {
     }
   });
 }
+function getClassList(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETCLASSLIST,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("getclasslist", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+function changeStudentClass(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CHANGECLASS,
+    error: request.ERROR.OK,
+    stdid: arg.stdid,
+    profid: arg.profid
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("changestdclass", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -493,3 +530,5 @@ ipcMain.on("addprof", addProf);
 ipcMain.on("delprof", delProf);
 ipcMain.on("editprof", editProf);
 ipcMain.on("changepassword", changePassword);
+ipcMain.on("getclasslist",getClassList);
+ipcMain.on("changestdclass",changeStudentClass);

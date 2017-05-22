@@ -51,7 +51,7 @@ function greenAlert(msg) {
     $("#" + id).fadeTo(500, 0).slideUp(500, function() {
       $(this).remove();
     });
-  }, 2000);
+  }, 5000);
   console.log(msg);
 }
 
@@ -117,6 +117,29 @@ function getStudents(tableId, cb) {
   });
 }
 
+function getStudentsAll(cb) {
+  ipcRenderer.send("students", window.SCOPE.ALL);
+  ipcRenderer.once("students", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(arg.students);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+
+  });
+}
+
 function getStudent(id, cb) {
   ipcRenderer.send("students", id);
   ipcRenderer.once("students", (event, arg) => {
@@ -168,9 +191,9 @@ function createStudent(fname, lname, username, email, tag, tclass, dob, project,
       case window.ERROR.USEREXISTS:
         redAlert("User already exists with this username...");
         break;
-        case window.ERROR.TAGEXISTS:
-          redAlert("User already exists with this tag...");
-          break;
+      case window.ERROR.TAGEXISTS:
+        redAlert("User already exists with this tag...");
+        break;
       default:
         redAlert("Ill formed request...");
     }
@@ -489,6 +512,7 @@ function onNotificationInsert(event, arg) {
     $("#notifTable").bootstrapTable('prepend', tmp);
   }
 }
+
 function delHolidays(id, calId) {
   ipcRenderer.send("delHolidays", id);
   ipcRenderer.once("delHolidays", (event, arg) => {
@@ -511,6 +535,7 @@ function delHolidays(id, calId) {
     }
   });
 }
+
 function getHolidays(calendarId) {
   ipcRenderer.send("getHolidays", null);
   ipcRenderer.once("getHolidays", (event, arg) => {
@@ -545,7 +570,9 @@ function getHolidays(calendarId) {
           firstDay: 1,
           weekNumbersWithinDays: true,
           eventClick: function(calEvent, jsEvent, view) {
-            document.getElementById("confirmDeleteEvent").onclick = function() { delHolidays(calEvent.id,calendarId); };
+            document.getElementById("confirmDeleteEvent").onclick = function() {
+              delHolidays(calEvent.id, calendarId);
+            };
             $("#delEventModal").modal("show");
           }
         });
@@ -595,6 +622,7 @@ function addHolidays(calendarId, title, date1, date2) {
     }
   });
 }
+
 function getProf(tableId, cb) {
   ipcRenderer.send("getprof");
   ipcRenderer.once("getprof", (event, arg) => {
@@ -632,7 +660,8 @@ function getProf(tableId, cb) {
 
   });
 }
-function createProf(username, fname, lname,tag,tclass,dob,email,cb) {
+
+function createProf(username, fname, lname, tag, tclass, dob, email, cb) {
   ipcRenderer.send("addprof", {
     username: username,
     fname: fname,
@@ -662,7 +691,8 @@ function createProf(username, fname, lname,tag,tclass,dob,email,cb) {
     }
   });
 }
-function delProf(id,cb) {
+
+function delProf(id, cb) {
   ipcRenderer.send("delprof", id);
   ipcRenderer.once("delprof", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -684,7 +714,8 @@ function delProf(id,cb) {
     }
   });
 }
-function editProf(data,cb) {
+
+function editProf(data, cb) {
   ipcRenderer.send("editprof", data);
   ipcRenderer.once("editprof", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -706,6 +737,7 @@ function editProf(data,cb) {
     }
   });
 }
+
 function changePassword(event, data) {
   ipcRenderer.send("changepassword", data);
   ipcRenderer.once("changepassword", (event, arg) => {
@@ -715,6 +747,57 @@ function changePassword(event, data) {
     switch (arg.error) {
       case window.ERROR.OK:
         greenAlert("Password changed !");
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+
+function getClassList(cb) {
+  ipcRenderer.send("getclasslist", null);
+  ipcRenderer.once("getclasslist", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        if (arg.class == null)
+          redAlert("There is no class configured");
+        else
+          cb(arg.class);
+
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+  });
+}
+
+function changeStudentClass(stdid, profid) {
+  ipcRenderer.send("changestdclass", {
+    stdid: stdid,
+    profid: profid
+  });
+  ipcRenderer.once("changestdclass", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert("Student's class updated successfully");
         break;
       case window.ERROR.NOTLOGEDIN:
         redAlert("Not logged in !");

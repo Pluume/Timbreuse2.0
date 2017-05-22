@@ -189,7 +189,7 @@ module.exports = {
         table.string("reasonDesc");
         table.integer("proof");
         table.string("where");
-
+        table.boolean("accepted");
       }).toString());
     });
     handle.get("SELECT * FROM users WHERE rank=2", (err, data) => {
