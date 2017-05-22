@@ -5,6 +5,10 @@ const wait = require("deasync").sleep(10);
 const async = require("async");
 const config = require("./config.js");
 const math = require("./math.js");
+var knex = require('knex')({
+  client: 'sqlite3',
+  useNullAsDefault: true
+});
 /**
  * Create a leave request in the database
  * @method create
@@ -71,38 +75,38 @@ function routine(res) {
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === 1) // If has started precedently
   {
-    ssecs = today.schedule[0].begin - 1; //Set the start date just before the schedule's begin
+    ssecs = today.scheduleFix[0].begin - 1; //Set the start date just before the scheduleFix's begin
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === -1) // If it will not end today but in the future
   {
-    esecs = today.schedule[today.schedule.length - 1].end + 1; //Set the end date just after the schedule's end
+    esecs = today.scheduleFix[today.scheduleFix.length - 1].end + 1; //Set the end date just after the scheduleFix's end
   }
-  for (var i = 0; i < today.schedule.length; i++) { //Iterating through the schedule of the day
+  for (var i = 0; i < today.scheduleFix.length; i++) { //Iterating through the scheduleFix of the day
 
-    if (ssecs <= today.schedule[i].begin) { //The start time is before start schedule
+    if (ssecs <= today.scheduleFix[i].begin) { //The start time is before start scheduleFix
 
-      if (esecs >= today.schedule[i].begin && esecs <= today.schedule[i].end) //End time in schedule
-        diff += esecs - today.schedule[i].begin; //diff equal from the schedule between to esecs
+      if (esecs >= today.scheduleFix[i].begin && esecs <= today.scheduleFix[i].end) //End time in scheduleFix
+        diff += esecs - today.scheduleFix[i].begin; //diff equal from the scheduleFix between to esecs
 
-      if (esecs <= today.schedule[i].end) //But the end is before this schedule end
+      if (esecs <= today.scheduleFix[i].end) //But the end is before this scheduleFix end
         break;
       else {
-        diff += today.schedule[i].end - today.schedule[i].begin; //The begin and end of the leavereq is out of the schedule so we add all to the diff
+        diff += today.scheduleFix[i].end - today.scheduleFix[i].begin; //The begin and end of the leavereq is out of the scheduleFix so we add all to the diff
         continue;
       }
     }
 
-    if (ssecs > today.schedule[i].begin && ssecs < today.schedule[i].end) { //The start of the leavereq is superior to the schedule begin but inferior to it's end
-      if (esecs < today.schedule[i].end) { //But the end of the leavereq is inferior to the end of the schedule.
+    if (ssecs > today.scheduleFix[i].begin && ssecs < today.scheduleFix[i].end) { //The start of the leavereq is superior to the scheduleFix begin but inferior to it's end
+      if (esecs < today.scheduleFix[i].end) { //But the end of the leavereq is inferior to the end of the scheduleFix.
         diff += esecs - ssecs; //So we diff from these two dates
         break;
       }
-      diff += today.schedule[i].end - ssecs; //However is the end of the leavereq is superior to the end of the schedule, we diff from the start of the leavereq to the end of the schedule
+      diff += today.scheduleFix[i].end - ssecs; //However is the end of the leavereq is superior to the end of the scheduleFix, we diff from the start of the leavereq to the end of the scheduleFix
       continue;
     }
   }
-  if (diff > today.timeToDo)
-    diff = today.timeToDo; //Never give more than the maximum
+  if (diff > today.timeToDo + global.config.lunch.time)
+    diff = today.timeToDo + global.config.lunch.time; //Never give more than the maximum
   return diff;
 }
 /**
@@ -147,6 +151,56 @@ function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, 
 {
 
 }
+/**
+ * Return if a student is in a leavereq's range
+ * @method checkIfInLeaveReq
+ * @param {Integer} stdid The id a student.
+ * @param {Moment} time The time we want to check for.
+ **/
+function checkIfInLeaveReq(stdid, time) {
+  global.db.all(knex("students").where({
+    id: stdid
+  }).toString(), (err, rows) => {
+    if (err) {
+      log.error(err);
+      return false;
+    }
+    if (rows == undefined)
+      return false;
+    for (var i = 0; i < rows.length; i++) {
+      var momentA = moment(rows[i].dateFrom);
+      var momentB = moment(rows[i].dateTo);
+      if (compareDate(momentA, time) <= 0 && compareDate(momentB, time) >= 0)
+        return true;
+      else
+        return false;
+    }
+  });
+}
+
+function getTimeToRefund(stdid) {
+  var res = 0;
+  var today = config.loadDay(new Date().getDay());
+  global.db.all(knex("leavereq").where({
+    studentid: stdid
+  }).toString(), (err, rows) => {
+    if (err) {
+      log.error(err);
+      return false;
+    }
+    if (rows == undefined)
+      return 0;
+    for (var i = 0; i < rows.length; i++)
+      res += routine(rows[i]);
+    if (res > today.timeToDo + global.config.lunch.time)
+      res = today.timeToDo + global.config.lunch.time);
+    return res;
+  });
+}
+
+
 module.exports = {
+  getTimeToRefund,
+  checkIfInLeaveReq,
   routine
 };
