@@ -810,11 +810,15 @@ function changeStudentClass(stdid, profid) {
     }
   });
 }
-function createLeaveRequest(sDate,eDate,cb) {
-  ipcRenderer.send("createLR", {
+
+function createLeaveRequest(sDate, eDate, cb, id) {
+  var obj = {
     sDate: sDate,
     eDate: eDate
-  });
+  };
+  if (id != undefined)
+    obj.id = id;
+  ipcRenderer.send("createLR", obj);
   ipcRenderer.once("createLR", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -835,6 +839,7 @@ function createLeaveRequest(sDate,eDate,cb) {
     }
   });
 }
+
 function getLRForStudent(tableId, cb) {
   ipcRenderer.send("getLR");
   ipcRenderer.once("getLR", (event, arg) => {
@@ -844,7 +849,41 @@ function getLRForStudent(tableId, cb) {
     switch (arg.error) {
       case window.ERROR.OK:
         var data = [];
-        console.log(arg.data);
+        for (var i = 0; i < arg.data.length; i++) {
+          data.push({
+            id: arg.data[i].id,
+            dateFrom: arg.data[i].dateFrom,
+            dateTo: arg.data[i].dateTo,
+            acpt: arg.data[i].acpt
+          });
+        }
+        $('#' + tableId).bootstrapTable('load', data);
+
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+
+  });
+}
+
+function getLR(tableId, cb) {
+  console.log(window.SCOPE.ALL);
+  ipcRenderer.send("getLR", window.SCOPE.ALL);
+  ipcRenderer.once("getLR", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
         for (var i = 0; i < arg.data.length; i++) {
           data.push({
             id: arg.data[i].id,

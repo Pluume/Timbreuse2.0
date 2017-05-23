@@ -313,6 +313,54 @@ function validateStudentCreateLeaveRequest() {
 
 }
 
+function validateProfCreateLeaveRequest() {
+  $("#addLeaveRequestForm").validate({
+
+    rules: {
+      csdate: {
+        validDateTime: true
+      },
+      cedate: {
+        validDateTime: true
+      }
+    },
+    messages: {
+      csdate: {
+        validDateTime: "Date format DD-MM-YYYY hh:mm",
+        required: "This field is required"
+      },
+      cedate: {
+        validDateTime: "Date format DD-MM-YYYY hh:mm",
+        required: "This field is required"
+      }
+    },
+    errorPlacement: function(error, element) {
+      $(element).closest('.form-group').find('.help-block').html(error.html());
+    },
+    highlight: function(element) {
+      $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+    },
+    unhighlight: function(element, errorClass, validClass) {
+      $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+      $(element).closest('.form-group').find('.help-block').html('');
+    },
+
+    submitHandler: function(form) {
+      var date1, date2;
+      date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
+      date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
+      var studentID = $("#stdListSelect").val();
+      createLeaveRequest(date1, date2, () => {
+        getLR("LRTable", () => {
+
+        });
+      }, studentID);
+      $("#addLeaveRequest").modal("hide");
+    }
+  });
+
+}
+
 function activateValidator() {
   // name validation
   var nameregex = /^[a-zA-Z \-]+$/;
@@ -350,5 +398,7 @@ function activateValidator() {
     validateEditProf();
   } else if (require('electron').remote.getGlobal('currentPage') == window.PAGES.LEAVEREQ_STUDENT) {
     validateStudentCreateLeaveRequest();
+  } else if (require('electron').remote.getGlobal('currentPage') == window.PAGES.LEAVEREQ_PROF) {
+    validateProfCreateLeaveRequest();
   }
 }

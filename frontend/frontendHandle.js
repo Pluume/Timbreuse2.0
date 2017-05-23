@@ -514,6 +514,7 @@ function changeStudentClass(event, arg) {
     }
   });
 }
+
 function createLeaveRequest(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CREATELR,
@@ -521,6 +522,8 @@ function createLeaveRequest(event, arg) {
     sDate: arg.sDate,
     eDate: arg.eDate
   }];
+  if(arg.id!=undefined)
+  oreq[0].id = arg.id;
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
@@ -533,11 +536,14 @@ function createLeaveRequest(event, arg) {
     }
   });
 }
-function getLeaveRequestForStudent(event, arg) {
+
+function getLeaveRequest(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETLR,
     error: request.ERROR.OK
   }];
+  if (arg != undefined)
+    oreq[0].scope = arg;
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
@@ -578,5 +584,5 @@ ipcMain.on("editprof", editProf);
 ipcMain.on("changepassword", changePassword);
 ipcMain.on("getclasslist", getClassList);
 ipcMain.on("changestdclass", changeStudentClass);
-ipcMain.on("createLR",createLeaveRequest);
-ipcMain.on("getLR",getLeaveRequestForStudent);
+ipcMain.on("createLR", createLeaveRequest);
+ipcMain.on("getLR", getLeaveRequest);

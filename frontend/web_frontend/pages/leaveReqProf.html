@@ -57,9 +57,11 @@
     function actionFormatter(val, row) {
       return "";
     }
+
     function acptFormatter(val, row) {
       return "";
     }
+
     function timeFormatter(val) {
       return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:mm");
     }
@@ -69,9 +71,27 @@
         selector: '[data-toggle=tooltip]'
       });
       activateValidator();
-      getLRForStudent("LRTable", () => {
+      getStudent(window.SCOPE.UNIQUE, (arg) => {
+        var students = arg.students;
+        var selector = document.createElement("select");
+        selector.setAttribute("class", "form-control");
+        selector.setAttribute("id", "stdListSelect");
+        console.log(students);
+        for (var i = 0; i < students.length; i++) {
+          var nopt = document.createElement("option");
+          nopt.innerHTML = students[i].user.fname + " " + students[i].user.lname + " (" + students[i].user.username + ")";
+          nopt.setAttribute("value", students[i].id);
+          if (i == 0)
+            nopt.setAttribute("selected", "");
+          selector.appendChild(nopt);
+        }
+        document.getElementById("stdListSelect").outerHTML = selector.outerHTML;
+        getLR("LRTable", () => {
 
+        });
       });
+
+
     });
   </script>
   <div class="modal fade" id="addLeaveRequest" tabindex="-1" role="dialog" aria-labelledby="addLeaveRequest" aria-hidden="true">
@@ -82,6 +102,10 @@
             <h2 class="modal-title" id="addLeaveRequestTitle">Create a new leave application</h2>
           </div>
           <div class="modal-body">
+            <div id="fgcstdid" class="form-group">
+              <label for="cstdid" class="form-control-label">The student</label>
+              <select id="stdListSelect"></select>
+            </div>
             <div id="fgcsdate" class="form-group">
               <label for="csdate" class="form-control-label">Begin date : </label>
               <input type="text" class="form-control" name="csdate" id="csdate">
@@ -96,246 +120,6 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="cancelForm('#addLeaveRequestForm');" data-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-success">Create</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="editStudentTimeModal" tabindex="-1" role="dialog" aria-labelledby="editStudentTimeModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="editStudentTimeModalTitle">Edit student's time</h2>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="radio">
-              <label for="settime_group"><input id="settime_radio" group="editTime" checked type="radio" name="optradio">Set time</label>
-              <div id="settime_group">
-                <div display="inline-block">
-                  <label for="settime_hours">Hours</label>
-                  <input id="settime_hours" class="form-control" group="editTime" type="number" value="0">
-                </div>
-                <div display="inline-block">
-                  <label for="settime_minutes">Minutes</label>
-                  <input id="settime_minutes" class="form-control" group="editTime" type="number" value="0">
-                </div>
-              </div>
-            </div>
-            <div class="radio">
-              <label for="modtime_group"><input id="modtime_radio" group="editTime" type="radio" name="optradio">Add/Substract time</label>
-              <div id="modtime_group">
-                <div display="inline-block">
-                  <label for="edittime_hours">Hours</label>
-                  <input id="edittime_hours" class="form-control" disabled="true" group="editTime" type="number" value="0">
-                </div>
-                <div display="inline-block">
-                  <label for="edittime_minutes">Minutes</label>
-                  <input id="edittime_minutes" class="form-control" disabled="true" group="editTime" type="number" value="0">
-                </div>
-              </div>
-            </div>
-            <div class="radio">
-              <label for="resettime_group"><input id="resettime_radio" group="editTime" type="radio" name="optradio">Reset</label>
-            </div>
-            <br />
-            <label for="edittime_comment">Comments</label>
-            <input id="edittime_comment" class="form-control" type="text" value="">
-            <script>
-              $('input[type=radio][group=editTime]').on('change', function() {
-                switch ($(this).attr("id")) {
-                  case 'resettime_radio':
-                    $('#settime_hours').prop("disabled", true);
-                    $('#settime_minutes').prop("disabled", true);
-                    $('#edittime_hours').prop("disabled", true);
-                    $('#edittime_minutes').prop("disabled", true);
-                    break;
-                  case 'modtime_radio':
-                    $('#settime_hours').prop("disabled", true);
-                    $('#settime_minutes').prop("disabled", true);
-                    $('#edittime_hours').prop("disabled", false);
-                    $('#edittime_minutes').prop("disabled", false);
-                    break;
-                  case 'settime_radio':
-                    $('#settime_hours').prop("disabled", false);
-                    $('#settime_minutes').prop("disabled", false);
-                    $('#edittime_hours').prop("disabled", true);
-                    $('#edittime_minutes').prop("disabled", true);
-                    break;
-                }
-              });
-
-              function preSubmitEditTimeModal() {
-                $('#editStudentTimeModal').modal('toggle');
-                if (document.getElementById("resettime_radio").checked) {
-                  resetTime(stdToApply);
-                  return;
-                } else if (document.getElementById("modtime_radio").checked) {
-                  var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
-                  if (isNaN(time))
-                    time = 0;
-                  modTime(stdToApply, time, "Comments not included for now");
-                  return;
-                } else if (document.getElementById("settime_radio").checked) {
-                  var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;
-                  if (isNaN(time))
-                    time = 0;
-                  setTime(stdToApply, time)
-                  return;
-                }
-              }
-            </script>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" onclick="preSubmitEditTimeModal();" class="btn btn-success">Apply</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="advancedOptionsModal" tabindex="-1" role="dialog" aria-labelledby="advancedOptionsModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="eadvancedOptionsModalTitle">Advanced options :</h2>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="radio">
-              <label for="setabsent_radio"><input id="setabsent_radio" group="advancedoptions" name="advancedoptions" checked type="radio">Set absent</label>
-            </div>
-            <div class="radio">
-              <label for="setfixed_radio"><input id="setfixed_radio" group="advancedoptions" name="advancedoptions" type="radio">Toggle fixed</label>
-            </div>
-            <div class="radio">
-              <label for="tag_radio"><input id="tag_radio" group="advancedoptions" name="advancedoptions" type="radio">Tag</label>
-            </div>
-            <br />
-            <label for="advancedoptions_comment">Comments</label>
-            <input id="advancedoptions_comment" class="form-control" type="text" value="">
-            <script>
-              $('input[type=radio][group=advancedoptions]').on('change', function() {
-                switch ($(this).attr("id")) {
-
-                }
-              });
-            </script>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" onclick="submitAdvancedOptionsModal();" class="btn btn-success">Apply</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="delStudentModal" tabindex="-1" role="dialog" aria-labelledby="delStudentModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title" id="delStudentModalTitle">Are you sure to delete this/these student(s) ?</h2>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" onclick="submitDeleteModal();" class="btn btn-danger">Delete</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .modal-dialogMax {
-      width: 98%;
-      height: 98%;
-      padding: 0;
-      margin: 1%;
-    }
-
-    .modal-contentMax {
-      height: 100%;
-      border-radius: 0;
-    }
-  </style>
-  <div class="modal fade" id="detailsStudentModal" tabindex="-1" role="dialog" aria-labelledby="detailsStudentModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialogMax" role="document">
-      <div class="modal-content modal-contentMax">
-        <div class="modal-header">
-          <h2 class="modal-title" id="detailsStudentModalTitle"></h2>
-        </div>
-        <div class="modal-body">
-          <div id="detailsCalendar"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="closeDetailsModal();" data-dismiss="modal">Ok</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <form id="editStudentForm">
-          <div class="modal-header">
-            <h2 class="modal-title" id="editStudentModalTitle">Edit this student</h2>
-          </div>
-          <div class="modal-body">
-
-            <div id="fgetclass" class="form-group">
-              <label for="etclass" class="form-control-label">Class : </label>
-              <input type="text" class="form-control" readonly id="etclass">
-            </div>
-            <div id="fgecfname" class="form-group">
-              <label for="efname" class="form-control-label">First name :</label>
-              <input type="text" class="form-control" name="efname" id="efname">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgelname" class="form-group">
-              <label for="elname" class="form-control-label">Last name:</label>
-              <input type="text" class="form-control" name="elname" id="elname">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgeusername" class="form-group">
-              <label for="eusername" class="form-control-label">Username :</label>
-              <input type="text" class="form-control" name="eusername" id="eusername">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgedob" class="form-group">
-              <label for="edob" class="form-control-label">Date of birth:</label>
-              <input type="text" class="form-control" name="edob" id="edob">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgeemail" class="form-group">
-              <label for="eemail" class="form-control-label">Email :</label>
-              <input type="text" class="form-control" name="eemail" id="eemail">
-              <span class="help-block" id="error"></span>
-            </div>
-
-
-            <div id="fgetag" class="form-group">
-              <label for="etag" class="form-control-label">Tag :</label>
-              <input type="text" class="form-control" name="etag" id="etag">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgeproject" class="form-group">
-              <label for="eproject" class="form-control-label">Project :</label>
-              <input type="text" class="form-control" id="eproject">
-              <span class="help-block" id="error"></span>
-            </div>
-            <div id="fgepass" class="form-group">
-              <div class="checkbox">
-                <label>
-                                  <input id="epass" type="checkbox" value="Reset password">Reset password
-                              </label>
-              </div>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <input type="hidden" id="editStudentID" value="" />
-            <button type="button" class="btn btn-secondary" onclick="cancelForm('#editStudentForm');" data-dismiss="modal">Close</button>
-            <button type="submit" id="updateSubmit" class="btn btn-primary">Update</button>
           </div>
         </form>
       </div>

@@ -62,7 +62,6 @@
 
           getStudentsAll((students) => {
             var data = [];
-            var lodash = require("electron").remote.require("lodash");
             for (var i = 0; i < students.length; i++) {
               var listSelector = document.createElement("div");
               listSelector.setAttribute("class", "form-group");

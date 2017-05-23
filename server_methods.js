@@ -1635,25 +1635,43 @@ function createLeaveRequest(conn, ireq) {
     log.error("Ill formed request");
     return;
   }
-  global.db.get(knex("students").select().where({
-    userid: conn.user.id
-  }).toString(), (err, row) => {
-    if (err) {
-      log.error("Error : " + err);
+  if(ireq.id == undefined)
+  {
+    global.db.get(knex("students").select().where({
+      userid: conn.user.id
+    }).toString(), (err, row) => {
+      if (err) {
+        log.error("Error : " + err);
 
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
-    if (row == undefined) {
-      log.error("Error : Unkown student");
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      if (row == undefined) {
+        log.error("Error : Unkown student");
 
-      oreq.error = request.ERROR.UNKNOWN;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
+        oreq.error = request.ERROR.UNKNOWN;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      global.db.run(knex("leavereq").insert({
+        studentid: row.id,
+        dateFrom: ireq.sDate,
+        dateTo: ireq.eDate
+      }).toString(), (err) => {
+        if (err) {
+          log.error("Error : " + err);
+
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+      });
+    });
+  } else {
     global.db.run(knex("leavereq").insert({
-      studentid: row.id,
+      studentid: ireq.id,
       dateFrom: ireq.sDate,
       dateTo: ireq.eDate
     }).toString(), (err) => {
@@ -1665,8 +1683,9 @@ function createLeaveRequest(conn, ireq) {
         return;
       }
       conn.socket.write(JSON.stringify(oreq) + "\0");
-    })
-  });
+    });
+  }
+
 }
 /**
  * Get the leave req for the connected user
@@ -1680,35 +1699,70 @@ function getLeaveRequest(conn, ireq) {
     log.error("Not logged in");
     return;
   }
-  global.db.get(knex("students").select().where({
-    userid: conn.user.id
-  }).toString(), (err, row) => {
-    if (err) {
-      log.error("Error : " + err);
+  if (ireq.scope != undefined) {
+    global.db.all(knex("students").select().where({
+        profid: conn.user.id
+      }).toString(), (err, rows0) => {
+        if (err) {
+          log.error("Error : " + err);
 
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
-    if (row == undefined) {
-      log.error("Error : Unkown student");
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        if (rows0 == undefined) {
+          log.warning("Warning : No students");
 
-      oreq.error = request.ERROR.UNKNOWN;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
-    global.db.all(knex("leavereq").select().toString(), (err, rows) => {
-      if (err) {
-        log.error("Error : " + err);
+          oreq.data = [];
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        var idList = [];
+        for(var i = 0;i<rows0.length;i++)
+          idList.push(rows0[i].id);
+        global.db.all(knex("leavereq").select().where("studentid","in",idList).toString(), (err, rows) => {
+          if (err) {
+            log.error("Error : " + err);
 
-        oreq.error = request.ERROR.SQLITE;
-        conn.socket.write(JSON.stringify(oreq) + "\0");
-        return;
-      }
-      oreq.data = rows;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-    })
-  });
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq) + "\0");
+            return;
+          }
+          oreq.data = rows;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+        })
+    });
+  } else {
+    global.db.get(knex("students").select().where({
+        userid: conn.user.id
+      }).toString(), (err, row) => {
+        if (err) {
+          log.error("Error : " + err);
+
+          oreq.error = request.ERROR.SQLITE;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        if (row == undefined) {
+          log.error("Error : Unkown student");
+
+          oreq.error = request.ERROR.UNKNOWN;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        global.db.all(knex("leavereq").select().where({studentid: row.id}).toString(), (err, rows) => {
+          if (err) {
+            log.error("Error : " + err);
+
+            oreq.error = request.ERROR.SQLITE;
+            conn.socket.write(JSON.stringify(oreq) + "\0");
+            return;
+          }
+          oreq.data = rows;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+        })
+    });
+  }
 }
 /**
  * Sort the incoming request. Redirect the request to the correct function.
