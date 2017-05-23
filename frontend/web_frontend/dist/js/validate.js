@@ -75,11 +75,12 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
   });
 
 }
+
 function validateCreateProf() { // http://demos.codingcage.com/bs-form-validation/
   $("#addProfModalForm").validate({
 
     rules: {
-      ctclass:{
+      ctclass: {
         required: true,
         validName: true
       },
@@ -149,6 +150,7 @@ function validateCreateProf() { // http://demos.codingcage.com/bs-form-validatio
   });
 
 }
+
 function validateEditStd() {
   $("#editStudentForm").validate({
 
@@ -204,6 +206,7 @@ function validateEditStd() {
   });
 
 }
+
 function validateEditProf() {
   $("#editProfModalForm").validate({
 
@@ -256,14 +259,60 @@ function validateEditProf() {
     },
 
     submitHandler: function(form) {
-      console.log("HA");
-      console.log($(form).find('#editProfId').attr('value'));
       editProfSubmit($(form).find('#editProfId').attr('value'));
       $("#editProfModal").modal("hide");
     }
   });
 
 }
+
+function validateStudentCreateLeaveRequest() {
+  $("#addLeaveRequestForm").validate({
+
+    rules: {
+      csdate: {
+        validDateTime: true
+      },
+      cedate: {
+        validDateTime: true
+      }
+    },
+    messages: {
+      csdate: {
+        validDateTime: "Date format DD-MM-YYYY hh:mm",
+        required: "This field is required"
+      },
+      cedate: {
+        validDateTime: "Date format DD-MM-YYYY hh:mm",
+        required: "This field is required"
+      }
+    },
+    errorPlacement: function(error, element) {
+      $(element).closest('.form-group').find('.help-block').html(error.html());
+    },
+    highlight: function(element) {
+      $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+    },
+    unhighlight: function(element, errorClass, validClass) {
+      $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+      $(element).closest('.form-group').find('.help-block').html('');
+    },
+
+    submitHandler: function(form) {
+      var date1, date2;
+      date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
+      date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
+      createLeaveRequest(date1, date2, () => {
+        getLRForStudent("LRTable", () => {
+
+        });
+      });
+      $("#addLeaveRequest").modal("hide");
+    }
+  });
+
+}
+
 function activateValidator() {
   // name validation
   var nameregex = /^[a-zA-Z \-]+$/;
@@ -282,6 +331,9 @@ function activateValidator() {
   $.validator.addMethod("validDate", function(value, element) {
     return this.optional(element) || moment(value, "DD-MM-YYYY", true).isValid();
   });
+  $.validator.addMethod("validDateTime", function(value, element) {
+    return this.optional(element) || moment(value, "DD-MM-YYYY H:mm", true).isValid();
+  });
 
   $.validator.addMethod("validTime", function(value, element) {
     return this.optional(element) || moment(value, "HH:MM").isValid();
@@ -290,13 +342,13 @@ function activateValidator() {
   $.validator.addMethod("validUsername", function(value, element) {
     return this.optional(element) || usernameregex.test(value);
   });
-
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS) {
     validateCreateStd();
     validateEditStd();
-  } else if(require('electron').remote.getGlobal('currentPage') == window.PAGES.ADMIN)
-  {
+  } else if (require('electron').remote.getGlobal('currentPage') == window.PAGES.ADMIN) {
     validateCreateProf();
     validateEditProf();
+  } else if (require('electron').remote.getGlobal('currentPage') == window.PAGES.LEAVEREQ_STUDENT) {
+    validateStudentCreateLeaveRequest();
   }
 }

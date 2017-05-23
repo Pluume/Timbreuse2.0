@@ -48,12 +48,7 @@ function endOfDay() {
       }
 
     }
-    if (row.status != global.STATUS.ABS) { //FIXME 
-      ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60)); //Substract time in case of missed pause
-      if (dayConfig.lunch)
-        ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
-    }
-    if (!row.hadLunch && row.status != global.STATUS.ABS && dayConfig.lunch)
+    if (!row.hadLunch && row.status != global.STATUS.ABS && dayConfig.lunch && !hd.isTodayOff)
       log.save(global.LOGS.NOLUNCH, row.id, "SERVER", null, "", row.timeDiff, row.timeDiffToday);
     var ndetails;
     try {
@@ -65,9 +60,9 @@ function endOfDay() {
         month: []
       };
     }
-    if(hd.isTodayOff)
-    {
+    if (hd.isTodayOff) {
       ntimeDiff = row.timeDiff + row.timeDiffToday;
+      ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60));
       log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Holidays) ", ntimeDiff, 0);
     } else {
       ndetails.day.push({
@@ -86,8 +81,17 @@ function endOfDay() {
           timeDiff: ntimeDiff
         });
       }
-      ntimeDiff += lr.getTimeToRefund(row.id);
-      log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed", ntimeDiff, 0);
+      if (row.status != global.STATUS.ABS)
+      {
+        ntimeDiff -= (row.missedPause <= 0) ? 0 : (row.missedPause * (20 * 60));
+        ntimeDiff += lr.getTimeToRefund(row.id);
+        if (dayConfig.lunch)
+          ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
+          log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed", ntimeDiff, 0);
+      } else {
+        log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Absent)", ntimeDiff, 0);
+      }
+
     }
     //TODO Notification on student's status == IN at end of day
     global.db.run(knex("students").where("id", row.id).update({

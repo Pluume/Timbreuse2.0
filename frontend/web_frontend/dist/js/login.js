@@ -26,6 +26,9 @@ function login(user, pass) {
           case window.RANK.ADMIN:
             ipcRenderer.send("redirect", window.PAGES.ADMIN);
             break;
+          case window.RANK.STUDENT:
+            ipcRenderer.send("redirect", window.PAGES.STUDENT);
+            break;
           default:
             redAlert("Ill formed request...");
         }

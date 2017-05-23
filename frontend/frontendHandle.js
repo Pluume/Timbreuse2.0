@@ -61,8 +61,11 @@ function redirect(event, arg) {
     case request.PAGES.PROFS:
       global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/index.html'));
       break;
-      case request.PAGES.ADMIN:
+    case request.PAGES.ADMIN:
       global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/indexAdmin.html'));
+      break;
+    case request.PAGES.STUDENT:
+      global.mwin.loadURL("file://" + path.join(__dirname, 'web_frontend/pages/indexStudent.html'));
       break;
   }
 }
@@ -315,6 +318,7 @@ function toggleNotification(event, arg) {
 
   client.send(JSON.stringify(oreq), (err, data) => {});
 }
+
 function getHolidays(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETHOLIDAYS,
@@ -355,6 +359,7 @@ function addHolidays(event, arg) {
     }
   });
 }
+
 function delHolidays(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.DELHOLIDAYS,
@@ -373,8 +378,8 @@ function delHolidays(event, arg) {
     }
   });
 }
-function logout(event, arg)
-{
+
+function logout(event, arg) {
   client.disconnect();
 }
 
@@ -395,6 +400,7 @@ function getProf(event, arg) {
     }
   });
 }
+
 function addProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CREATEPROF,
@@ -413,6 +419,7 @@ function addProf(event, arg) {
     }
   });
 }
+
 function delProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.DELPROF,
@@ -431,6 +438,7 @@ function delProf(event, arg) {
     }
   });
 }
+
 function editProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.EDITPROF,
@@ -449,6 +457,7 @@ function editProf(event, arg) {
     }
   });
 }
+
 function changePassword(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CHANGEPASS,
@@ -467,6 +476,7 @@ function changePassword(event, arg) {
     }
   });
 }
+
 function getClassList(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETCLASSLIST,
@@ -484,6 +494,7 @@ function getClassList(event, arg) {
     }
   });
 }
+
 function changeStudentClass(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CHANGECLASS,
@@ -503,7 +514,42 @@ function changeStudentClass(event, arg) {
     }
   });
 }
-
+function createLeaveRequest(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CREATELR,
+    error: request.ERROR.OK,
+    sDate: arg.sDate,
+    eDate: arg.eDate
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("createLR", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+function getLeaveRequestForStudent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETLR,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("getLR", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -530,5 +576,7 @@ ipcMain.on("addprof", addProf);
 ipcMain.on("delprof", delProf);
 ipcMain.on("editprof", editProf);
 ipcMain.on("changepassword", changePassword);
-ipcMain.on("getclasslist",getClassList);
-ipcMain.on("changestdclass",changeStudentClass);
+ipcMain.on("getclasslist", getClassList);
+ipcMain.on("changestdclass", changeStudentClass);
+ipcMain.on("createLR",createLeaveRequest);
+ipcMain.on("getLR",getLeaveRequestForStudent);

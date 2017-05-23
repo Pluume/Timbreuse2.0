@@ -1604,11 +1604,6 @@ function changeStudentClass(conn, ireq) {
     log.error("Ill formed request");
     return;
   }
-  console.log(knex("students").update({
-    profid: ireq.profid
-  }).where({
-    id: ireq.stdid
-  }).toString());
   global.db.run(knex("students").update({
     profid: ireq.profid
   }).where({
@@ -1622,6 +1617,97 @@ function changeStudentClass(conn, ireq) {
       return;
     } else
       conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+/**
+ * Create a new leave application
+ * @method createLeaveRequest
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function createLeaveRequest(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
+    log.error("Not logged in");
+    return;
+  }
+  if (ireq.sDate == undefined || ireq.eDate == undefined) {
+    log.error("Ill formed request");
+    return;
+  }
+  global.db.get(knex("students").select().where({
+    userid: conn.user.id
+  }).toString(), (err, row) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (row == undefined) {
+      log.error("Error : Unkown student");
+
+      oreq.error = request.ERROR.UNKNOWN;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    global.db.run(knex("leavereq").insert({
+      studentid: row.id,
+      dateFrom: ireq.sDate,
+      dateTo: ireq.eDate
+    }).toString(), (err) => {
+      if (err) {
+        log.error("Error : " + err);
+
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+    })
+  });
+}
+/**
+ * Get the leave req for the connected user
+ * @method getLeaveRequest
+ * @param {Object} conn a JSON object containing a socket connection and an userid variable.
+ * @param {Object} ireq a JSON object containing the request.
+ **/
+function getLeaveRequest(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined) {
+    log.error("Not logged in");
+    return;
+  }
+  global.db.get(knex("students").select().where({
+    userid: conn.user.id
+  }).toString(), (err, row) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    if (row == undefined) {
+      log.error("Error : Unkown student");
+
+      oreq.error = request.ERROR.UNKNOWN;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    global.db.all(knex("leavereq").select().toString(), (err, rows) => {
+      if (err) {
+        log.error("Error : " + err);
+
+        oreq.error = request.ERROR.SQLITE;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      oreq.data = rows;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+    })
   });
 }
 /**
@@ -1749,6 +1835,12 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.CHANGECLASS:
         changeStudentClass(connection, ireq[i]);
+        break;
+      case request.REQUEST.CREATELR:
+        createLeaveRequest(connection, ireq[i]);
+        break;
+      case request.REQUEST.GETLR:
+        getLeaveRequest(connection, ireq[i]);
         break;
     }
   }

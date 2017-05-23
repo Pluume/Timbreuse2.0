@@ -1,7 +1,6 @@
 var log = require("./log.js");
 var moment = require("moment");
 
-const wait = require("deasync").sleep(10);
 const async = require("async");
 const config = require("./config.js");
 const math = require("./math.js");
@@ -193,7 +192,7 @@ function getTimeToRefund(stdid) {
     for (var i = 0; i < rows.length; i++)
       res += routine(rows[i]);
     if (res > today.timeToDo + global.config.lunch.time)
-      res = today.timeToDo + global.config.lunch.time);
+      res = today.timeToDo + global.config.lunch.time;
     return res;
   });
 }
