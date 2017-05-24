@@ -811,10 +811,15 @@ function changeStudentClass(stdid, profid) {
   });
 }
 
-function createLeaveRequest(sDate, eDate, cb, id) {
+function createLeaveRequest(sDate, eDate, missedTest, reason, reasonDesc, proof, where, cb, id) {
   var obj = {
     sDate: sDate,
-    eDate: eDate
+    eDate: eDate,
+    missedTest: missedTest,
+    reason: reason,
+    reasonDesc: reasonDesc,
+    proof: proof,
+    where: where
   };
   if (id != undefined)
     obj.id = id;

@@ -219,7 +219,6 @@ function getLogs(event, arg) {
   }];
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
-
       var ireq = JSON.parse(data);
       if (ireq.fnc != oreq[0].fnc)
         return;
@@ -520,7 +519,12 @@ function createLeaveRequest(event, arg) {
     fnc: request.REQUEST.CREATELR,
     error: request.ERROR.OK,
     sDate: arg.sDate,
-    eDate: arg.eDate
+    eDate: arg.eDate,
+    missedTest: arg.missedTest,
+    reason: arg.reason,
+    reasonDesc: arg.reasonDesc,
+    proof: arg.proof,
+    where: arg.where
   }];
   if(arg.id!=undefined)
   oreq[0].id = arg.id;

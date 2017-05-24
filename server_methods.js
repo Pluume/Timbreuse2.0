@@ -1657,7 +1657,13 @@ function createLeaveRequest(conn, ireq) {
       global.db.run(knex("leavereq").insert({
         studentid: row.id,
         dateFrom: ireq.sDate,
-        dateTo: ireq.eDate
+        dateTo: ireq.eDate,
+        acpt: 0,
+        missedTest: (ireq.missedTest ? 1:0),
+        reason: ireq.reason,
+        reasonDesc: ireq.reasonDesc,
+        proof: ireq.proof,
+        where: ireq.where
       }).toString(), (err) => {
         if (err) {
           log.error("Error : " + err);
@@ -1673,7 +1679,13 @@ function createLeaveRequest(conn, ireq) {
     global.db.run(knex("leavereq").insert({
       studentid: ireq.id,
       dateFrom: ireq.sDate,
-      dateTo: ireq.eDate
+      dateTo: ireq.eDate,
+      acpt: 1,
+      missedTest: (ireq.missedTest ? 1:0),
+      reason: ireq.reason,
+      reasonDesc: ireq.reasonDesc,
+      proof: ireq.proof,
+      where: ireq.where
     }).toString(), (err) => {
       if (err) {
         log.error("Error : " + err);

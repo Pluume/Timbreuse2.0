@@ -69,7 +69,6 @@ function routine(res) {
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateTo).format("DD/MM/YYYY")) === 1) // If has passed
   {
-    //TODO DELETE THE RECORD
     return diff; //Return nothing
   }
   if (compareDate(moment().format("DD/MM/YYYY"), moment(res.dateFrom).format("DD/MM/YYYY")) === 1) // If has started precedently
@@ -86,7 +85,6 @@ function routine(res) {
 
       if (esecs >= today.scheduleFix[i].begin && esecs <= today.scheduleFix[i].end) //End time in scheduleFix
         diff += esecs - today.scheduleFix[i].begin; //diff equal from the scheduleFix between to esecs
-
       if (esecs <= today.scheduleFix[i].end) //But the end is before this scheduleFix end
         break;
       else {
@@ -94,14 +92,15 @@ function routine(res) {
         continue;
       }
     }
-
     if (ssecs > today.scheduleFix[i].begin && ssecs < today.scheduleFix[i].end) { //The start of the leavereq is superior to the scheduleFix begin but inferior to it's end
       if (esecs < today.scheduleFix[i].end) { //But the end of the leavereq is inferior to the end of the scheduleFix.
         diff += esecs - ssecs; //So we diff from these two dates
         break;
       }
+
       diff += today.scheduleFix[i].end - ssecs; //However is the end of the leavereq is superior to the end of the scheduleFix, we diff from the start of the leavereq to the end of the scheduleFix
       continue;
+
     }
   }
   if (diff > today.timeToDo + global.config.lunch.time)
@@ -177,23 +176,27 @@ function checkIfInLeaveReq(stdid, time) {
   });
 }
 
-function getTimeToRefund(stdid) {
+function getTimeToRefund(stdid, cb) {
   var res = 0;
   var today = config.loadDay(new Date().getDay());
-  global.db.all(knex("leavereq").where({
-    studentid: stdid
+  global.db.all(knex("leavereq").select().where({
+    studentid: stdid,
+    acpt: 1
   }).toString(), (err, rows) => {
     if (err) {
       log.error(err);
-      return false;
+      cb(0);
     }
     if (rows == undefined)
-      return 0;
+      cb(0);
     for (var i = 0; i < rows.length; i++)
+    {
       res += routine(rows[i]);
+    }
+
     if (res > today.timeToDo + global.config.lunch.time)
       res = today.timeToDo + global.config.lunch.time;
-    return res;
+    cb(res);
   });
 }
 

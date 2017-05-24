@@ -3,10 +3,10 @@
   "csvFreq": 0,
   "server": "172.21.201.254",
   "defaultPass": "test",
-  "slaves": [
-  {"ip":"172.21.201.255","name":"YE-S1c"
-  }
-  ],
+  "slaves": [{
+    "ip": "172.21.201.255",
+    "name": "YE-S1c"
+  }],
   "lunch": {
     "begin": 41400,
     "end": 48600,
@@ -39,14 +39,14 @@
         }
       ],
       "scheduleFix": [{
-        "begin": 28800,
-        "end": 44400
-      },
-	  {
-        "begin": 47100,
-        "end": 60000
-      }
-	  ]
+          "begin": 28800,
+          "end": 44400
+        },
+        {
+          "begin": 47100,
+          "end": 60000
+        }
+      ]
     },
     {
       "name": "tuesday",
@@ -62,14 +62,14 @@
         }
       ],
       "scheduleFix": [{
-        "begin": 28800,
-        "end": 44400
-      },
-	  {
-        "begin": 47100,
-        "end": 60000
-      }
-	  ]
+          "begin": 28800,
+          "end": 44400
+        },
+        {
+          "begin": 47100,
+          "end": 60000
+        }
+      ]
     },
     {
       "name": "wednesday",
@@ -92,23 +92,23 @@
         }
       ],
       "scheduleFix": [{
-        "begin": 28800,
-        "end": 44400
-      },
-	  {
-        "begin": 47100,
-        "end": 60000
-      }
-	  ]
+          "begin": 28800,
+          "end": 44400
+        },
+        {
+          "begin": 47100,
+          "end": 60000
+        }
+      ]
     },
     {
       "name": "friday",
       "timeToDo": 14400,
       "launch": 0,
       "schedule": [{
-          "begin": 32400,
-          "end": 41400
-        }],
+        "begin": 32400,
+        "end": 41400
+      }],
       "scheduleFix": [{
         "begin": 28800,
         "end": 44400

@@ -8,7 +8,7 @@ var knex = require('knex')({
   client: 'sqlite3',
   useNullAsDefault: true
 });
-var sqlite = require("sqlite3");
+var sqlite = require('sqlite3');
 var handle;
 const async = require("async");
 const path = require("path");
@@ -191,6 +191,7 @@ module.exports = {
         table.string("reasonDesc");
         table.integer("proof");
         table.string("where");
+        table.string("date");
         table.boolean("acpt");
       }).toString());
     });

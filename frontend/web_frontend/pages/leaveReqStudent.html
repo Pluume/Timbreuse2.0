@@ -31,9 +31,13 @@
       <thead>
         <tr>
           <th data-field="state" data-checkbox="true"></th>
-          <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">LeaveReq ID</th>
+          <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">LeaveReq ID</th>
           <th data-field="dateFrom" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Start date</th>
           <th data-field="dateTo" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">End date</th>
+          <th data-field="missedTest" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Missed Test</th>
+          <th data-field="reason" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Reason</th>
+          <th data-field="reasonDesc" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Reason Desc</th>
+          <th data-field="proof" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Proof</th>
           <th data-field="acpt" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="acptFormatter" data-sortable="true">Accepted</th>
           <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="actionFormatter"><span data-toggle='modal' data-target="#addLeaveRequest"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
         </tr>
@@ -57,9 +61,11 @@
     function actionFormatter(val, row) {
       return "";
     }
+
     function acptFormatter(val, row) {
       return "";
     }
+
     function timeFormatter(val) {
       return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:mm");
     }
@@ -92,6 +98,67 @@
               <input type="text" class="form-control" name="cedate" id="cedate">
               <span class="help-block" id="error"></span>
             </div>
+            <div id="fgcmissedTest" class="form-group">
+              <div class="checkbox">
+                <label><input id="cmissedTest" type="checkbox" value="missedTest">Will you miss a test ?</label>
+              </div>
+            </div>
+            <div id="fgcreasons" class="form-group">
+              <label for="reasonBlock" class="form-control-label">Proof</label>
+              <div id="reasonBlock" style="padding-left: 10px; border-size:1px; border-radius: 25px; border-style:solid; border-color:#bdc3c7;">
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="0">Military obligation</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="1">Deceased</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="2">Offical convocation</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="3">Driver liscence appointement</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="4">Sick w/ a medical certificate</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="5">Sick w/o a medical certificate</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="6">Medical treatement</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="reasonradio" value="7" checked>Other</label>
+              </div>
+              </div>
+            </div>
+            <div id="fgcreasonDesc" class="form-group">
+              <label for="creasonDesc" class="form-control-label">Reason description</label>
+              <input type="text" class="form-control" name="creasonDesc" id="creasonDesc">
+              <span class="help-block" id="error"></span>
+            </div>
+            <div id="fgcproof" class="form-group">
+              <label for="proofBlock" class="form-control-label">Proof</label>
+              <div id="proofBlock" style="padding-left: 10px; border-size:1px; border-radius: 25px; border-style:solid; border-color:#bdc3c7;">
+                <div class="radio">
+                  <label><input type="radio" name="proofradio" value="0" checked>None</label>
+                </div>
+                <div class="radio">
+                  <label><input type="radio" name="proofradio" value="1">Medical certificate</label>
+                </div>
+                <div class="radio">
+                  <label><input type="radio" name="proofradio" value="2">Certificate</label>
+                </div>
+                <div class="radio">
+                  <label><input type="radio" name="proofradio" value="3">Copy of the convocation</label>
+                </div>
+              </div>
+            </div>
+            <div id="fgcwhere" class="form-group">
+              <label for="cplace" class="form-control-label">Place</label>
+              <input type="text" class="form-control" name="cplace" id="cplace">
+              <span class="help-block" id="error"></span>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="cancelForm('#addLeaveRequestForm');" data-dismiss="modal">Close</button>
@@ -101,7 +168,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Bootstrap Core JavaScript -->
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 

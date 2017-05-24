@@ -299,10 +299,15 @@ function validateStudentCreateLeaveRequest() {
     },
 
     submitHandler: function(form) {
-      var date1, date2;
+      var date1, date2,missedTest,reason,reasonDesc,proof,where;
       date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
       date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
-      createLeaveRequest(date1, date2, () => {
+      missedTest = document.getElementById("cmissedTest").checked;
+      reason = $('input[name="reasonradio"]:checked').val();
+      reasonDesc = document.getElementById("creasonDesc").value;
+      proof = $('input[name="proofradio"]:checked').val();;
+      where = document.getElementById("cplace").value;
+      createLeaveRequest(date1, date2, missedTest, reason, reasonDesc, proof, where, () => {
         getLRForStudent("LRTable", () => {
 
         });
@@ -346,11 +351,16 @@ function validateProfCreateLeaveRequest() {
     },
 
     submitHandler: function(form) {
-      var date1, date2;
+      var date1, date2,missedTest,reason,reasonDesc,proof,where;
       date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
       date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
       var studentID = $("#stdListSelect").val();
-      createLeaveRequest(date1, date2, () => {
+      missedTest = document.getElementById("cmissedTest").checked;
+      reason = $('input[name="reasonradio"]:checked').val();
+      reasonDesc = document.getElementById("creasonDesc").value;
+      proof = $('input[name="proofradio"]:checked').val();;
+      where = document.getElementById("cplace").value;
+      createLeaveRequest(date1, date2, missedTest, reason, reasonDesc, proof, where, () => {
         getLR("LRTable", () => {
 
         });

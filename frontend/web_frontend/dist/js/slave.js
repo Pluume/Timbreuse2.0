@@ -133,7 +133,7 @@ function showOnline(event, val) {
     var body = document.createElement("div");
     body.setAttribute("class", "panel-body ");
     var loading = document.createElement("img");
-    var imgPath = require('electron').remote.require("path").join(require('electron').remote.getGlobal('mainPath'), "graphics", "unplugedCage.png");
+    var imgPath = require('electron').remote.require("path").join(require('electron').remote.getGlobal('mainPath'), "graphics", "unpluged.png");
     loading.setAttribute("src", imgPath);
     loading.setAttribute("width", "327px");
     loading.setAttribute("height", "250px");
