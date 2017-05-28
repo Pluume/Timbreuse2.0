@@ -1,4 +1,16 @@
-function displayTaggedStudent(event, std) { //TODO Handle std = undefined
+/**
+ * Handle the animation on the slave main page
+ *
+ * @module slave
+ * @class slave
+ */
+/**
+ * Display the student that just Tagged
+ * @method displayTaggedStudent
+ * @param  {event}             event The event object
+ * @param  {Object}             std   The student object
+ */
+function displayTaggedStudent(event, std) {
   var element = document.getElementById('infoPanel');
   if (typeof(element) != 'undefined' && element != null) {
     element.parentNode.removeChild(element);
@@ -67,7 +79,12 @@ function displayTaggedStudent(event, std) { //TODO Handle std = undefined
   panel.appendChild(footer);
   document.getElementById("infoPane").appendChild(panel);
 }
-
+/**
+ * Display the status of the CSV Copying
+ * @method displayCSV
+ * @param  {Event}   event The event object
+ * @param  {Boolean}   val   0 if still being copied, 1 if copied
+ */
 function displayCSV(event, val) {
   var element = document.getElementById('infoPanel');
   if (typeof(element) != 'undefined' && element != null) {
@@ -116,7 +133,12 @@ function displayCSV(event, val) {
   panel.appendChild(footer);
   document.getElementById("infoPane").appendChild(panel);
 }
-
+/**
+ * Display the offline statusGroup
+ * @method showOnline
+ * @param  {Event}   event The event statusGroup
+ * @param  {Interger}   val   If 0 then display has disconnected, if 1 remove the disconnected panel
+ */
 function showOnline(event, val) {
   if (!val) {
     var element = document.getElementById('infoPanel');

@@ -1,3 +1,9 @@
+/**
+ * Handle the leave applications function
+ *
+ * @module leavereq
+ * @class leavereq
+ */
 var log = require("./log.js");
 var moment = require("moment");
 
@@ -175,7 +181,12 @@ function checkIfInLeaveReq(stdid, time) {
     }
   });
 }
-
+/**
+ * Get the number of second the server needs to give back to a student that has justified his absence
+ * @method getTimeToRefund
+ * @param {Integer} stdid The id a student.
+ * @param {Function} cb Callback called when the function is done processing, with one argument : the number of seconds to refund.
+ **/
 function getTimeToRefund(stdid, cb) {
   var res = 0;
   var today = config.loadDay(new Date().getDay());

@@ -1,17 +1,18 @@
+/**
+ * Some useful function for the frontend process
+ *
+ * @module frontendUtil
+ * @class frontendUtil
+ */
+/**
+ * Log out the current user
+ * @method logout
+ */
 function logout()
 {
   ipcRenderer.send("logout");
 }
-function getNotificationsNumber()
-{
-  //TODO
-  return 0;
-}
-function searchStudent(searchString)
-{
-  return searchString;
-}
-function searchSubmit(event)
+function searchSubmit(event) //TODO Delete
 {
   if(event.keyCode == 13)
   {
@@ -22,7 +23,7 @@ function searchSubmit(event)
   }
 }
 
-function emptyInput(arrId)
+function emptyInput(arrId) //Delete
 {
   for(var i = 0; i< arrId.length; i++)
   {
@@ -36,16 +37,22 @@ function emptyInput(arrId)
       }
   }
 }
+/**
+ * Load a new page
+ * @method loadPage
+ * @param  {Interger} page The page code
+ */
 function loadPage(page)
 {
   document.getElementById("MainIFrame").src = page;
 }
-function resizeToClient()
+
+function resizeToClient() //TODO Delete
 {
   document.getElementById("MainIFrame").style.height = document.body.clientHeight + "px";
 }
 
-function resizeIFrame() {
+function resizeIFrame() {//TODO Delete
     document.getElementById("MainIFrame").style.height = (document.body.clientHeight - document.getElementById("MainIFrame").offsetTop) + "px";
 }
-window.onload = function () { resizeIFrame(); }
+window.onload = function () { resizeIFrame(); }//TODO Delete

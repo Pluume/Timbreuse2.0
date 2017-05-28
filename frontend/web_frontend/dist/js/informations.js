@@ -1,7 +1,16 @@
+/**
+ * Handle the communication between electron's renderer process and electron's main process
+ *
+ * @module informations
+ * @class informations
+ */
 const {
   ipcRenderer
 } = require('electron');
-
+/**
+ * Create a random string
+ * @method makeRdmString
+ **/
 function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 {
   var text = "";
@@ -12,7 +21,11 @@ function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/
 
   return text;
 }
-
+/**
+ * Print a red notification on screen
+ * @method redAlert
+ * @param {String} msg The message to display
+ **/
 function redAlert(msg) {
   var message = document.createElement("div");
   message.setAttribute("class", "alert alert-danger");
@@ -33,7 +46,11 @@ function redAlert(msg) {
   }, 15000);
   console.log(msg);
 }
-
+/**
+ * Print a green notification on screen
+ * @method greenAlert
+ * @param {String} msg The message to display
+ **/
 function greenAlert(msg) {
   var message = document.createElement("div");
   message.setAttribute("class", "alert alert-success");
@@ -54,7 +71,11 @@ function greenAlert(msg) {
   }, 5000);
   console.log(msg);
 }
-
+/**
+ * Get the classes
+ * @method getClass
+ * @param {Function} cb Callback function
+ **/
 function getClass(cb) {
   ipcRenderer.once("class", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -78,7 +99,12 @@ function getClass(cb) {
   });
   ipcRenderer.send("class", window.SCOPE.UNIQUE);
 }
-
+/**
+ * Get the students' informations
+ * @method getStudents
+ * @param {String} tableId The bootstrap table in which to load the informations
+ * @param {Function} cb Callback function
+ **/
 function getStudents(tableId, cb) {
   ipcRenderer.send("students", window.SCOPE.UNIQUE);
   ipcRenderer.once("students", (event, arg) => {
@@ -116,7 +142,11 @@ function getStudents(tableId, cb) {
 
   });
 }
-
+/**
+ * Get all the students
+ * @method getStudentsAll
+ * @param {Function} cb Callback function
+ **/
 function getStudentsAll(cb) {
   ipcRenderer.send("students", window.SCOPE.ALL);
   ipcRenderer.once("students", (event, arg) => {
@@ -139,7 +169,12 @@ function getStudentsAll(cb) {
 
   });
 }
-
+/**
+ * Get a student
+ * @method getStudent
+ * @param {Integer} id The student id
+ * @param {Function} cb Callback function
+ **/
 function getStudent(id, cb) {
   ipcRenderer.send("students", id);
   ipcRenderer.once("students", (event, arg) => {
@@ -162,7 +197,19 @@ function getStudent(id, cb) {
 
   });
 }
-
+/**
+ * Create a student in the database
+ * @method createStudent
+ * @param {String} fname The student's first name
+ * @param {String} lname The student's last name
+ * @param {String} username The student's username
+ * @param {String} email The student's email
+ * @param {String} tag The student's tag
+ * @param {String} tclass The student's class
+ * @param {String} dob The student's date of birth
+ * @param {String} project The student's current project
+ * @param {String} tableid The bootstrap table id in which the informations will be loaded
+ **/
 function createStudent(fname, lname, username, email, tag, tclass, dob, project, tableid) {
   var obj = {};
   obj.fname = fname;
@@ -200,7 +247,12 @@ function createStudent(fname, lname, username, email, tag, tclass, dob, project,
   });
   ipcRenderer.send("createStudent", obj);
 }
-
+/**
+ * Delete a student
+ * @method deleteStudent
+ * @param {Integer} id The student id
+ * @param {String} tableid The bootstrap table to update
+ **/
 function deleteStudent(id, tableid) {
 
   ipcRenderer.once("deleteStudent", (event, arg) => {
@@ -224,7 +276,20 @@ function deleteStudent(id, tableid) {
   });
   ipcRenderer.send("deleteStudent", id);
 }
-
+/**
+ * Edit a student in the database
+ * @method editStudent
+ * @param {Interger} id The student's id
+ * @param {String} fname The student's first name
+ * @param {String} lname The student's last name
+ * @param {String} username The student's username
+ * @param {String} email The student's email
+ * @param {String} tag The student's tag
+ * @param {String} tclass The student's class
+ * @param {String} dob The student's date of birth
+ * @param {String} project The student's current project
+ * @param {String} tableid The bootstrap table id in which the informations will be loaded
+ **/
 function editStudent(id, fname, lname, username, email, tag, dob, project, pass, tableid) {
   var obj = {};
   obj.id = id;
@@ -257,7 +322,11 @@ function editStudent(id, fname, lname, username, email, tag, dob, project, pass,
   });
   ipcRenderer.send("editStudent", obj);
 }
-
+/**
+ * Reset the time and last tag time of student to null
+ * @method resetTime
+ * @param  {Interger}  id The student's id
+ */
 function resetTime(id) {
   ipcRenderer.once("resetTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -280,7 +349,13 @@ function resetTime(id) {
   });
   ipcRenderer.send("resetTime", id);
 }
-
+/**
+ * Add/Sub time to a student
+ * @method modTime
+ * @param  {Interger} id       The student's id
+ * @param  {Interger} ntime    The time to add/sub
+ * @param  {String} comments A description
+ */
 function modTime(id, ntime, comments) {
   ipcRenderer.once("modTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -307,7 +382,12 @@ function modTime(id, ntime, comments) {
     comments: comments
   });
 }
-
+/**
+ * Set the time of a student
+ * @method setTime
+ * @param  {Interger} id    The student's id
+ * @param  {Interger} ntime The new time
+ */
 function setTime(id, ntime) {
   ipcRenderer.once("setTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -333,7 +413,12 @@ function setTime(id, ntime) {
     time: ntime
   });
 }
-
+/**
+ * Get the logs of student
+ * @method getLogs
+ * @param  {Interger}   id The student's id
+ * @param  {Function} cb The callback function
+ */
 function getLogs(id, cb) {
   ipcRenderer.once("logs", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -363,7 +448,12 @@ function getLogs(id, cb) {
     id: id
   });
 }
-
+/**
+ * Set an student as absent
+ * @method setAbsent
+ * @param  {Interger}  id       The student's id
+ * @param  {String}  comments A description
+ */
 function setAbsent(id, comments) {
   ipcRenderer.once("absent", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -391,7 +481,12 @@ function setAbsent(id, comments) {
     comments: comments
   });
 }
-
+/**
+ * Tag a student
+ * @method tag
+ * @param  {Interger} id       The student's id
+ * @param  {String} comments A description
+ */
 function tag(id, comments) {
   ipcRenderer.once("tag", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -419,7 +514,12 @@ function tag(id, comments) {
     comments
   });
 }
-
+/**
+ * Toggle a student is fixed schedule or not
+ * @method setFixed
+ * @param  {Interger} id       The student's id
+ * @param  {String} comments A description
+ */
 function setFixed(id, comments) {
   ipcRenderer.once("fixed", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -447,7 +547,12 @@ function setFixed(id, comments) {
     comments: comments
   });
 }
-
+/**
+ * Handle if the server sends update about the currently monitored students
+ * @method onUpdate
+ * @param  {Event} event The event object
+ * @param  {Object} arg   The object containing the informations
+ */
 function onUpdate(event, arg) {
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
   {
@@ -468,7 +573,12 @@ function onUpdate(event, arg) {
   }
 
 }
-
+/**
+ * Get the notifications
+ * @method getNotifications
+ * @param  {Interger}       tableId The table's id in which to put the informations
+ * @param  {Function}       cb      The callback function to call
+ */
 function getNotifications(tableId, cb) {
   ipcRenderer.send("notification", null);
   ipcRenderer.once("notification", (event, arg) => {
@@ -491,11 +601,20 @@ function getNotifications(tableId, cb) {
     }
   });
 }
-
+/**
+ * Toggle the read status of a notification
+ * @method toggleNotification
+ * @param  {Interger}           id The notification's id
+ */
 function toggleNotification(id) {
   ipcRenderer.send("notificationToggle", id);
 }
-
+/**
+ * Handle the incomming notifications
+ * @method onNotificationUpdate
+ * @param  {Event}             event The event object
+ * @param  {Object}             arg   The notification's informations
+ */
 function onNotificationUpdate(event, arg) {
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined && arg.id != undefined) {
     $("#notifTable").bootstrapTable('updateByUniqueId', {
@@ -504,7 +623,12 @@ function onNotificationUpdate(event, arg) {
     });
   }
 }
-
+/**
+ * Append the notification at the beginning of the table
+ * @method onNotificationInsert
+ * @param  {Event}             event The event object
+ * @param  {Object}             arg   The notification's informations
+ */
 function onNotificationInsert(event, arg) {
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.NOTIFICATIONS && arg != undefined) {
     var tmp = [];
@@ -512,7 +636,12 @@ function onNotificationInsert(event, arg) {
     $("#notifTable").bootstrapTable('prepend', tmp);
   }
 }
-
+/**
+ * Delete an holidays object from the database
+ * @method delHolidays
+ * @param  {Interger}    id    The holidays id
+ * @param  {Interger}    calId The calendar's id to update
+ */
 function delHolidays(id, calId) {
   ipcRenderer.send("delHolidays", id);
   ipcRenderer.once("delHolidays", (event, arg) => {
@@ -535,7 +664,11 @@ function delHolidays(id, calId) {
     }
   });
 }
-
+/**
+ * Fetch the holidays from the server
+ * @method getHolidays
+ * @param  {Interger}    calendarId The calendar's id to update
+ */
 function getHolidays(calendarId) {
   ipcRenderer.send("getHolidays", null);
   ipcRenderer.once("getHolidays", (event, arg) => {
@@ -589,7 +722,14 @@ function getHolidays(calendarId) {
 
   });
 }
-
+/**
+ * Create a new holidays object in the database
+ * @method addHolidays
+ * @param  {Interger}    calendarId The calendar's id to update
+ * @param  {String}    title      The event title
+ * @param  {Date}    date1      The start date
+ * @param  {Date}    date2      The end date
+ */
 function addHolidays(calendarId, title, date1, date2) {
   ipcRenderer.send("addHolidays", {
     title: title,
@@ -622,7 +762,12 @@ function addHolidays(calendarId, title, date1, date2) {
     }
   });
 }
-
+/**
+ * Get the professor object in the database
+ * @method getProf
+ * @param  {Interger}   tableId The table's id to update
+ * @param  {Function} cb      The callback function
+ */
 function getProf(tableId, cb) {
   ipcRenderer.send("getprof");
   ipcRenderer.once("getprof", (event, arg) => {
@@ -660,7 +805,18 @@ function getProf(tableId, cb) {
 
   });
 }
-
+/**
+ * Create a new professor
+ * @method createProf
+ * @param  {String}   username The prof's username
+ * @param  {String}   fname    The prof's first name
+ * @param  {String}   lname    The prof's last name
+ * @param  {String}   tag      The prof's tag
+ * @param  {String}   tclass   The prof's class name
+ * @param  {Date}   dob      The prof's date of birth
+ * @param  {String}   email    The prof's email
+ * @param  {Function} cb       The callback function
+ */
 function createProf(username, fname, lname, tag, tclass, dob, email, cb) {
   ipcRenderer.send("addprof", {
     username: username,
@@ -691,7 +847,12 @@ function createProf(username, fname, lname, tag, tclass, dob, email, cb) {
     }
   });
 }
-
+/**
+ * Delete a prof from the database
+ * @method delProf
+ * @param  {Interger}   id The prof'is
+ * @param  {Function} cb The callback function
+ */
 function delProf(id, cb) {
   ipcRenderer.send("delprof", id);
   ipcRenderer.once("delprof", (event, arg) => {
@@ -737,7 +898,12 @@ function editProf(data, cb) {
     }
   });
 }
-
+/**
+ * Change the current user's password
+ * @method changePassword
+ * @param  {Event}       event The event object
+ * @param  {String}       data  The new password
+ */
 function changePassword(event, data) {
   ipcRenderer.send("changepassword", data);
   ipcRenderer.once("changepassword", (event, arg) => {
@@ -759,7 +925,11 @@ function changePassword(event, data) {
     }
   });
 }
-
+/**
+ * Get a list of all the class
+ * @method getClassList
+ * @param  {Function}   cb The callback function
+ */
 function getClassList(cb) {
   ipcRenderer.send("getclasslist", null);
   ipcRenderer.once("getclasslist", (event, arg) => {
@@ -785,7 +955,12 @@ function getClassList(cb) {
     }
   });
 }
-
+/**
+ * Change the student's class
+ * @method changeStudentClass
+ * @param  {Interger}           stdid  The student's id
+ * @param  {Interger}           profid The new prof's id
+ */
 function changeStudentClass(stdid, profid) {
   ipcRenderer.send("changestdclass", {
     stdid: stdid,
@@ -810,7 +985,20 @@ function changeStudentClass(stdid, profid) {
     }
   });
 }
-
+/**
+ * Create a new leave application
+ * @method createLeaveRequest
+ * @param  {Date}           sDate      The start Date
+ * @param  {Date}           eDate      The end Date
+ * @param  {Boolean}           missedTest 0 if no tests was missed, 1 otherwise
+ * @param  {Interger}           reason     The reason code
+ * @param  {String}           reasonDesc A description
+ * @param  {Interger}           proof      The proof code
+ * @param  {String}           where      Where the application was filled
+ * @param  {Function}         cb         [description]
+ * @param  {Interger}           id         (Optional) if a professor create a leave request for a student, this parameter is the student's id
+ * @return {[type]}                      [description]
+ */
 function createLeaveRequest(sDate, eDate, missedTest, reason, reasonDesc, proof, where, cb, id) {
   var obj = {
     sDate: sDate,
@@ -844,7 +1032,12 @@ function createLeaveRequest(sDate, eDate, missedTest, reason, reasonDesc, proof,
     }
   });
 }
-
+/**
+ * Get the leave application for the connected student
+ * @method getLRForStudent
+ * @param  {String}        tableId The table's id
+ * @param  {Function}      cb      A callback function
+ */
 function getLRForStudent(tableId, cb) {
   ipcRenderer.send("getLR");
   ipcRenderer.once("getLR", (event, arg) => {
@@ -878,9 +1071,13 @@ function getLRForStudent(tableId, cb) {
 
   });
 }
-
+/**
+ * Get all the leave application
+ * @method getLR
+ * @param  {Interger}   tableId The table's id
+ * @param  {Function} cb      A callback function
+ */
 function getLR(tableId, cb) {
-  console.log(window.SCOPE.ALL);
   ipcRenderer.send("getLR", window.SCOPE.ALL);
   ipcRenderer.once("getLR", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {

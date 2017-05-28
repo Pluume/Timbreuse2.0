@@ -1,3 +1,9 @@
+/**
+ * Handle the timeoff functions
+ *
+ * @module holidays
+ * @class holidays
+ */
 var moment = require("moment");
 var knex = require('knex')({
   client: 'sqlite3',

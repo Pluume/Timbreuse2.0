@@ -1,13 +1,24 @@
+/**
+ * Handle the communication between electron's main process and electron's renderer process
+ *
+ * @module frontendHandle
+ * @class frontendHandle
+ */
 const {
   ipcMain
 } = require('electron');
 const client = require("./client.js");
-const request = require("../request.js")
-const log = require("../utils/log.js")
+const request = require("../request.js");
+const log = require("../utils/log.js");
 const crypto = require("crypto-js");
 const path = require('path');
 const array = require('array')();
-
+/**
+ * Get the students from the server
+ * @method getStudents
+ * @param {Event} event The event object
+ * @param {Object} arg The scope of the search (see the server_methods.js)
+ **/
 function getStudents(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETSTUDENT,
@@ -26,7 +37,12 @@ function getStudents(event, arg) {
     }
   });
 }
-
+/**
+ * Log into the server
+ * @method logIn
+ * @param {Event} event The event object
+ * @param {Object} arg Raw credentials entered by the user
+ **/
 function logIn(event, arg) {
   var passhash = crypto.SHA256(arg.pass).toString(crypto.enc.utf8);
   var oreq = [{
@@ -55,7 +71,12 @@ function logIn(event, arg) {
     });
   });
 }
-
+/**
+ * Redirect the renderer process to another page
+ * @method redirect
+ * @param {Event} event The event object
+ * @param {Integer} arg Which page to redirect to
+ **/
 function redirect(event, arg) {
   switch (arg) {
     case request.PAGES.PROFS:
@@ -69,11 +90,21 @@ function redirect(event, arg) {
       break;
   }
 }
-
+/**
+ * Set the global variable to the current page
+ * @method setPage
+ * @param {Event} event The event object
+ * @param {Object} arg The page ID
+ **/
 function setPage(event, arg) {
   global.currentPage = arg;
 }
-
+/**
+ * Get the current class object
+ * @method getClass
+ * @param {Event} event The event object
+ * @param {Object} arg The scope (see server_methods.js)
+ **/
 function getClass(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETCLASS,
@@ -92,7 +123,12 @@ function getClass(event, arg) {
     }
   });
 }
-
+/**
+ * Create a new students
+ * @method createStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function createStudent(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.ADDSTUDENT,
@@ -111,7 +147,12 @@ function createStudent(event, arg) {
     }
   });
 }
-
+/**
+ * Delete a student from the database
+ * @method deleteStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function deleteStudent(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.DELSTUDENT,
@@ -129,7 +170,12 @@ function deleteStudent(event, arg) {
     }
   });
 }
-
+/**
+ * Edit a student
+ * @method editStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function editStudent(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.EDITSTUDENT,
@@ -147,7 +193,12 @@ function editStudent(event, arg) {
     }
   });
 }
-
+/**
+ * Reset the time and last tagged time of student
+ * @method resetTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function resetTime(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.RESETTIME,
@@ -166,7 +217,12 @@ function resetTime(event, arg) {
     }
   });
 }
-
+/**
+ * Add/Sub time to a student
+ * @method modTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function modTime(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.MODTIME,
@@ -187,7 +243,12 @@ function modTime(event, arg) {
     }
   });
 }
-
+/**
+ * Set the time of a student
+ * @method setTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function setTime(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.SETTIME,
@@ -208,9 +269,12 @@ function setTime(event, arg) {
     }
   });
 }
-
-
-
+/**
+ * Get the logs of a student
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function getLogs(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.LOGS,
@@ -229,7 +293,12 @@ function getLogs(event, arg) {
     }
   });
 }
-
+/**
+ * Toggle the absent status of a student
+ * @method setAbsent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function setAbsent(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.SETABSENT,
@@ -249,7 +318,12 @@ function setAbsent(event, arg) {
     }
   });
 }
-
+/**
+ * Toggle the status blocked of student. If blocked the student must comply to the fixed schedule
+ * @method setFixed
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function setFixed(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.SETFIXED,
@@ -269,7 +343,12 @@ function setFixed(event, arg) {
     }
   });
 }
-
+/**
+ * Tag a student
+ * @method tag
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function tag(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.TAG,
@@ -290,7 +369,12 @@ function tag(event, arg) {
     }
   });
 }
-
+/**
+ * Get alls the notification relative to a student
+ * @method getNotifications
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function getNotifications(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETNOTIFICATIONS,
@@ -307,7 +391,12 @@ function getNotifications(event, arg) {
     }
   });
 }
-
+/**
+ * Change the status (either read or unread) of notification
+ * @method toggleNotification
+ * @param {Event} event The event object
+ * @param {Integer} arg The notification id
+ **/
 function toggleNotification(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.TOGGLENOTIFICATION,
@@ -317,7 +406,12 @@ function toggleNotification(event, arg) {
 
   client.send(JSON.stringify(oreq), (err, data) => {});
 }
-
+/**
+ * Get the holidays
+ * @method getHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function getHolidays(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETHOLIDAYS,
@@ -335,7 +429,12 @@ function getHolidays(event, arg) {
     }
   });
 }
-
+/**
+ * Create a new holidays object in the database
+ * @method addHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function addHolidays(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.ADDHOLIDAYS,
@@ -358,7 +457,12 @@ function addHolidays(event, arg) {
     }
   });
 }
-
+/**
+ * Delete holidays in the database
+ * @method delHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function delHolidays(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.DELHOLIDAYS,
@@ -377,11 +481,21 @@ function delHolidays(event, arg) {
     }
   });
 }
-
+/**
+ * Log out of the server
+ * @method logout
+ * @param {Event} event The event object
+ * @param {Object} arg Nothing
+ **/
 function logout(event, arg) {
   client.disconnect();
 }
-
+/**
+ * Get all the informations relative to the professor currently connected if any
+ * @method getProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function getProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETPROF,
@@ -399,7 +513,12 @@ function getProf(event, arg) {
     }
   });
 }
-
+/**
+ * Create a new professor
+ * @method addProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function addProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CREATEPROF,
@@ -418,7 +537,12 @@ function addProf(event, arg) {
     }
   });
 }
-
+/**
+ * Delete a professor object from the database
+ * @method delProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function delProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.DELPROF,
@@ -437,7 +561,12 @@ function delProf(event, arg) {
     }
   });
 }
-
+/**
+ * Edit a professor object
+ * @method editProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function editProf(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.EDITPROF,
@@ -456,7 +585,12 @@ function editProf(event, arg) {
     }
   });
 }
-
+/**
+ * Change the password of the currently connected user if any
+ * @method changePassword
+ * @param {Event} event The event object
+ * @param {Object} arg The new raw password
+ **/
 function changePassword(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CHANGEPASS,
@@ -475,7 +609,12 @@ function changePassword(event, arg) {
     }
   });
 }
-
+/**
+ * Get a list of all the existings classes
+ * @method getClassList
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function getClassList(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETCLASSLIST,
@@ -493,7 +632,12 @@ function getClassList(event, arg) {
     }
   });
 }
-
+/**
+ * Change a student's class
+ * @method changeStudentClass
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function changeStudentClass(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CHANGECLASS,
@@ -513,7 +657,12 @@ function changeStudentClass(event, arg) {
     }
   });
 }
-
+/**
+ * Create a new leave request in the database
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
 function createLeaveRequest(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.CREATELR,
@@ -540,7 +689,12 @@ function createLeaveRequest(event, arg) {
     }
   });
 }
-
+/**
+ * Get all the leaves request accessible for the currently connected user if any
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Nothing
+ **/
 function getLeaveRequest(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.GETLR,

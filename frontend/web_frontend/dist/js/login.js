@@ -1,7 +1,17 @@
+/**
+ * Handle the login page to the server
+ *
+ * @module login
+ * @class login
+ */
 const {
   ipcRenderer
 } = require('electron');
-
+/**
+ * Print a error message
+ * @method redAlert
+ * @param  {String} msg The message
+ */
 function redAlert(msg) {
   var message = document.createElement("div");
   message.setAttribute("class", "alert alert-danger");
@@ -10,7 +20,12 @@ function redAlert(msg) {
   document.getElementById("loginPanel").replaceChild(message, document.getElementById("errorAlert"));
   console.log(msg);
 }
-
+/**
+ * Try to connect to the server with the given credentials
+ * @method login
+ * @param  {String} user The username
+ * @param  {String} pass The password
+ */
 function login(user, pass) {
   ipcRenderer.once("login", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
