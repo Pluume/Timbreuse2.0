@@ -714,6 +714,34 @@ function getLeaveRequest(event, arg) {
     }
   });
 }
+/**
+ * Toggle the accepted status of a leave application's
+ * @method toggleLR
+ * @param {Event} event The event object
+ * @param {Object} arg The id and the new value of the status
+ **/
+function toggleLR(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TOGGLELR,
+    error: request.ERROR.OK,
+    id: arg.id,
+    status: arg.status
+  }];
+  if (arg != undefined)
+    oreq[0].scope = arg;
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("toggleLR", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+ipcMain.on("toggleLR",toggleLR);
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);

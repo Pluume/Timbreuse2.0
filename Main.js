@@ -3,9 +3,11 @@
  *
  * @module main
  */
+const inst = require("./utils/installRoutines.js");
+if (inst.handleSquirrelEvent())
+  return 0;
 const fh = require("./frontend/frontendHandle.js");
 const log = require("./utils/log.js");
-
 const sinon = require("sinon");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");
@@ -34,7 +36,7 @@ if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYP
     slaveHandle.load(); //Load the slave frontend
   } else {
     const scheduler = require("./utils/scheduler.js");
-    scheduler.endOfDay();
+    scheduler.start();
   }
 } else {
   const clientHandle = require("./frontend/client.js");

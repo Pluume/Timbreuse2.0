@@ -25,6 +25,7 @@ function endOfDay() {
         return;
       }
       var updateStdForTheDay = function(id, status, ntimeDiff, details) {
+
         if (isNaN(ntimeDiff)) {
           log.error("New time diff is NaN");
           ntimeDiff = row.timeDiff;
@@ -38,13 +39,32 @@ function endOfDay() {
           missedPause: -1
         }).toString());
       };
+      var updateDetails = function(ndetails, ntimeDiff) {
+        ndetails.day.push({
+          time: moment().format(),
+          timeDiff: ntimeDiff
+        });
+        if (moment(moment().format()).isSame(moment().endOf("week"), 'day')) {
+
+          ndetails.week.push({
+            time: moment().format(),
+            timeDiff: ntimeDiff
+          });
+        }
+        if (moment(moment().format()).isSame(moment().endOf("month"), 'day')) {
+          ndetails.month.push({
+            time: moment().format(),
+            timeDiff: ntimeDiff
+          });
+        }
+      };
       var ntimeDiff;
       if (row.status == global.STATUS.IN) {
         ntimeDiff = row.timeDiff - dayConfig.timeToDo;
         log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Last status of the day was IN", row.timeDiff, row.timeDiffToday);
       } else if (row.status == global.STATUS.ABS) {
         ntimeDiff = row.timeDiff
-      } else {
+      } else if (!isTodayOff) {
         ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
         if (row.isBlocked) {
           if (dayConfig.scheduleFix.length > 0)
@@ -79,23 +99,6 @@ function endOfDay() {
         ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60));
         log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Holidays) ", ntimeDiff, 0);
       } else {
-        ndetails.day.push({
-          time: moment().format(),
-          timeDiff: ntimeDiff
-        });
-        if (moment(moment().format()).isSame(moment().endOf("week"), 'day')) {
-
-          ndetails.week.push({
-            time: moment().format(),
-            timeDiff: ntimeDiff
-          });
-        }
-        if (moment(moment().format()).isSame(moment().endOf("month"), 'day')) {
-          ndetails.month.push({
-            time: moment().format(),
-            timeDiff: ntimeDiff
-          });
-        }
         if (row.status != global.STATUS.ABS) {
 
           ntimeDiff -= (row.missedPause <= 0) ? 0 : (row.missedPause * (20 * 60));
@@ -108,6 +111,7 @@ function endOfDay() {
               log.save(global.LOGS.LEAVEREQ, row.id, "", moment().format(), "Time refunded " + res + " secb", ntimeDiff, 0);
             }
             log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed", ntimeDiff, 0);
+            updateDetails(ndetails, ntimeDiff);
             updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
           });
           return;
@@ -117,8 +121,7 @@ function endOfDay() {
 
       }
       //TODO Notification on student's status == IN at end of day
-
-
+      updateDetails(ndetails, ntimeDiff);
       updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
     }, (err, nb) => {
       if (err) {

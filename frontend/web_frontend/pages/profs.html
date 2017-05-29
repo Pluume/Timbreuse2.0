@@ -24,8 +24,10 @@
 </head>
 
 <body>
+
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="stdTable" data-unique-id="id" data-detail-view="true" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="false" data-sort-order="desc">
+    <table id="stdTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="false"
+      data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="state" data-checkbox="true"></th>
@@ -38,13 +40,33 @@
           <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
           <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Last tag time</th>
           <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+          <th data-field="dob" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="email" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="tag" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="userid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="profid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="missedPause" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="hadLunch" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="details" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="isBlocked" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="project" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
+          <th data-field="firstClass" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
         </tr>
       </thead>
     </table>
   </div>
-
+  <style>
+    .img-circle {
+      border-radius: 50%;
+    }
+  </style>
   <!-- jQuery -->
   <script>
+    /*
+       *
+       *
+       *
+       */
     window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
     window.secToHMS = require('../../../utils/math.js').secondsToHms;
     window.ERROR = require('../../../request.js').ERROR;
@@ -55,6 +77,59 @@
     window.LOGS = require('../../../db/db.js').LOGS;
     setPage(window.PAGES.PROFS);
     var stdToApply = [];
+  </script>
+  <script src="../dist/js/bootstrap-table.js"></script>
+  <script>
+
+    function genProfil(row) {
+      var profilBlock = document.createElement("div");
+      var tid = document.createElement("code");
+      var tidText = document.createElement("p");
+      tidText.innerHTML = "The student's id is : ";
+      tid.innerHTML = row.id;
+      tidText.appendChild(tid);
+      profilBlock.appendChild(tidText);
+      return profilBlock.outerHTML;
+    }
+
+    function detailsFormatter(index, row) { //Thanks to https://cdn4.iconfinder.com/data/icons/man-and-woman/154/man-human-person-login-512.png
+      var card = document.createElement("div");
+      var cardHeader = document.createElement("div");
+      var nav = document.createElement("ul");
+      var profilTab = document.createElement("li");
+      var profilLink = document.createElement("a");
+      var chartsTab = document.createElement("li");
+      var chartsLink = document.createElement("a");
+      var cardBlock = document.createElement("div");
+      var cardTitle = document.createElement("h2");
+      var cardText = document.createElement("p");
+      card.setAttribute("class", "card text-center");
+      cardHeader.setAttribute("class", "card-header");
+      nav.setAttribute("class", "nav nav-pills card-header-pills");
+      profilTab.setAttribute("class", "active");
+      chartsLink.setAttribute("href", "#");
+      profilLink.setAttribute("href", "#");
+      chartsTab.setAttribute("id", "charts" + index);
+      profilTab.setAttribute("id", "profil" + index);
+      profilLink.innerHTML = "Profil";
+      chartsLink.innerHTML = "Charts";
+      cardBlock.setAttribute("class", "card-block");
+      cardTitle.setAttribute("class", "card-title");
+      cardTitle.innerHTML = row.fname + " " + row.lname;
+      cardText.setAttribute("class", "card-text");
+      cardText.innerHTML = genProfil(row);
+      cardBlock.appendChild(cardTitle);
+      cardBlock.appendChild(cardText);
+      chartsTab.appendChild(chartsLink);
+      profilTab.appendChild(profilLink);
+      nav.appendChild(profilTab);
+      nav.appendChild(chartsTab);
+      cardHeader.appendChild(nav);
+      card.appendChild(cardHeader);
+      card.appendChild(cardBlock);
+      console.log(card.outerHTML);
+      return card.outerHTML;
+    }
 
     function editCb(std) {
       document.getElementById("elname").setAttribute("placeholder", std.students.user.lname == null ? "" : std.students.user.lname);
@@ -142,9 +217,9 @@
     });
 
     function submitCreateModal() {
-        createStudent(document.getElementById('cfname').value, document.getElementById('clname').value, document.getElementById('cusername').value, document.getElementById('cemail').value, document.getElementById('ctag').value, document.getElementById(
-          'ctclass').value, document.getElementById('cdob').value, document.getElementById('cproject').value, "stdTable");
-        $('#addStudentModal').modal('toggle');
+      createStudent(document.getElementById('cfname').value, document.getElementById('clname').value, document.getElementById('cusername').value, document.getElementById('cemail').value, document.getElementById('ctag').value, document.getElementById(
+        'ctclass').value, document.getElementById('cdob').value, document.getElementById('cproject').value, "stdTable");
+      $('#addStudentModal').modal('toggle');
     }
 
     function submitDeleteModal() {
@@ -452,10 +527,10 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="editStudentForm">
-        <div class="modal-header">
-          <h2 class="modal-title" id="editStudentModalTitle">Edit this student</h2>
-        </div>
-        <div class="modal-body">
+          <div class="modal-header">
+            <h2 class="modal-title" id="editStudentModalTitle">Edit this student</h2>
+          </div>
+          <div class="modal-body">
 
             <div id="fgetclass" class="form-group">
               <label for="etclass" class="form-control-label">Class : </label>
@@ -506,12 +581,12 @@
               </div>
             </div>
 
-        </div>
-        <div class="modal-footer">
-          <input type="hidden" id="editStudentID" value=""/>
-          <button type="button" class="btn btn-secondary" onclick="cancelForm('#editStudentForm');"data-dismiss="modal">Close</button>
-          <button type="submit" id="updateSubmit" class="btn btn-primary">Update</button>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" id="editStudentID" value="" />
+            <button type="button" class="btn btn-secondary" onclick="cancelForm('#editStudentForm');" data-dismiss="modal">Close</button>
+            <button type="submit" id="updateSubmit" class="btn btn-primary">Update</button>
+          </div>
         </form>
       </div>
     </div>
@@ -531,7 +606,7 @@
 
   <!-- Custom Theme JavaScript -->
   <script src="../dist/js/sb-admin-2.js"></script>
-  <script src="../dist/js/bootstrap-table.js"></script>
+
   <script src="../dist/js/informations.js"></script>
   <script src="../dist/js/redirect.js"></script>
   <script src="../dist/js/utils.js"></script>

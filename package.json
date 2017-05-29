@@ -50,6 +50,9 @@
   "devDependencies": {
     "builder": "^3.2.1",
     "electron": "^1.6.1",
+    "electron-packager": "^8.7.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-winstaller": "^2.5.2",
     "nan": "^2.5.1",
     "sinon": "^2.1.0",
     "throw-max-listeners-error": "^1.0.1"

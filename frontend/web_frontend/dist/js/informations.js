@@ -22,6 +22,40 @@ function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/
   return text;
 }
 /**
+ * Format the data for the students' bootstap-table
+ * @method formatForStdTable
+ * @param  {Array}          data Array of students object
+ * @return {Array}               Formatted array of students object
+ */
+function formatForStdTable(data) {
+  var ndata = [];
+  for (var i = 0; i < data.students.length; i++) {
+    ndata.push({
+      id: data.students[i].id,
+      lname: data.students[i].user.lname,
+      fname: data.students[i].user.fname,
+      username: data.students[i].user.username,
+      timeDiffToday: data.students[i].timeDiffToday,
+      timeDiff: data.students[i].timeDiff,
+      status: data.students[i].status,
+      lastTagTime: data.students[i].lastTagTime,
+      tag: data.students[i].user.tag,
+      email: data.students[i].user.email,
+      pp: data.students[i].user.pp,
+      userid: data.students[i].user.userid,
+      profid: data.students[i].profid,
+      missedPause: data.students[i].missedPause,
+      hadLunch: data.students[i].hadLunch,
+      details: data.students[i].details,
+      isBlocked: data.students[i].isBlocked,
+      project: data.students[i].project,
+      firstClass: data.students[i].firstClass
+
+    });
+  }
+  return ndata;
+}
+/**
  * Print a red notification on screen
  * @method redAlert
  * @param {String} msg The message to display
@@ -113,19 +147,7 @@ function getStudents(tableId, cb) {
     }
     switch (arg.error) {
       case window.ERROR.OK:
-        var data = [];
-        for (var i = 0; i < arg.students.length; i++) {
-          data.push({
-            id: arg.students[i].id,
-            lname: arg.students[i].user.lname,
-            fname: arg.students[i].user.fname,
-            username: arg.students[i].user.username,
-            timeDiffToday: arg.students[i].timeDiffToday,
-            timeDiff: arg.students[i].timeDiff,
-            status: arg.students[i].status,
-            lastTagTime: arg.students[i].lastTagTime
-          });
-        }
+        var data = formatForStdTable(arg);
         $('#' + tableId).bootstrapTable('load', data);
 
         cb();
@@ -564,7 +586,10 @@ function onUpdate(event, arg) {
       timeDiffToday: arg.timeDiffToday,
       timeDiff: arg.timeDiff,
       status: arg.status,
-      lastTagTime: arg.lastTagTime
+      lastTagTime: arg.lastTagTime,
+      missedPause: arg.missedPause,
+      hadLunch: arg.hadLunch,
+      isBlocked: arg.isBlocked
     };
     $("#stdTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,
@@ -1108,6 +1133,39 @@ function getLR(tableId, cb) {
         redAlert("Ill formed request...");
     }
 
+  });
+}
+/**
+ * Toggle a leave application accepted status
+ * @method changeLRStatus
+ * @param  {Interger} id The leave application's id
+ * @param  {Interger} status The leave application's new status
+ * @param  {Function} cb      A callback function
+ */
+function changeLRStatus(id, status, cb) {
+  ipcRenderer.send("toggleLR", {
+    id: id,
+    status: status
+  });
+  ipcRenderer.once("toggleLR", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(true);
+        return;
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+    cb(false);
   });
 }
 ipcRenderer.on("update", onUpdate);

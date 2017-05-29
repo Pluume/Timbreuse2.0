@@ -27,7 +27,7 @@
 
 <body>
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="LRTable" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
+    <table id="LRTable" data-unique-id="id" data-detail-view="true" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="state" data-checkbox="true"></th>
@@ -57,13 +57,31 @@
     window.LOGS = require('../../../db/db.js').LOGS;
     setPage(window.PAGES.LEAVEREQ_PROF);
 
+    function toggleAcpt(id, val) {
+      var row = $("#LRTable").bootstrapTable('getRowByUniqueId', id);
+      row.acpt = val;
+      changeLRStatus(id, val, (res) => {
+        if (res)
+          $("#LRTable").bootstrapTable('updateRow', {
+            index: id,
+            row: row
+          });
+      });
+
+    }
 
     function actionFormatter(val, row) {
-      return "";
+      if (row.acpt)
+        return "<button data-toggle='tooltip' data-placement='left' title='Set denied' href='#' onclick='toggleAcpt(" + row.id + "," + "false);' class='btn btn-success'><i class='glyphicon glyphicon-remove'></i></button>";
+      else
+        return "<button data-toggle='tooltip' data-placement='left' title='Set accepted' href='#' onclick='toggleAcpt(" + row.id + "," + "true);' class='btn btn-danger btn-circle'><i class='glyphicon glyphicon-ok'></i></button>";
     }
 
     function acptFormatter(val, row) {
-      return "";
+      if (val)
+        return "Accepted";
+      else
+        return "Denied";
     }
 
     function timeFormatter(val) {

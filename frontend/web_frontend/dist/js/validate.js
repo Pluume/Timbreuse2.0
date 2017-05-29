@@ -82,7 +82,7 @@ function validateCreateProf() { // http://demos.codingcage.com/bs-form-validatio
     rules: {
       ctclass: {
         required: true,
-        validName: true
+        validClass: true
       },
       cfname: {
         required: true,
@@ -109,6 +109,10 @@ function validateCreateProf() { // http://demos.codingcage.com/bs-form-validatio
       }
     },
     messages: {
+      ctclass: {
+        required: "Please enter a valid class name",
+        validClass: "Name must contain only alphabets, numbers, space and dash"
+      },
       cfname: {
         required: "Please enter a first name",
         validName: "Name must contain only alphabets, space and dash"
@@ -395,6 +399,10 @@ function activateValidator() {
 
   $.validator.addMethod("validTime", function(value, element) {
     return this.optional(element) || moment(value, "HH:MM").isValid();
+  });
+  var classregex = /^[a-zA-Z1-9 \-]+$/;
+  $.validator.addMethod("validClass", function(value, element) {
+  return this.optional(element) || classregex.test(value);
   });
   var usernameregex = /^[a-zA-Z1-9 \-\.\_]+$/;
   $.validator.addMethod("validUsername", function(value, element) {

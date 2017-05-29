@@ -4,3 +4,5 @@ CSV/
 config/
 
 Timbreuse\.log
+
+/dist/*

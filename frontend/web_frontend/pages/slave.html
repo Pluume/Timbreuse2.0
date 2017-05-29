@@ -23,8 +23,6 @@
 </head>
 
 <style>
-
-
   .clock {
     width: 150px;
     height: 150px;
@@ -69,8 +67,8 @@
       }
 
     }
-    function delCSV()
-    {
+
+    function delCSV() {
       try {
         slave.delCSV();
         $("#infoPanel").hide('slow', function() {
@@ -91,8 +89,8 @@
         currentTag += String.fromCharCode(e.keyCode);
       });
       $('body').click(function() {
-   dissmissInfoPane();
-});
+        dissmissInfoPane();
+      });
     });
     var circleH = new ProgressBar.Circle('#clockHours', {
       color: '#1b0500',
@@ -149,7 +147,7 @@
       strokeWidth: 12,
       trailColor: '#eee',
       trailWidth: 12,
-      easing: 'easeInOut',
+      easing: 'linear',
       duration: 1000,
       svgStyle: null,
       text: {
@@ -169,8 +167,7 @@
     });
 
     circleS.animate(0, {});
-    var CronJob = require('electron').remote.require("cron").CronJob;
-    new CronJob('* * * * * *', function() {
+    window.setInterval(function() {
       var d = new Date();
       var h = d.getHours();
       var m = d.getMinutes();
@@ -181,7 +178,7 @@
       circleS.setText(s + "s");
       circleM.setText(m + "m");
       circleH.setText(h + "h");
-    }, null, true);
+    }, 1000);
   </script>
 
   <!-- Bootstrap Core JavaScript -->

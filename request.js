@@ -64,7 +64,8 @@ REQUEST ={
     GETCLASSLIST: 28,
     CHANGECLASS: 29,
     CREATELR: 30,
-    GETLR: 31
+    GETLR: 31,
+    TOGGLELR: 32
 };
 PAGES ={
     LOGIN: 0,
