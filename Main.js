@@ -6,6 +6,19 @@
 const inst = require("./utils/installRoutines.js");
 if (inst.handleSquirrelEvent())
   return 0;
+var app = require("electron").app;
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+  if (global.mwin) {
+    if (global.mwin.isMinimized()) global.mwin.restore();
+    global.mwin.focus();
+    global.mwin.show();
+  }
+});
+
+if (shouldQuit) {
+  app.quit();
+  return;
+}
 const fh = require("./frontend/frontendHandle.js");
 const log = require("./utils/log.js");
 const sinon = require("sinon");

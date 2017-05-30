@@ -9,7 +9,8 @@ packager({
   win32metadata: {
     ProductName: "Timbreuse"
   },
-  name: "Timbreuse"
+  name: "Timbreuse",
+  icon: path.join(__dirname, "..", "graphics", "ico.ico")
 }, function done_callback(err, appPaths) {
   if (err) {
     console.error("Error : " + err);
@@ -23,7 +24,7 @@ packager({
     exe: 'timbreuse.exe',
     loadingGif: path.join(__dirname, "..", "graphics", "loading.gif"),
     noMsi: true,
-    iconUrl: path.join(__dirname, "..", "graphics", "ico.png")
+    iconUrl: path.join(__dirname, "..", "graphics", "ico.ico")
   });
 
   resultPromise.then(() => console.log("Installer generated"), (e) => console.log(`Error : ${e.message}`));

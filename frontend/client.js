@@ -143,7 +143,8 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }));
-  global.mwin.webContents.openDevTools();
+  if (global.DEBUG)
+    global.mwin.webContents.openDevTools();
   global.mwin.on('closed', function() {
     mainWindow = null;
   });
@@ -172,6 +173,8 @@ function createWindow() {
  **/
 function load() {
   global.clientconn = null;
+
+
   app.on('ready', createWindow);
   app.on('window-all-closed', function() {
     if (process.platform !== 'darwin') {

@@ -81,11 +81,20 @@ function endOfDay() {
         }
 
       }
-      if (!row.hadLunch && row.status != global.STATUS.ABS && dayConfig.lunch && !hd.isTodayOff)
+      if (!row.hadLunch && row.status != global.STATUS.ABS && dayConfig.lunch && !isTodayOff)
+      {
+        log.info("USRID " + row.id + " : Missed lunch");
         log.save(global.LOGS.NOLUNCH, row.id, "SERVER", null, "", row.timeDiff, row.timeDiffToday);
+      }
+
       var ndetails;
       try {
         ndetails = JSON.parse(row.details);
+        if (ndetails == null) {
+          ndetails.day = [];
+          ndetails.week = [];
+          ndetails.month = []
+        };
       } catch (err2) {
 
         ndetails = {
@@ -116,6 +125,7 @@ function endOfDay() {
           });
           return;
         } else {
+
           log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Absent)", ntimeDiff, 0);
         }
 
