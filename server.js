@@ -35,12 +35,14 @@ module.exports = {
       var connection = {socket: socket, userid: -1};
       connection.currentBuf = "";
       addClient(connection);
+      socket.setKeepalive(true,60000);
       if(global.DEBUG)
-      log.info(socket.address().address + " just connected");
+      log.info(socket.remoteAddress + " just connected");
         socket.on('error', function() {
             removeClient(connection);
         });
         socket.on('timeout', function() {
+          log.warning(socket.remoteAddress +" timed out")
             removeClient(connection);
             socket.end();
         });
@@ -53,7 +55,7 @@ module.exports = {
         socket.on('close', function(hadError) {
             removeClient(connection);
             if(global.DEBUG)
-            log.info(socket.address().address + " just disconnected");
+            log.info(socket.remoteAddress + " just disconnected");
         });
     }).listen(703).on('listening', function() {
       log.info("The server up on the port 703");

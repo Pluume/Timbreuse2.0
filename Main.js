@@ -21,6 +21,7 @@ if (shouldQuit) {
 }
 const fh = require("./frontend/frontendHandle.js");
 const log = require("./utils/log.js");
+log.createNewLogFile();
 const sinon = require("sinon");
 log.info("Loading configuration...");
 const config = require("./utils/config.js");

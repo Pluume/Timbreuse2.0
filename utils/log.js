@@ -8,9 +8,22 @@ const moment = require("moment");
 const at = require("console-at");
 var path = require("path");
 const fs = require("fs");
-var access = fs.createWriteStream(path.join(__dirname,"..","Timbreuse.log"), {
-  flags: 'w'
-});
+/**
+ * Create a new log file
+ * @method createNewLogFile
+ */
+function createNewLogFile() {
+  if (fs.existsSync(path.join(__dirname, "..", "Timbreuse.10.log")))
+    fs.unlinkSync(path.join(__dirname, "..", "Timbreuse.10.log"));
+  for (var i = 9; i > 0; i--)
+    if (fs.existsSync(path.join(__dirname, "..", "Timbreuse." + i + ".log")))
+      fs.renameSync(path.join(__dirname, "..", "Timbreuse." + i + ".log"), path.join(__dirname, "..", "Timbreuse." + (i + 1) + ".log"));
+  if (fs.existsSync(path.join(__dirname, "..", "Timbreuse.log")))
+    fs.renameSync(path.join(__dirname, "..", "Timbreuse.log"), path.join(__dirname, "..", "Timbreuse.1.log"));
+  global.logFile = fs.createWriteStream(path.join(__dirname, "..", "Timbreuse.log"), {
+    flags: 'w'
+  });
+}
 const knex = require('knex')({
   client: 'sqlite3',
   useNullAsDefault: true
@@ -24,7 +37,7 @@ var info = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
-  access.write(cmsg + "\n");
+  global.logFile.write(cmsg + "\n");
 };
 /**
  * Print a user friendly error message to the console
@@ -35,7 +48,7 @@ var error = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
-  access.write(cmsg + "\n");
+  global.logFile.write(cmsg + "\n");
 };
 /**
  * Print a user friendly information warning to the console
@@ -46,14 +59,14 @@ var warning = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
-  access.write(cmsg + "\n");
+  global.logFile.write(cmsg + "\n");
 };
 process.on('uncaughtException', function(err) {
   error((err && err.stack) ? err.stack : err);
 });
 process.on("exit", (code) => {
   info("Exiting with code " + code);
-  access.end();
+  global.logFile.end();
 });
 
 var save = function(type, stdid, tclass, time, comments, td, tdT) {
@@ -220,7 +233,8 @@ module.exports = {
   warning,
   save,
   get,
-  format
+  format,
+  createNewLogFile
 };
 /**
  * On SIGINT (Ctrl + C), quit the app nicely
