@@ -38,7 +38,7 @@ function getBaseReq(fnc) {
  * @param {Object} ireq a JSON object containing the incoming request.
  **/
 function propagate_tag(ireq) {
-  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), ireq.time);
+  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, ''), ireq.time);
 }
 /**
  * Send a ping to server
@@ -296,12 +296,16 @@ function tagRequest(item, index, done) {
   var ireq = item.ireq;
   var conn = item.connection;
   tagReqList.splice(index, 1); // Remove current item
+  if (ireq.time != undefined && !ireq.delayed && !(moment(ireq.time).isBetween(moment().subtract(20, "seconds"), moment().add(20, "seconds"))))
+    ireq.time = moment().format().toString();
   if (ireq.tag != undefined && ireq.time != undefined)
-    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\s/g, ''), (ireq.time) ? ireq.time : moment().format().toString());
+    csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, ''), (ireq.time) ? ireq.time : moment().format().toString());
+
+
   if (global.DEBUG && ireq.tag != undefined)
-    console.log("[TAG] : " + ireq.tag.replace(/\s/g, ''));
+    console.log("[TAG] : " + ireq.tag.replace(/\W/g, ''));
   if (ireq.tag != undefined) {
-    global.db.get(knex.select().from("users").where("tag", ireq.tag.replace(/\s/g, '')).toString(), (err, row) => {
+    global.db.get(knex.select().from("users").where("tag", ireq.tag.replace(/\W/g, '')).toString(), (err, row) => {
       if (err) {
         log.error("Error while accessing the database...\n" + err);
 
@@ -635,7 +639,7 @@ function createStudent(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  ireq.data.tag = ireq.data.tag.replace(/\s/g, '');
+  ireq.data.tag = ireq.data.tag.replace(/\W/g, '');
   global.db.get(knex("users").select().where({
     username: ireq.data.username
   }).orWhere({
@@ -668,7 +672,7 @@ function createStudent(conn, ireq) {
       dob: ireq.data.dob,
       rank: global.RANK.STUDENT,
       email: ireq.data.email,
-      tag: ireq.data.tag.replace(/\s/g, '')
+      tag: ireq.data.tag.replace(/\W/g, '')
 
     }).returning('*').toString(), function(err) {
       if (err) {
@@ -768,7 +772,7 @@ function editStudent(conn, ireq) { //FIXME Handle when someone as the same tag o
         global.db.run(knex("users").update({
           username: (ireq.data.username == "") ? row.username : ireq.data.username,
           email: (ireq.data.email == "") ? row.email : ireq.data.email,
-          tag: (ireq.data.tag.replace(/\s/g, '') == "") ? row.tag : ireq.data.tag.replace(/\s/g, ''),
+          tag: (ireq.data.tag.replace(/\W/g, '') == "") ? row.tag : ireq.data.tag.replace(/\W/g, ''),
           dob: (ireq.data.dob == "") ? row.dob : ireq.data.dob,
           fname: (ireq.data.fname == "") ? row.fname : ireq.data.fname,
           lname: (ireq.data.lname == "") ? row.lname : ireq.data.lname,
@@ -817,22 +821,6 @@ function resetTime(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  global.db.run(knex("students").update({
-    hadLunch: 0,
-    missedPause: 0,
-    lastTagTime: 0,
-    timeDiffToday: 0,
-    timeDiff: 0,
-    status: 0
-  }).where("id", "in", ireq.id).toString(), (err) => {
-    if (err) {
-      log.error("Error : " + err);
-
-      oreq.error = request.ERROR.SQLITE;
-      conn.socket.write(JSON.stringify(oreq) + "\0");
-      return;
-    }
-
     global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
       if (err) {
         log.error("Error when querrying the database : " + err);
@@ -840,10 +828,43 @@ function resetTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
+      async.waterfall([
+        function(callback) {
+          global.db.run(knex("students").where("id", "in", row.id).update({
+            hadLunch: 0,
+            missedPause: 0,
+            lastTagTime: "",
+            timeDiffToday: 0,
+            timeDiff: 0,
+            status: 0,
+            details: ""
+          }).toString(), (err) => {
+            callback(err);
+          });
+        },
+        function(callback) {
+          global.db.run(knex("notifications").where("userid", "in", row.userid).del().toString(), callback);
+        },
+        function(callback) {
+          global.db.run(knex("leavereq").where("studentid", "in", row.id).del().toString(), callback);
+        },
+        function(callback) {
+          global.db.run(knex("logs").where("studentid", "in", row.id).del().toString(), callback);
+        }
+      ], function(err) {
+        if(err)
+        {
+          oreq.error = request.ERROR.SQLITE;
+          log.error(err);
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), 0, 0);
+      });
+
     });
-    conn.socket.write(JSON.stringify(oreq) + "\0");
-  });
+
 }
 
 /**
@@ -998,6 +1019,14 @@ function setAbsent(conn, ireq) {
     }
     for (var i = 0; i < ireq.id.length; i++) {
       log.save(global.LOGS.ABSENT, ireq.id[i], "SERVER", moment().format(), ireq.comments, "", "");
+      global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err,row) => {
+        if (err) {
+          log.error("Error when querrying the database : " + err);
+          return;
+        }
+          sendUpdate(row.profid, row);
+      });
+
     }
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -1475,7 +1504,7 @@ function editProf(conn, ireq) {
       global.db.run(knex("users").update({
         username: (ireq.data.username == "") ? row.username : ireq.data.username,
         email: (ireq.data.email == "") ? row.email : ireq.data.email,
-        tag: (ireq.data.tag.replace(/\s/g, '') == "") ? row.tag : ireq.data.tag.replace(/\s/g, ''),
+        tag: (ireq.data.tag.replace(/\W/g, '') == "") ? row.tag : ireq.data.tag.replace(/\W/g, ''),
         dob: (ireq.data.dob == "") ? row.dob : ireq.data.dob,
         fname: (ireq.data.fname == "") ? row.fname : ireq.data.fname,
         lname: (ireq.data.lname == "") ? row.lname : ireq.data.lname,
@@ -1795,7 +1824,7 @@ function toggleLeaveRequest(conn, ireq) {
     return;
   }
   global.db.run(knex("leavereq").update({
-    acpt: (ireq.status ? "1":"0"),
+    acpt: (ireq.status ? "1" : "0"),
   }).where({
     id: ireq.id
   }).toString(), (err) => {

@@ -61,6 +61,7 @@ function tag(stag, ntime) {
   if (global.DEBUG) {
     log.info("Tag : " + stag + " Time : " + ntime);
   }
+  stag = stag.replace(/\W/g, '');
   var oreq = {
     fnc: request.REQUEST.TAG,
     error: request.ERROR.OK,
@@ -116,7 +117,7 @@ function onSocketData(ireq) {
       global.mwin.webContents.send("CSV", false);
       csv.exportCSV(() => {
         global.mwin.webContents.send("CSV", true);
-      }); //TODO Function that handle master card in GUI
+      });
       break;
     case request.REQUEST.TAG:
       global.mwin.webContents.send("slaveStd", ireq.student);
@@ -183,13 +184,18 @@ function foreverConnect() {
     slaves[i].conn.connected = false;
     slaves[i].conn.on("close", slavesClose);
     slaves[i].conn.ip = slaves[i].ip;
+    slaves[i].conn.setKeepAlive(true,60000);
     slaves[i].conn.connect({
       host: slaves[i].ip,
       port: 703
     }, slavesConnect);
 
   }
+  slaveconn.on("timeout", () => {
+    log.error("Connection to server timed out");
+  });
   slaveconn.on("close", (err) => {
+    slaveconn.destroy();
     connected = false;
     global.mwin.webContents.send("onlineServer", false);
     if (!goingToClose) {

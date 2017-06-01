@@ -26,7 +26,7 @@
 <body>
 
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="stdTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="lname" data-pagination="false"
+    <table id="stdTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="947" data-click-to-select="false" data-sort-name="lname" data-pagination="false"
       data-sort-order="desc">
       <thead>
         <tr>
@@ -40,10 +40,10 @@
           <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
           <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Last tag time</th>
           <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+          <th data-field="userid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="dob" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="email" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="tag" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
-          <th data-field="userid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="profid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="missedPause" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="hadLunch" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
@@ -62,11 +62,6 @@
   </style>
   <!-- jQuery -->
   <script>
-    /*
-       *
-       *
-       *
-       */
     window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
     window.secToHMS = require('../../../utils/math.js').secondsToHms;
     window.ERROR = require('../../../request.js').ERROR;
@@ -76,20 +71,180 @@
     window.STATUS = require('../../../db/db.js').STATUS;
     window.LOGS = require('../../../db/db.js').LOGS;
     setPage(window.PAGES.PROFS);
+    var moment = require("electron").remote.require("moment");
     var stdToApply = [];
   </script>
   <script src="../dist/js/bootstrap-table.js"></script>
   <script>
-
     function genProfil(row) {
+
+      // Student's ID
       var profilBlock = document.createElement("div");
-      var tid = document.createElement("code");
-      var tidText = document.createElement("p");
-      tidText.innerHTML = "The student's id is : ";
-      tid.innerHTML = row.id;
-      tidText.appendChild(tid);
-      profilBlock.appendChild(tidText);
+      var tsid = document.createElement("code");
+      var tsidText = document.createElement("p");
+      tsidText.innerHTML = "The student's id is : ";
+      tsid.innerHTML = row.id;
+      tsidText.appendChild(tsid);
+      profilBlock.appendChild(tsidText);
+      // User's ID
+      var tuid = document.createElement("code");
+      var tuidText = document.createElement("p");
+      tuidText.innerHTML = "The user id is : ";
+      tuid.innerHTML = row.userid;
+      tuidText.appendChild(tuid);
+      profilBlock.appendChild(tuidText);
+      //Prof id
+      var prof = document.createElement("code");
+      var profText = document.createElement("p");
+      profText.innerHTML = "The prof id is : ";
+      prof.innerHTML = row.profid;
+      profText.appendChild(prof);
+      profilBlock.appendChild(profText);
+      // Date of birth
+      if (moment(row.dob, "DD-MM-YYYY").isValid()) {
+        var dobText = document.createElement("p");
+        dobText.innerHTML = "Born the " + moment(row.dob, "DD-MM-YYYY").format("Do MMMM YYYY");
+        profilBlock.appendChild(dobText);
+      }
+      //Email
+      if (row.email && row.email != null && row.email != "") {
+        var emailLink = document.createElement("a");
+        var emailText = document.createElement("p");
+        emailLink.setAttribute("href", "mailto:" + row.email);
+        emailLink.innerHTML = row.email;
+        emailText.innerHTML = "Email : " + emailLink.outerHTML;
+        profilBlock.appendChild(emailText);
+      }
+      //Tag
+      var tag = document.createElement("code");
+      var tagText = document.createElement("p");
+      tagText.innerHTML = "The tag id is : ";
+      tag.innerHTML = row.tag;
+      tagText.appendChild(tag);
+      profilBlock.appendChild(tagText);
+      //Missed pause
+      var missedPause = document.createElement("strong");
+      var missedPauseText = document.createElement("p");
+      missedPauseText.innerHTML = "The number of missed pause is : ";
+      missedPause.innerHTML = (row.missedPause < 0 ? 0 : row.missedPause);
+      missedPauseText.appendChild(missedPause);
+      profilBlock.appendChild(missedPauseText);
+      //Had lunch
+      var hadLunch = document.createElement("span");
+      var hadLunchText = document.createElement("p");
+      hadLunch.setAttribute("class", (row.hadLunch ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove"));
+      hadLunch.setAttribute("style", (row.hadLunch ? "color:green;" : "color:red;"));
+      hadLunchText.innerHTML = "Had lunch today : ";
+      hadLunchText.appendChild(hadLunch);
+      profilBlock.appendChild(hadLunchText);
+      //Blocked
+      var blocked = document.createElement("span");
+      var blockedText = document.createElement("p");
+      blocked.setAttribute("class", (row.isBlocked ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove"));
+      blockedText.innerHTML = "Blocked : ";
+      blockedText.appendChild(blocked);
+      profilBlock.appendChild(blockedText);
+      //Projet
+      var project = document.createElement("strong");
+      var projectText = document.createElement("p");
+      project.innerHTML = row.project;
+      projectText.innerHTML = "Project : ";
+      projectText.appendChild(project);
+      profilBlock.appendChild(projectText);
+      //First class
+      var firstClass = document.createElement("strong");
+      var firstClassText = document.createElement("p");
+      firstClass.innerHTML = row.firstClass;
+      firstClassText.innerHTML = "First class : ";
+      firstClassText.appendChild(firstClass);
+      profilBlock.appendChild(firstClassText);
       return profilBlock.outerHTML;
+    }
+
+    function genChart(row) {
+      const {
+        dialog
+      } = require('electron').remote;
+      try {
+        var details = JSON.parse(row.details);
+      } catch (e) {
+        dialog.showMessageBox({
+          type: "error",
+          title: "JSON parsing failed",
+          message: "Error while parsing this student's details...."
+        });
+        return;
+      }
+      var fomattedData = [];
+      for (var i = 0; i < details.day.length; i++) {
+        fomattedData.push({
+          x: moment(details.day[i].time).format("YYYY-MM-DD"),
+          day: details.day[i].timeDiff
+        });
+      }
+      for (var i = 0; i < details.week.length; i++) {
+        fomattedData.push({
+          x: moment(details.week[i].time).format("YYYY-MM-DD"),
+          week: details.week[i].timeDiff
+        });
+      }
+      for (var i = 0; i < details.month.length; i++) {
+        fomattedData.push({
+          x: moment(details.month[i].time).format("YYYY-MM-DD"),
+          month: details.month[i].timeDiff
+        });
+      }
+      new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: "card" + row.id,
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: fomattedData,
+        // The name of the data record attribute that contains x-values.
+        xkey: 'x',
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['day','week','month'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['Day','Week','Month'],
+        xLabelFormat: (x) => {
+          return moment(x).format("YYYY-MM-DD").toString();
+        },yLabelFormat: (y) => {
+          return window.secToHMS(y);
+        },
+        smooth: false
+      });
+    }
+
+    function genCardTitle(row) {
+      var cardTitle = document.createElement("h2");
+      cardTitle.setAttribute("class", "card-title");
+      cardTitle.innerHTML = row.fname + " " + row.lname;
+      return cardTitle.outerHTML;
+    }
+
+    function profilActivator(id) {
+      var chartsTab = document.getElementById("charts" + id);
+      var profilTab = document.getElementById("profil" + id);
+      var card = document.getElementById("card" + id);
+      var row = $("#stdTable").bootstrapTable("getRowByUniqueId", id);
+      var cardTitle = genCardTitle(row);
+      chartsTab.setAttribute("class", "");
+      profilTab.setAttribute("class", "active");
+      card.innerHTML = cardTitle + genProfil(row);
+    }
+
+    function chartsActivator(id) {
+      var chartsTab = document.getElementById("charts" + id);
+      var profilTab = document.getElementById("profil" + id);
+      var card = document.getElementById("card" + id);
+      var row = $("#stdTable").bootstrapTable("getRowByUniqueId", id);
+      var cardTitle = genCardTitle(row);
+      chartsTab.setAttribute("class", "active");
+      profilTab.setAttribute("class", "");
+      //card.innerHTML = cardTitle + "Heél";
+      card.innerHTML = "";
+      genChart(row);
     }
 
     function detailsFormatter(index, row) { //Thanks to https://cdn4.iconfinder.com/data/icons/man-and-woman/154/man-human-person-login-512.png
@@ -101,7 +256,7 @@
       var chartsTab = document.createElement("li");
       var chartsLink = document.createElement("a");
       var cardBlock = document.createElement("div");
-      var cardTitle = document.createElement("h2");
+      var cardTitle = genCardTitle(row);
       var cardText = document.createElement("p");
       card.setAttribute("class", "card text-center");
       cardHeader.setAttribute("class", "card-header");
@@ -109,16 +264,18 @@
       profilTab.setAttribute("class", "active");
       chartsLink.setAttribute("href", "#");
       profilLink.setAttribute("href", "#");
-      chartsTab.setAttribute("id", "charts" + index);
-      profilTab.setAttribute("id", "profil" + index);
+      profilLink.setAttribute("onclick", "profilActivator(" + row.id + ")");
+      chartsLink.setAttribute("onclick", "chartsActivator(" + row.id + ")");
+      chartsTab.setAttribute("id", "charts" + row.id);
+      profilTab.setAttribute("id", "profil" + row.id);
       profilLink.innerHTML = "Profil";
       chartsLink.innerHTML = "Charts";
       cardBlock.setAttribute("class", "card-block");
-      cardTitle.setAttribute("class", "card-title");
-      cardTitle.innerHTML = row.fname + " " + row.lname;
+
       cardText.setAttribute("class", "card-text");
+      cardBlock.setAttribute("id", "card" + row.id);
       cardText.innerHTML = genProfil(row);
-      cardBlock.appendChild(cardTitle);
+      cardBlock.innerHTML = cardTitle;
       cardBlock.appendChild(cardText);
       chartsTab.appendChild(chartsLink);
       profilTab.appendChild(profilLink);
@@ -127,7 +284,6 @@
       cardHeader.appendChild(nav);
       card.appendChild(cardHeader);
       card.appendChild(cardBlock);
-      console.log(card.outerHTML);
       return card.outerHTML;
     }
 
@@ -188,6 +344,12 @@
       return status.outerHTML;
     }
     $(document).ready(function() {
+      $(window).resize(function() {
+        $('#stdTable').bootstrapTable('resetView', {
+          height: document.body.clientHeight
+        });
+        $("#stdTable").bootstrapTable("resetWidth");
+      });
       $("body").tooltip({
         selector: '[data-toggle=tooltip]'
       });
@@ -602,7 +764,7 @@
   <!-- Morris Charts JavaScript -->
   <script src="../vendor/raphael/raphael.min.js"></script>
   <script src="../vendor/morrisjs/morris.min.js"></script>
-  <script src="../data/morris-data.js"></script>
+
 
   <!-- Custom Theme JavaScript -->
   <script src="../dist/js/sb-admin-2.js"></script>

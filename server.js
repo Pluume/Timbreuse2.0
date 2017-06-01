@@ -35,7 +35,7 @@ module.exports = {
       var connection = {socket: socket, userid: -1};
       connection.currentBuf = "";
       addClient(connection);
-      socket.setKeepalive(true,60000);
+      socket.setKeepAlive(true,60000);
       if(global.DEBUG)
       log.info(socket.remoteAddress + " just connected");
         socket.on('error', function() {

@@ -40,9 +40,10 @@ function formatForStdTable(data) {
       status: data.students[i].status,
       lastTagTime: data.students[i].lastTagTime,
       tag: data.students[i].user.tag,
+      dob: data.students[i].user.dob,
       email: data.students[i].user.email,
       pp: data.students[i].user.pp,
-      userid: data.students[i].user.userid,
+      userid: data.students[i].userid,
       profid: data.students[i].profid,
       missedPause: data.students[i].missedPause,
       hadLunch: data.students[i].hadLunch,
@@ -578,18 +579,19 @@ function setFixed(id, comments) {
 function onUpdate(event, arg) {
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
   {
+    var oldData = $("#stdTable").bootstrapTable('getRowByUniqueId', arg.id);
     var formatData = {
-      id: arg.id,
-      lname: arg.user.lname,
-      fname: arg.user.fname,
-      username: arg.user.username,
-      timeDiffToday: arg.timeDiffToday,
-      timeDiff: arg.timeDiff,
-      status: arg.status,
-      lastTagTime: arg.lastTagTime,
-      missedPause: arg.missedPause,
-      hadLunch: arg.hadLunch,
-      isBlocked: arg.isBlocked
+      id: (arg.id ? arg.id : oldData.id),
+      lname: ((arg.user && arg.user.lname) ? arg.user.lname : oldData.lname),
+      fname: ((arg.user && arg.user.fname) ? arg.user.fname : oldData.fname),
+      username: ((arg.user && arg.user.username) ? arg.user.username : oldData.username),
+      timeDiffToday: (arg.timeDiffToday ? arg.timeDiffToday : oldData.timeDiffToday),
+      timeDiff: (arg.timeDiff ? arg.timeDiff : oldData.id),
+      status: (arg.status ? arg.status : oldData.status),
+      lastTagTime: (arg.lastTagTime ? arg.lastTagTime : oldData.lastTagTime),
+      missedPause: (arg.missedPause ? arg.missedPause : oldData.missedPause),
+      hadLunch: (arg.hadLunch ? arg.hadLunch : oldData.hadLunch),
+      isBlocked: (arg.isBlocked ? arg.isBlocked : oldData.isBlocked)
     };
     $("#stdTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,

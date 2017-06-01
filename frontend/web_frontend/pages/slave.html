@@ -52,11 +52,6 @@
     setPage(window.PAGES.SLAVE);
     var slave = require('electron').remote.require("./frontend/slave.js");
     var currentTag = "";
-
-    function tag() {
-      slave.tag(document.getElementById("tagInput").value, slave.getNow());
-    }
-
     function dissmissInfoPane() {
       try {
         $("#infoPanel").hide('slow', function() {
@@ -190,7 +185,7 @@
   <!-- Morris Charts JavaScript -->
   <script src="../vendor/raphael/raphael.min.js"></script>
   <script src="../vendor/morrisjs/morris.min.js"></script>
-  <script src="../data/morris-data.js"></script>
+  
 
   <!-- Custom Theme JavaScript -->
   <script src="../dist/js/sb-admin-2.js"></script>
