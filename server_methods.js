@@ -21,6 +21,7 @@ const moment = require("moment");
 const config = require("./utils/config.js");
 const db = require("./db/db.js");
 const async = require("async");
+var clone = require('clone');
 /**
  * Generate the a base for an outgoing request
  * @method getBaseReq
@@ -32,6 +33,7 @@ function getBaseReq(fnc) {
     error: request.ERROR.OK
   };
 }
+
 /**
  * Save the propagated tag request into this Timbreuse's CSV
  * @method propagate_tag
@@ -42,12 +44,11 @@ function propagate_tag(ireq) {
 }
 /**
  * Send a ping to server
- * @method pingRequest
+ * @method okRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
-function pingRequest(conn) {
-  socket.write("up");
-  //TODO
+function okRequest(conn) {
+
 }
 
 function pushNotifications(profid, type, message) {
@@ -173,9 +174,8 @@ function tagRoutine(conn, user, ireq, done) {
           timeDiffToday: isNaN(nTimeDiffToday) ? row2.timeDiffToday : nTimeDiffToday,
           lastTagTime: (ireq.time) ? ireq.time : moment().format().toString(),
           status: nstatus,
-          missedPause: isNaN(missedPause) ? (row2.missedPause) : (row2.missedPause + missedPause)
+          missedPause: isNaN(missedPause) ? (row2.missedPause) : ((row2.missedPause < 0 ? 0 : row2.missedPause) + missedPause)
         }).where("userid", user.id).toString());
-
         global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err3, row3) => {
           if (err3) {
             log.error("Error while accessing the database...\n" + err);
@@ -187,7 +187,6 @@ function tagRoutine(conn, user, ireq, done) {
             done();
             return;
           }
-
           oreq.fnc = request.REQUEST.TAG;
           oreq.student = row3;
           oreq.student.timeToDo = config.loadDay(new Date().getDay()).timeToDo;
@@ -252,14 +251,7 @@ function tagRoutine(conn, user, ireq, done) {
             return;
           }
 
-          oreq.fnc = request.REQUEST.TAG;
-          oreq.student = row3;
-          oreq.student.timeToDo = config.loadDay(new Date().getDay()).timeToDo;
-          oreq.student.user = user;
-          delete oreq.student.user.password;
-          if (!ireq.delayed && ireq.client == undefined)
-            conn.socket.write(JSON.stringify(oreq) + "\0");
-          sendUpdate(row3.profid, oreq.student);
+          var arrivedLateBool = false;
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
           log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined || ireq.comments == "") ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
@@ -270,6 +262,7 @@ function tagRoutine(conn, user, ireq, done) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                   pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
+                  arrivedLateBool = true;
                 }
             } else {
               if (dayConfig.schedule.length > 0)
@@ -277,9 +270,19 @@ function tagRoutine(conn, user, ireq, done) {
                   log.warning("USRID " + user.id + " : Arrived late");
                   log.save(global.LOGS.TIMEERROR, row3.id, "", row3.lastTagTime, "Arrived late", row3.timeDiff, row3.timeDiffToday);
                   pushNotifications(row3.profid, global.LOGS.TIMEERROR, user.fname + " " + user.lname + " arrived late.");
+                  arrivedLateBool = true;
                 }
             }
           }
+          oreq.fnc = request.REQUEST.TAG;
+          oreq.student = row3;
+          oreq.student.timeToDo = config.loadDay(new Date().getDay()).timeToDo;
+          oreq.student.user = user;
+          oreq.student.arrivedLate = arrivedLateBool;
+          delete oreq.student.user.password;
+          if (!ireq.delayed && ireq.client == undefined)
+            conn.socket.write(JSON.stringify(oreq) + "\0");
+          sendUpdate(row3.profid, oreq.student);
           done();
         });
       });
@@ -334,7 +337,7 @@ function tagRequest(item, index, done) {
       tagRoutine(conn, row, ireq, done);
     });
   } else if (ireq.id != undefined) {
-    global.db.get(knex.select().from("students").where("id", ireq.id).toString(), (err, row0) => {
+    global.db.each(knex.select().from("students").where("id", "in", ireq.id).toString(), (err, row0) => {
       if (err) {
         log.error("Error while accessing the database...\n" + err);
         oreq.fnc = request.REQUEST.TAG;
@@ -370,7 +373,9 @@ function tagRequest(item, index, done) {
           done();
           return;
         }
-        tagRoutine(conn, row, ireq, done);
+        var nireq = clone(ireq);
+        nireq.id = row.id;
+        tagRoutine(conn, row, nireq, done);
       });
     });
   } else {
@@ -821,49 +826,48 @@ function resetTime(conn, ireq) {
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-    global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
+  global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
+    if (err) {
+      log.error("Error when querrying the database : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    async.waterfall([
+      function(callback) {
+        global.db.run(knex("students").where("id", "in", row.id).update({
+          hadLunch: 0,
+          missedPause: 0,
+          lastTagTime: "",
+          timeDiffToday: 0,
+          timeDiff: 0,
+          status: 0,
+          details: ""
+        }).toString(), (err) => {
+          callback(err);
+        });
+      },
+      function(callback) {
+        global.db.run(knex("notifications").where("userid", "in", row.userid).del().toString(), callback);
+      },
+      function(callback) {
+        global.db.run(knex("leavereq").where("studentid", "in", row.id).del().toString(), callback);
+      },
+      function(callback) {
+        global.db.run(knex("logs").where("studentid", "in", row.id).del().toString(), callback);
+      }
+    ], function(err) {
       if (err) {
-        log.error("Error when querrying the database : " + err);
         oreq.error = request.ERROR.SQLITE;
+        log.error(err);
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      async.waterfall([
-        function(callback) {
-          global.db.run(knex("students").where("id", "in", row.id).update({
-            hadLunch: 0,
-            missedPause: 0,
-            lastTagTime: "",
-            timeDiffToday: 0,
-            timeDiff: 0,
-            status: 0,
-            details: ""
-          }).toString(), (err) => {
-            callback(err);
-          });
-        },
-        function(callback) {
-          global.db.run(knex("notifications").where("userid", "in", row.userid).del().toString(), callback);
-        },
-        function(callback) {
-          global.db.run(knex("leavereq").where("studentid", "in", row.id).del().toString(), callback);
-        },
-        function(callback) {
-          global.db.run(knex("logs").where("studentid", "in", row.id).del().toString(), callback);
-        }
-      ], function(err) {
-        if(err)
-        {
-          oreq.error = request.ERROR.SQLITE;
-          log.error(err);
-          conn.socket.write(JSON.stringify(oreq) + "\0");
-          return;
-        }
-        conn.socket.write(JSON.stringify(oreq) + "\0");
-        log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + ((ireq.comments == undefined || ireq.comments == "") ? "" : " - " + ireq.comments), 0, 0);
-      });
-
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + ((ireq.comments == undefined || ireq.comments == "") ? "" : " - " + ireq.comments), 0, 0);
     });
+
+  });
 
 }
 
@@ -1019,12 +1023,12 @@ function setAbsent(conn, ireq) {
     }
     for (var i = 0; i < ireq.id.length; i++) {
       log.save(global.LOGS.ABSENT, ireq.id[i], "SERVER", moment().format(), ireq.comments, "", "");
-      global.db.each(knex("students").select().where("id","in",ireq.id).toString(), (err,row) => {
+      global.db.each(knex("students").select().where("id", "in", ireq.id).toString(), (err, row) => {
         if (err) {
           log.error("Error when querrying the database : " + err);
           return;
         }
-          sendUpdate(row.profid, row);
+        sendUpdate(row.profid, row);
       });
 
     }
@@ -1886,8 +1890,8 @@ function sortRequest(connection, data) {
       case request.REQUEST.EXIT:
         socketExit(connection);
         break;
-      case request.REQUEST.PING:
-        pingRequest(connection);
+      case request.REQUEST.OK:
+        okRequest(connection);
         break;
       case request.REQUEST.AUTH:
         authenticate(connection, ireq[i]);

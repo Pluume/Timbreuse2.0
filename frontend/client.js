@@ -64,12 +64,20 @@ function clientServer(data) {
   }
 }
 
+function sendOk()
+{
+  var oreq = [{
+    fnc: request.REQUEST.OK
+  }];
+  global.clientconn.write(oreq + "\0");
+}
 function incomingDataHandling(data) {
   currentBuf += data;
   if (currentBuf[currentBuf.length - 1] == "\0") {
     var tmp = currentBuf.substring(0, currentBuf.length - 1).toString("utf8");
     currentCb(null, tmp);
     clientServer(tmp);
+    sendOk();
     currentBuf = "";
   }
 }

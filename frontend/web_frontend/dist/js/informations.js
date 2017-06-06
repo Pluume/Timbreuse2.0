@@ -146,11 +146,10 @@ function getStudents(tableId, cb) {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
     }
-    switch (arg.error) {
+    switch(arg.error) {
       case window.ERROR.OK:
         var data = formatForStdTable(arg);
         $('#' + tableId).bootstrapTable('load', data);
-
         cb();
         break;
       case window.ERROR.NOTLOGEDIN:
@@ -535,7 +534,7 @@ function tag(id, comments) {
   });
   ipcRenderer.send("tag", {
     id: id,
-    comments
+    comments: comments
   });
 }
 /**

@@ -24,8 +24,29 @@
 </head>
 
 <body>
+  <style>
+    .img-circle {
+      border-radius: 50%;
+    }
 
-  <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
+    .centered_img {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      width: 512px;
+      height: 512px;
+      margin-top: -256px;
+      margin-left: -256px;
+      text-align: center;
+    }
+  </style>
+  <!--Thanks to http://www.just-wp-it.com/wp-content/uploads/2016/03/animat-lightbulb-color.gif-->
+  <div id="loadingGif" class="centered_img">
+    <img src="../../../graphics/loading.gif" alt="Loading" title="Loading" />
+    <strong>Loading...</strong>
+  </div>
+
+  <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;display:none;">
     <table id="stdTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="947" data-click-to-select="false" data-sort-name="lname" data-pagination="false"
       data-sort-order="desc">
       <thead>
@@ -39,7 +60,13 @@
           <th data-field="timeDiff" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeListFormatter" data-sortable="true">Time delta</th>
           <th data-field="status" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="statusFormatter" data-sortable="true">Status</th>
           <th data-field="lastTagTime" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Last tag time</th>
-          <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter"><span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='right' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-success btn-circle'><i class='fa fa-plus'></i></button></span></th>
+          <th data-field="actions" style="display: inline-block" data-sortable="false" data-formatter="studentsListFormatter">
+            <button href="#" onclick="changeTimeGroup();" data-toggle='tooltip' data-placement='bottom' title="Change student's time" href='#' class='btn btn-outline btn-primary btn-circle'><i class='fa fa-clock-o'></i></button>
+            <button href="#" onclick="tagGroup();" data-toggle='tooltip' data-placement='bottom' title='Tag for selected students' href='#' class='btn btn-outline btn-warning btn-circle'><i class='fa fa-tag'></i></button>
+            <button href="#" onclick="blockedGroup();" data-toggle='tooltip' data-placement='bottom' title="Set blocked" href='#' class='btn btn-outline btn-primary btn-circle'><i class='fa fa-lock'></i></button>
+            <span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='bottom' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-outline btn-success btn-circle'><i class='fa fa-plus'></i></button></span>
+
+          </th>
           <th data-field="userid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="dob" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="email" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
@@ -55,11 +82,7 @@
       </thead>
     </table>
   </div>
-  <style>
-    .img-circle {
-      border-radius: 50%;
-    }
-  </style>
+
   <!-- jQuery -->
   <script>
     window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
@@ -198,11 +221,12 @@
         element: "card" + row.id,
         data: fomattedData,
         xkey: 'x',
-        ykeys: ['day','week','month'],
-        labels: ['Day','Week','Month'],
+        ykeys: ['day', 'week', 'month'],
+        labels: ['Day', 'Week', 'Month'],
         xLabelFormat: (x) => {
           return moment(x).format("YYYY-MM-DD").toString();
-        },yLabelFormat: (y) => {
+        },
+        yLabelFormat: (y) => {
           return window.secToHMS(y);
         },
         smooth: false
@@ -292,9 +316,9 @@
     }
 
     function studentsListFormatter(val, row) {
-      return "<span data-toggle='modal' data-target='#detailsStudentModal'><button data-toggle='tooltip' data-placement='left' title='Details' href='#' onclick='showDetailsModal(" + row.id +
-        ",\"" + row.fname + "\",\"" + row.lname +
-        "\");' class='btn btn-info btn-circle'><i class='glyphicon glyphicon-zoom-in'></i></button></span><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" +
+      return "<span data-toggle='modal' data-target='#detailsStudentModal'><button data-toggle='tooltip' data-placement='left' title='Details' href='#' data-stdid='" + row.id +
+        "' data-fname='" + row.fname + "' data-lname='" + row.lname + "' " +
+        "class='btn btn-info btn-circle'><i class='glyphicon glyphicon-zoom-in'></i></button></span><span data-toggle='modal' data-target='#editStudentModal'><button data-toggle='tooltip' data-placement='top' title='Edit' href='#' onclick='getStudent(" +
         row.id +
         ",editCb);' class='btn btn-warning btn-circle'><i class='fa fa-edit'></i></button></span><span data-toggle='modal' data-target='#editStudentTimeModal'><button data-toggle='tooltip' data-placement='bottom' title='Edit time' href='#' onclick='stdToApply = [" +
         row.id +
@@ -336,6 +360,63 @@
       return status.outerHTML;
     }
     $(document).ready(function() {
+      $("#detailsStudentModal").on('hidden.bs.modal', function(event) {
+        $("#detailsCalendar").css("display", "none");
+        $('#detailsCalendar').fullCalendar('destroy');
+      });
+      $("#detailsStudentModal").on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget).find("button:first");
+        var lname = button.data('lname');
+        var fname = button.data('fname');
+        var modal = $(this);
+        modal.find('.modal-title').text("Detail of " + fname + " " + lname);
+      });
+      $("#detailsStudentModal").on('shown.bs.modal', function(event) {
+        var button = $(event.relatedTarget).find("button:first");
+        var modal = $(this);
+        var modalDialogHeight = modal.find('.modal-dialog').innerHeight();
+        var modalHeaderHeight = modal.find('.modal-header').outerHeight();
+        var modalBodyHeight = modal.find('.modal-body').innerHeight();
+        var modalFooterHeight = modal.find('.modal-footer').outerHeight();
+        var id = button.data('stdid');
+        $('#detailsCalendar').fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,listWeek'
+          },
+          navLinks: true,
+          editable: false,
+          defaultView: 'listWeek',
+          weekNumbers: true,
+          eventLimit: true,
+          timeFormat: 'H:mm',
+          firstDay: 1,
+          weekNumbersWithinDays: true,
+          dayClick: function(date, jsEvent, view) {
+            $('#calendar').fullCalendar('gotoDate', date);
+            $('#calendar').fullCalendar('changeView', 'list');
+          }
+        });
+        $('#detailsCalendar').fullCalendar('option', 'height', modalDialogHeight - modalHeaderHeight - modalFooterHeight - modalBodyHeight);
+
+        getLogs(id, (data) => {
+          var moment = require("electron").remote.require("moment");
+          var toDelete = [];
+
+          for (var i = 0; i < data.format.length; i++) {
+            if (!moment(data.format[i].start).isValid()) {
+              data.format.splice(i, 1);
+              i = i - 1;
+            }
+          }
+          $('#detailsCalendar').fullCalendar('addEventSource', data.format);
+          $("#detailsCalendar").css("display", "");
+          $('#detailsCalendar').fullCalendar('render');
+
+        });
+
+      });
       $(window).resize(function() {
         $('#stdTable').bootstrapTable('resetView', {
           height: document.body.clientHeight
@@ -355,19 +436,11 @@
             document.getElementById("etclass").setAttribute("placeholder", tclass.name);
             window.currentClass = tclass;
           }
-
+          $("#loadingGif").css("display", "none");
+          $("#pageContainer").css("display", "");
         });
       });
-      $("#detailsStudentModal").on('shown.bs.modal', function() {
-        var viewportHeight = $(window).height();
-        var modalDialogHeight = $(this).find('.modal-dialog').innerHeight();
-        var modalHeaderHeight = $(this).find('.modal-header').outerHeight();
-        var modalBodyHeight = $(this).find('.modal-body').innerHeight();
-        var modalFooterHeight = $(this).find('.modal-footer').outerHeight();
-        $('#detailsCalendar').fullCalendar('option', 'height', viewportHeight - modalHeaderHeight - modalFooterHeight - modalBodyHeight);
-      });
       activateValidator();
-
     });
 
     function submitCreateModal() {
@@ -381,48 +454,7 @@
       $('#delStudentModal').modal('toggle');
     }
 
-    function showDetailsModal(id, fname, lname) {
-      document.getElementById("detailsStudentModalTitle").innerHTML = "Detail of " + fname + " " + lname;
-      getLogs(id, (data) => {
-        var moment = require("electron").remote.require("moment");
-        var toDelete = [];
 
-        for (var i = 0; i < data.format.length; i++) {
-          if (!moment(data.format[i].start).isValid()) {
-            data.format.splice(i, 1);
-            i = i - 1;
-          }
-        }
-
-        $('#detailsCalendar').fullCalendar({
-          header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,listWeek'
-          },
-          navLinks: true, // can click day/week names to navigate views
-          editable: false,
-          defaultView: 'listWeek',
-          weekNumbers: true,
-          eventLimit: true, // allow "more" link when too many events
-          events: data.format,
-          timeFormat: 'H:mm',
-          firstDay: 1,
-          weekNumbersWithinDays: true
-        });
-        $('#calendar').fullCalendar('render');
-        $('#calendar').fullCalendar({
-          dayClick: function(date, jsEvent, view) {
-            $('#calendar').fullCalendar('gotoDate', date);
-            $('#calendar').fullCalendar('changeView', 'list');
-          }
-        });
-      });
-    }
-
-    function closeDetailsModal() {
-      $('#detailsCalendar').fullCalendar("destroy");
-    }
 
     function submitEditModal(id) {
       editStudent(id, document.getElementById('efname').value, document.getElementById('elname').value, document.getElementById('eusername').value, document.getElementById('eemail').value, document.getElementById('etag').value, document.getElementById(
@@ -447,6 +479,17 @@
       document.getElementById("advancedoptions_comment").value = "";
       $('#advancedOptionsModal').modal('hide');
     }
+
+    function tagGroup() {
+
+      $("#tagStudentModal").modal("toggle");
+      stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
+          return row.id;
+        });
+      }
+      function tagGroupSubmit() {
+        tag(stdToApply,document.getElementById("tagComment").value);
+      }
   </script>
   <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -571,7 +614,7 @@
               function preSubmitEditTimeModal() {
                 $('#editStudentTimeModal').modal('toggle');
                 if (document.getElementById("resettime_radio").checked) {
-                  resetTime(stdToApply,document.getElementById("edittime_comment").value);
+                  resetTime(stdToApply, document.getElementById("edittime_comment").value);
                   return;
                 } else if (document.getElementById("modtime_radio").checked) {
                   var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
@@ -583,7 +626,7 @@
                   var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                  setTime(stdToApply, time,document.getElementById("edittime_comment").value)
+                  setTime(stdToApply, time, document.getElementById("edittime_comment").value)
                   return;
                 }
               }
@@ -609,7 +652,7 @@
               <label for="setabsent_radio"><input id="setabsent_radio" group="advancedoptions" name="advancedoptions" checked type="radio">Set absent</label>
             </div>
             <div class="radio">
-              <label for="setfixed_radio"><input id="setfixed_radio" group="advancedoptions" name="advancedoptions" type="radio">Toggle fixed</label>
+              <label for="setfixed_radio"><input id="setfixed_radio" group="advancedoptions" name="advancedoptions" type="radio">Toggle blocked schedule</label>
             </div>
             <div class="radio">
               <label for="tag_radio"><input id="tag_radio" group="advancedoptions" name="advancedoptions" type="radio">Tag</label>
@@ -667,15 +710,34 @@
           <h2 class="modal-title" id="detailsStudentModalTitle"></h2>
         </div>
         <div class="modal-body">
-          <div id="detailsCalendar"></div>
+          <div id="detailsCalendar" style="display: none;"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="closeDetailsModal();" data-dismiss="modal">Ok</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         </div>
       </div>
     </div>
   </div>
-
+  <div class="modal fade" id="tagStudentModal" tabindex="-1" role="dialog" aria-labelledby="tagStudentModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog" role="document">
+      <div class="modal-content modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="tagStudentModalTitle">Give a description on your action</h2>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="tagComment" class="form-control-label">Comment:</label>
+            <input type="text" class="form-control" name="tagComment" id="tagComment">
+            <span class="help-block" id="error"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="tagGroupSubmit();" data-dismiss="modal">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">

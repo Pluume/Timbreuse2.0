@@ -42,6 +42,13 @@ var info = (msg) => {
   global.logFile.write(cmsg + "\n");
 };
 /**
+ * Print the stacj
+ * @method stack
+ */
+var printStack = function() {
+  console.error(new Error().stack);
+};
+/**
  * Print a user friendly error message to the console
  * @method error
  * @param {String} msg the message.
@@ -50,8 +57,10 @@ var error = (msg) => {
   var stack = at(1);
   var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
   console.log(cmsg);
+  printStack();
   global.logFile.write(cmsg + "\n");
 };
+
 /**
  * Print a user friendly information warning to the console
  * @method warning

@@ -33,7 +33,7 @@ ERROR = {
 };
 REQUEST ={
     EXIT: -1,
-    PING: 0,
+    OK: 0,
     TAG: 1,
     AUTH: 2,
     MASTER: 3,

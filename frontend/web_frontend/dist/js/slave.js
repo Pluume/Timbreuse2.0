@@ -24,8 +24,7 @@ function displayTaggedStudent(event, std) {
   } else {
     panel.setAttribute("class", "panel panel-red bigText");
   }
-  if(std == null)
-  {
+  if (std == null) {
     var heading = document.createElement("div");
     heading.setAttribute("class", "panel-heading");
     heading.innerHTML = "No user with this tag";
@@ -34,22 +33,24 @@ function displayTaggedStudent(event, std) {
     body.innerHTML = "This tag doesn't belong to any students. If you're sure that this tag belong to a student, then try again.</b>";
   } else {
     var heading = document.createElement("div");
-  heading.setAttribute("class", "panel-heading");
-  heading.innerHTML = std.user.fname + " " + std.user.lname;
-  var body = document.createElement("div");
-  var remaining = std.timeToDo - std.timeDiffToday;
-  if (remaining < 0)
-    remaining = 0;
-  body.setAttribute("class", "panel-body ");
-  body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
-  body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
-  body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : std.missedPause) + "</b> missed pause";
-  body.innerHTML += "<br />Remaining time to do today : <b>" + require("../../../utils/math.js").secondsToHms(remaining);
-  body.innerHTML += "<br /><span class='glyphicon glyphicon-cutlery black'/>  ";
-  if (std.hadLunch)
-    body.innerHTML += "<span class='glyphicon glyphicon-ok green'/>";
-  else
-    body.innerHTML += "<span class='glyphicon glyphicon-remove red'/>";
+    heading.setAttribute("class", "panel-heading");
+    heading.innerHTML = std.user.fname + " " + std.user.lname;
+    var body = document.createElement("div");
+    var remaining = std.timeToDo - std.timeDiffToday;
+    if (remaining < 0)
+      remaining = 0;
+    body.setAttribute("class", "panel-body ");
+    body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
+    body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
+    body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : std.missedPause) + "</b> missed pause";
+    body.innerHTML += "<br />Remaining time to do today : <b>" + require("../../../utils/math.js").secondsToHms(remaining);
+    body.innerHTML += "<br /><span class='glyphicon glyphicon-cutlery black'/>  ";
+    if (std.hadLunch)
+      body.innerHTML += "<span class='glyphicon glyphicon-ok green'/>";
+    else
+      body.innerHTML += "<span class='glyphicon glyphicon-remove red'/>";
+    if (std.arrivedLate !== undefined && std.arrivedLate != false)
+      body.innerHTML += "<br /><span><i class='glyphicon glyphicon-alert red'></i><strong> You are late</strong></span>"
   }
 
 
