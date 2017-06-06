@@ -577,21 +577,24 @@ function setFixed(id, comments) {
  * @param  {Object} arg   The object containing the informations
  */
 function onUpdate(event, arg) {
+
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
   {
+    console.log(arg.id);
     var oldData = $("#stdTable").bootstrapTable('getRowByUniqueId', arg.id);
-    var formatData = {
+    console.log(JSON.stringify(oldData,null,1));
+    var formatData = { //FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Todo : verifie arg.user a part + faire en sorte que l'on puisse donne autant d'info qu'on le souhaite
       id: (arg.id ? arg.id : oldData.id),
-      lname: ((arg.user && arg.user.lname) ? arg.user.lname : oldData.lname),
-      fname: ((arg.user && arg.user.fname) ? arg.user.fname : oldData.fname),
-      username: ((arg.user && arg.user.username) ? arg.user.username : oldData.username),
-      timeDiffToday: (arg.timeDiffToday ? arg.timeDiffToday : oldData.timeDiffToday),
-      timeDiff: (arg.timeDiff ? arg.timeDiff : oldData.id),
-      status: (arg.status ? arg.status : oldData.status),
-      lastTagTime: (arg.lastTagTime ? arg.lastTagTime : oldData.lastTagTime),
-      missedPause: (arg.missedPause ? arg.missedPause : oldData.missedPause),
-      hadLunch: (arg.hadLunch ? arg.hadLunch : oldData.hadLunch),
-      isBlocked: (arg.isBlocked ? arg.isBlocked : oldData.isBlocked)
+      lname: ((arg.user == undefined && arg.user.lname == undefined) ? arg.user.lname : oldData.lname),
+      fname: ((arg.user == undefined && arg.user.fname == undefined) ? arg.user.fname : oldData.fname),
+      username: ((arg.user == undefined && arg.user.username == undefined) ? arg.user.username : oldData.username),
+      timeDiffToday: (arg.timeDiffToday == undefined ? arg.timeDiffToday : oldData.timeDiffToday),
+      timeDiff: (arg.timeDiff == undefined ? arg.timeDiff : oldData.id),
+      status: (arg.status == undefined ? arg.status : oldData.status),
+      lastTagTime: (arg.lastTagTime == undefined ? arg.lastTagTime : oldData.lastTagTime),
+      missedPause: (arg.missedPause == undefined ? arg.missedPause : oldData.missedPause),
+      hadLunch: (arg.hadLunch == undefined ? arg.hadLunch : oldData.hadLunch),
+      isBlocked: (arg.isBlocked == undefined ? arg.isBlocked : oldData.isBlocked)
     };
     $("#stdTable").bootstrapTable('updateByUniqueId', {
       id: arg.id,

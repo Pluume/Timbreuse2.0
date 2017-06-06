@@ -64,22 +64,21 @@ function clientServer(data) {
   }
 }
 
-function sendOk()
-{
-  var oreq = [{
-    fnc: request.REQUEST.OK
-  }];
-  global.clientconn.write(oreq + "\0");
-}
-function incomingDataHandling(data) {
-  currentBuf += data;
-  if (currentBuf[currentBuf.length - 1] == "\0") {
-    var tmp = currentBuf.substring(0, currentBuf.length - 1).toString("utf8");
+function dataExecuter(data) {
+  var index = currentBuf.indexOf("\0");
+  if (index != -1) {
+    var tmp = currentBuf.substring(0, index).toString("utf8");
+    currentBuf = currentBuf.slice(index + 1);
     currentCb(null, tmp);
     clientServer(tmp);
-    sendOk();
-    currentBuf = "";
+    if (currentBuf.length > 0)
+      dataExecuter(currentBuf);
   }
+}
+
+function incomingDataHandling(data) {
+  currentBuf += data;
+  dataExecuter(currentBuf);
 }
 
 function connect(cb) {

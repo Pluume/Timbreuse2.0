@@ -482,13 +482,25 @@
 
     function tagGroup() {
 
-      $("#tagStudentModal").modal("toggle");
+      $("#groupActionModal").modal("toggle");
+      document.getElementById("groupActionSubmit").setAttribute("onclick","tagGroupSubmit();");
       stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
           return row.id;
         });
       }
       function tagGroupSubmit() {
-        tag(stdToApply,document.getElementById("tagComment").value);
+        tag(stdToApply,document.getElementById("groupActionComment").value);
+      }
+      function blockedGroup()
+      {
+          $("#groupActionModal").modal("toggle");
+          document.getElementById("groupActionSubmit").setAttribute("onclick","blockedGroupSubmit();");
+        stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
+            return row.id;
+          });
+      }
+      function blockedGroupSubmit() {
+        setFixed(stdToApply,document.getElementById("groupActionComment").value);
       }
   </script>
   <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
@@ -718,22 +730,22 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="tagStudentModal" tabindex="-1" role="dialog" aria-labelledby="tagStudentModal" aria-hidden="true">
+  <div class="modal fade" id="groupActionModal" tabindex="-1" role="dialog" aria-labelledby="groupActionModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog" role="document">
       <div class="modal-content modal-content">
         <div class="modal-header">
-          <h2 class="modal-title" id="tagStudentModalTitle">Give a description on your action</h2>
+          <h2 class="modal-title" id="groupActionModalTitle">Give a description on your action</h2>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="tagComment" class="form-control-label">Comment:</label>
-            <input type="text" class="form-control" name="tagComment" id="tagComment">
+            <label for="groupActionComment" class="form-control-label">Comment:</label>
+            <input type="text" class="form-control" name="groupActionComment" id="groupActionComment">
             <span class="help-block" id="error"></span>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="tagGroupSubmit();" data-dismiss="modal">Apply</button>
+          <button type="button" class="btn btn-primary" id="groupActionSubmit" data-dismiss="modal">Apply</button>
         </div>
       </div>
     </div>

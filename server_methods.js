@@ -1082,6 +1082,11 @@ function setFixed(conn, ireq) {
       }
       for (var i = 0; i < toggle1.length; i++) {
         log.save(global.LOGS.UNBLOCKED, toggle1[i], "SERVER", moment().format(), ireq.comments, "", "");
+
+        sendUpdate(conn.user.id, {
+          id: toggle1[i],
+          isBlocked: 0
+        });
       }
       global.db.run(knex("students").update({
         isBlocked: 1
@@ -1094,6 +1099,10 @@ function setFixed(conn, ireq) {
         }
         for (var ii = 0; ii < toggle2.length; ii++) {
           log.save(global.LOGS.BLOCKED, toggle2[ii], "SERVER", moment().format(), ireq.comments, "", "");
+          sendUpdate(conn.user.id, {
+            id: toggle2[i],
+            isBlocked: 0
+          });
         }
         conn.socket.write(JSON.stringify(oreq) + "\0");
       });
