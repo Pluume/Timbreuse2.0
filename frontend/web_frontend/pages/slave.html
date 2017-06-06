@@ -52,6 +52,7 @@
     setPage(window.PAGES.SLAVE);
     var slave = require('electron').remote.require("./frontend/slave.js");
     var currentTag = "";
+
     function dissmissInfoPane() {
       try {
         $("#infoPanel").hide('slow', function() {
@@ -75,9 +76,13 @@
 
     }
     $(function() {
-      $(window).keypress(function(e) {
+      $(window).blur(function() {
+        $(window).focus();
+      });
+      $('body').keypress(function(e) {
         if (e.keyCode == 13) {
-          slave.tag(currentTag, slave.getNow());
+          console.log("Tag > " + currentTag);
+          slave.tag(currentTag.replace(/\W/g, ''), slave.getNow());
           currentTag = ""
           return;
         }
@@ -179,16 +184,7 @@
   <!-- Bootstrap Core JavaScript -->
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
-  <!-- Metis Menu Plugin JavaScript -->
-  <script src="../vendor/metisMenu/metisMenu.min.js"></script>
-
-  <!-- Morris Charts JavaScript -->
-  <script src="../vendor/raphael/raphael.min.js"></script>
-  <script src="../vendor/morrisjs/morris.min.js"></script>
-  
-
   <!-- Custom Theme JavaScript -->
-  <script src="../dist/js/sb-admin-2.js"></script>
   <script src="../dist/js/bootstrap-table.js"></script>
   <script src="../dist/js/informations.js"></script>
   <script src="../dist/js/redirect.js"></script>

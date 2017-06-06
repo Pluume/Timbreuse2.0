@@ -106,7 +106,7 @@ function endOfDay() {
       if (isTodayOff) {
         ntimeDiff = row.timeDiff + row.timeDiffToday;
         ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60));
-        log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Holidays) ", ntimeDiff, 0);
+        log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "Function executed (Holidays) ", ntimeDiff, 0);
       } else {
         if (row.status != global.STATUS.ABS) {
 
@@ -119,14 +119,14 @@ function endOfDay() {
               log.info("Time refunded to student " + row.id + " : " + res + " seconds");
               log.save(global.LOGS.LEAVEREQ, row.id, "", moment().format(), "Time refunded " + res + " secb", ntimeDiff, 0);
             }
-            log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed", ntimeDiff, 0);
+            log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "Function executed", ntimeDiff, 0);
             updateDetails(ndetails, ntimeDiff);
             updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
           });
           return;
         } else {
 
-          log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "END of DAY Function executed (Absent)", ntimeDiff, 0);
+          log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "Function executed (Absent)", ntimeDiff, 0);
         }
 
       }

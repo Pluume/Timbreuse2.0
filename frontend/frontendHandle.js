@@ -203,7 +203,7 @@ function resetTime(event, arg) {
   var oreq = [{
     fnc: request.REQUEST.RESETTIME,
     error: request.ERROR.OK,
-    id: arg,
+    id: arg.id,
     comments: arg.comments
   }];
   client.send(JSON.stringify(oreq), (err, data) => {

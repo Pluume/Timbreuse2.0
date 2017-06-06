@@ -350,7 +350,7 @@ function editStudent(id, fname, lname, username, email, tag, dob, project, pass,
  * @method resetTime
  * @param  {Interger}  id The student's id
  */
-function resetTime(id) {
+function resetTime(id,comments) {
   ipcRenderer.once("resetTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -370,7 +370,7 @@ function resetTime(id) {
         redAlert("Ill formed request...");
     }
   });
-  ipcRenderer.send("resetTime", id);
+  ipcRenderer.send("resetTime", {id,comments});
 }
 /**
  * Add/Sub time to a student
@@ -411,7 +411,7 @@ function modTime(id, ntime, comments) {
  * @param  {Interger} id    The student's id
  * @param  {Interger} ntime The new time
  */
-function setTime(id, ntime) {
+function setTime(id, ntime,comments) {
   ipcRenderer.once("setTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -433,7 +433,8 @@ function setTime(id, ntime) {
   });
   ipcRenderer.send("setTime", {
     id: id,
-    time: ntime
+    time: ntime,
+    comments: comments
   });
 }
 /**

@@ -195,17 +195,10 @@
         });
       }
       new Morris.Line({
-        // ID of the element in which to draw the chart.
         element: "card" + row.id,
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
         data: fomattedData,
-        // The name of the data record attribute that contains x-values.
         xkey: 'x',
-        // A list of names of data record attributes that contain y-values.
         ykeys: ['day','week','month'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
         labels: ['Day','Week','Month'],
         xLabelFormat: (x) => {
           return moment(x).format("YYYY-MM-DD").toString();
@@ -242,7 +235,6 @@
       var cardTitle = genCardTitle(row);
       chartsTab.setAttribute("class", "active");
       profilTab.setAttribute("class", "");
-      //card.innerHTML = cardTitle + "Heél";
       card.innerHTML = "";
       genChart(row);
     }
@@ -410,7 +402,6 @@
           },
           navLinks: true, // can click day/week names to navigate views
           editable: false,
-          defaultDate: "2017-05-08",
           defaultView: 'listWeek',
           weekNumbers: true,
           eventLimit: true, // allow "more" link when too many events
@@ -580,19 +571,19 @@
               function preSubmitEditTimeModal() {
                 $('#editStudentTimeModal').modal('toggle');
                 if (document.getElementById("resettime_radio").checked) {
-                  resetTime(stdToApply);
+                  resetTime(stdToApply,document.getElementById("edittime_comment").value);
                   return;
                 } else if (document.getElementById("modtime_radio").checked) {
                   var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                  modTime(stdToApply, time, "Comments not included for now");
+                  modTime(stdToApply, time, document.getElementById("edittime_comment").value);
                   return;
                 } else if (document.getElementById("settime_radio").checked) {
                   var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                  setTime(stdToApply, time)
+                  setTime(stdToApply, time,document.getElementById("edittime_comment").value)
                   return;
                 }
               }

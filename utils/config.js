@@ -10,7 +10,7 @@ const jsonfile = require("jsonfile");
 const log = require("./log.js");
 var filename = path.join(__dirname, "..", "config.json");
 var TYPE = {SERVER: {int: 0, string: "server"}, SLAVE: {int: 1, string: "slave"}, CLIENT: {int: 2, string: "client"}};
-
+global.TYPE_LIST = TYPE;
 module.exports = {
   /**
    * Read the config

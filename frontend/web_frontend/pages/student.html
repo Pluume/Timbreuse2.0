@@ -349,7 +349,7 @@
                   var time = parseInt(document.getElementById("edittime_hours").value, 10) * 3600 + parseInt(document.getElementById("edittime_minutes").value, 10) * 60;
                   if (isNaN(time))
                     time = 0;
-                  modTime(stdToApply, time, "Comments not included for now");
+                  modTime(stdToApply, time, document.getElementById("edittime_comment").value);
                   return;
                 } else if (document.getElementById("settime_radio").checked) {
                   var time = parseInt(document.getElementById("settime_hours").value, 10) * 3600 + parseInt(document.getElementById("settime_minutes").value, 10) * 60;
@@ -527,7 +527,7 @@
   <!-- Morris Charts JavaScript -->
   <script src="../vendor/raphael/raphael.min.js"></script>
   <script src="../vendor/morrisjs/morris.min.js"></script>
-  
+
 
   <!-- Custom Theme JavaScript -->
   <script src="../dist/js/sb-admin-2.js"></script>

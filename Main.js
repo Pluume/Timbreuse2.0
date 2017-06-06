@@ -20,14 +20,17 @@ if (shouldQuit) {
   return;
 }
 const fh = require("./frontend/frontendHandle.js");
+console.log("Loading configuration...");
+const config = require("./utils/config.js");
+config.read();
+config.getType();
+console.log("Config OK\nInitializing logs...");
 const log = require("./utils/log.js");
 log.createNewLogFile();
 const sinon = require("sinon");
-log.info("Loading configuration...");
-const config = require("./utils/config.js");
+
 const db = require("./db/db.js");
-config.read();
-config.getType();
+
 global.mainPath = __dirname;
 if (global.DEBUG && global.TYPE.int === config.TYPE.SERVER.int) {
   //clock = sinon.useFakeTimers(new Date("2017-05-23T22:59:54+02:00").getTime());

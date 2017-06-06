@@ -196,7 +196,7 @@ function tagRoutine(conn, user, ireq, done) {
           if (!ireq.delayed && ireq.client == undefined)
             conn.socket.write(JSON.stringify(oreq) + "\0");
           sendUpdate(row3.profid, oreq.student);
-          log.save(global.LOGS.OUT, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          log.save(global.LOGS.OUT, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined || ireq.comments == "") ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
           done();
         });
       });
@@ -262,7 +262,7 @@ function tagRoutine(conn, user, ireq, done) {
           sendUpdate(row3.profid, oreq.student);
           var d = new Date();
           var dayConfig = config.loadDay(d.getDay());
-          log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined) ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
+          log.save(global.LOGS.IN, row3.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), ((ireq.comments == undefined || ireq.comments == "") ? "" : ireq.comments), row3.timeDiff, row3.timeDiffToday);
           if (moment((ireq.time) ? ireq.time : moment().format().toString()).isAfter(moment(row2.lastTagTime), "day")) { //First tag of the day
             if (row2.isBlocked) {
               if (dayConfig.scheduleFix.length > 0)
@@ -860,7 +860,7 @@ function resetTime(conn, ireq) {
           return;
         }
         conn.socket.write(JSON.stringify(oreq) + "\0");
-        log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), 0, 0);
+        log.save(global.LOGS.RESETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + ((ireq.comments == undefined || ireq.comments == "") ? "" : " - " + ireq.comments), 0, 0);
       });
 
     });
@@ -903,7 +903,7 @@ function modTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.MODTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + ((ireq.comments == undefined || ireq.comments == "") ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -948,7 +948,7 @@ function setTime(conn, ireq) {
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       }
-      log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + (ireq.comments == undefined ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
+      log.save(global.LOGS.SETTIME, row.id, "SERVER", moment().format().toString(), math.secondsToHms(ireq.time) + ((ireq.comments == undefined || ireq.comments == "") ? "" : " - " + ireq.comments), row.timeDiff, row.timeDiffToday);
     });
     conn.socket.write(JSON.stringify(oreq) + "\0");
   });
@@ -1256,7 +1256,7 @@ function addHolidays(conn, ireq) {
   oreq.data = [];
   var date1 = moment(ireq.data.date1, "DD-MM-YYYY").format();
   var date2;
-  if (ireq.data.date2 != null)
+  if (moment(ireq.data.date2, "DD-MM-YYYY").isValid())
     date2 = moment(ireq.data.date2, "DD-MM-YYYY").add(1, "days").format();
   else
     date2 = null;

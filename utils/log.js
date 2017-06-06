@@ -8,19 +8,21 @@ const moment = require("moment");
 const at = require("console-at");
 var path = require("path");
 const fs = require("fs");
+const math = require("./math.js");
 /**
  * Create a new log file
  * @method createNewLogFile
  */
 function createNewLogFile() {
-  if (fs.existsSync(path.join(__dirname, "..", "Timbreuse.10.log")))
-    fs.unlinkSync(path.join(__dirname, "..", "Timbreuse.10.log"));
+  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? "./":path.join(__dirname,".."));
+  if (fs.existsSync(path.join(basePath, "Timbreuse.10.log")))
+    fs.unlinkSync(path.join(basePath, "Timbreuse.10.log"));
   for (var i = 9; i > 0; i--)
-    if (fs.existsSync(path.join(__dirname, "..", "Timbreuse." + i + ".log")))
-      fs.renameSync(path.join(__dirname, "..", "Timbreuse." + i + ".log"), path.join(__dirname, "..", "Timbreuse." + (i + 1) + ".log"));
-  if (fs.existsSync(path.join(__dirname, "..", "Timbreuse.log")))
-    fs.renameSync(path.join(__dirname, "..", "Timbreuse.log"), path.join(__dirname, "..", "Timbreuse.1.log"));
-  global.logFile = fs.createWriteStream(path.join(__dirname, "..", "Timbreuse.log"), {
+    if (fs.existsSync(path.join(basePath, "Timbreuse." + i + ".log")))
+      fs.renameSync(path.join(basePath, "Timbreuse." + i + ".log"), path.join(basePath, "Timbreuse." + (i + 1) + ".log"));
+  if (fs.existsSync(path.join(basePath, "Timbreuse.log")))
+    fs.renameSync(path.join(basePath, "Timbreuse.log"), path.join(basePath, "Timbreuse.1.log"));
+  global.logFile = fs.createWriteStream(path.join(basePath, "Timbreuse.log"), {
     flags: 'w'
   });
 }
@@ -138,13 +140,13 @@ function format(data) {
         curr.color = "rgb(193, 57, 43)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-      case global.LOGS.ABS:
+      case global.LOGS.ABSENT:
         curr.title = "ABSENT";
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
-        curr.color = "rgb(78, 166, 194)"
-        curr.textColor = "rgb(0, 0, 0)"
+        curr.color = "rgb(53, 113, 133)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.SETTIME:
         curr.title = "TIME SET";
@@ -152,7 +154,7 @@ function format(data) {
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
         curr.color = "rgb(170, 13, 159)"
-        curr.textColor = "rgb(0, 0, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.MODTIME:
         curr.title = "TIME ALTERED";
@@ -160,7 +162,7 @@ function format(data) {
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
         curr.color = "rgb(170, 13, 159)"
-        curr.textColor = "rgb(0, 0, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.RESETTIME:
         curr.title = "ACCOUNT RESET";
@@ -168,7 +170,7 @@ function format(data) {
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
         curr.color = "rgb(170, 13, 159)"
-        curr.textColor = "rgb(0, 0, 0)"
+        curr.textColor = "rgb(255, 255, 255)"
         break;
       case global.LOGS.MINIMUMPAUSE:
         curr.title = "MINIMUMPAUSE RULE BROKEN";
@@ -218,7 +220,14 @@ function format(data) {
         curr.color = "rgb(0, 0, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-
+        case global.LOGS.ENDOFDAY:
+          curr.title = "END OF DAY >" + math.secondsToHms(data.logs[i].timeDiff) + "< ";
+          curr.start = data.logs[i].date;
+          if (data.logs[i].description)
+            curr.title += " - " + data.logs[i].description
+          curr.color = "rgb(223, 222, 179)"
+          curr.textColor = "rgb(0, 0, 0)"
+          break;
       default:
         continue;
     }
