@@ -168,6 +168,7 @@ module.exports = {
           drivelist.list((error, drives) => {
             if (error) {
               log.error("Error while detecting USB drive. Aborting...");
+              callback(error);
               return;
             }
             drives.forEach((drive) => {
@@ -177,6 +178,7 @@ module.exports = {
                 log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
                 if (fs.existsSync(remotefolder)) {
                   log.error("The folder already exists. Aborting");
+                  callback(1);
                   return;
                 } else {
                   fs.mkdirSync(remotefolder);
@@ -190,14 +192,17 @@ module.exports = {
                 }
               }
             });
+            callback(0);
+            return;
           });
         });
 
       }
-    ], function(err, result) {
+    ], function(err) {
       if (err) {
         log.error("Error happened during the database dump : " + err);
       }
+      cb(err);
     });
 
   },

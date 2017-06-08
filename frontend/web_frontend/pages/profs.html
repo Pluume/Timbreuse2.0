@@ -482,26 +482,43 @@
 
     function tagGroup() {
 
-      $("#groupActionModal").modal("toggle");
-      document.getElementById("groupActionSubmit").setAttribute("onclick","tagGroupSubmit();");
+
       stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
-          return row.id;
-        });
+        return row.id;
+      });
+      if (stdToApply.length > 0) {
+        $("#groupActionModal").modal("toggle");
+        document.getElementById("groupActionSubmit").setAttribute("onclick", "tagGroupSubmit();");
       }
-      function tagGroupSubmit() {
-        tag(stdToApply,document.getElementById("groupActionComment").value);
+
+    }
+
+    function tagGroupSubmit() {
+      tag(stdToApply, document.getElementById("groupActionComment").value);
+    }
+
+    function blockedGroup() {
+
+      stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
+        return row.id;
+      });
+      if (stdToApply.length > 0) {
+        $("#groupActionModal").modal("toggle");
+        document.getElementById("groupActionSubmit").setAttribute("onclick", "blockedGroupSubmit();");
       }
-      function blockedGroup()
-      {
-          $("#groupActionModal").modal("toggle");
-          document.getElementById("groupActionSubmit").setAttribute("onclick","blockedGroupSubmit();");
-        stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
-            return row.id;
-          });
+    }
+    function changeTimeGroup()
+    {
+      stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
+        return row.id;
+      });
+      if (stdToApply.length > 0) {
+        $("#editStudentTimeModal").modal("toggle");
       }
-      function blockedGroupSubmit() {
-        setFixed(stdToApply,document.getElementById("groupActionComment").value);
-      }
+    }
+    function blockedGroupSubmit() {
+      setFixed(stdToApply, document.getElementById("groupActionComment").value);
+    }
   </script>
   <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModal" aria-hidden="true">
     <div class="modal-dialog" role="document">

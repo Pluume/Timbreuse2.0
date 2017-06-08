@@ -308,6 +308,15 @@ function tagRequest(item, index, done) {
   if (global.DEBUG && ireq.tag != undefined)
     console.log("[TAG] : " + ireq.tag.replace(/\W/g, ''));
   if (ireq.tag != undefined) {
+    if (ireq.tag == global.config.adminTag) {
+      log.info("[CSV] Admin tag detected. Copying database to USB disk(s)");
+      csv.exportDBtoCSV(() => {
+        log.info("[CSV]Copying CSV to USB disk(s)");
+        csv.exportCSV(() => {
+          log.info("[CSV] Done, you may unplug your USB disk(s)");
+        });
+      });
+    }
     global.db.get(knex.select().from("users").where("tag", ireq.tag.replace(/\W/g, '')).toString(), (err, row) => {
       if (err) {
         log.error("Error while accessing the database...\n" + err);
@@ -660,6 +669,10 @@ function createStudent(conn, ireq) {
     if (res != undefined) {
       if (res.username == ireq.data.username) {
         oreq.error = request.ERROR.USEREXISTS;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      } else if (ireq.data.tag == global.config.adminTag) {
+        oreq.error = request.ERROR.TAGEXISTS;
         conn.socket.write(JSON.stringify(oreq) + "\0");
         return;
       } else {
@@ -1101,7 +1114,7 @@ function setFixed(conn, ireq) {
           log.save(global.LOGS.BLOCKED, toggle2[ii], "SERVER", moment().format(), ireq.comments, "", "");
           sendUpdate(conn.user.id, {
             id: toggle2[i],
-            isBlocked: 0
+            isBlocked: 1
           });
         }
         conn.socket.write(JSON.stringify(oreq) + "\0");

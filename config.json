@@ -3,6 +3,7 @@
   "csvFreq": 0,
   "server": "172.21.201.254",
   "defaultPass": "test",
+  "adminTag": "15bef41b",
   "slaves": [{
     "ip": "172.21.201.255",
     "name": "YE-S1c"

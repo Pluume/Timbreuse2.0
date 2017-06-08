@@ -184,7 +184,7 @@ function foreverConnect() {
     slaves[i].conn.connected = false;
     slaves[i].conn.on("close", slavesClose);
     slaves[i].conn.ip = slaves[i].ip;
-    slaves[i].conn.setKeepAlive(true,60000);
+    slaves[i].conn.setKeepAlive(true, 60000);
     slaves[i].conn.connect({
       host: slaves[i].ip,
       port: 703

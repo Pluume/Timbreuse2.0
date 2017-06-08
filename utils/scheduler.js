@@ -69,13 +69,13 @@ function endOfDay() {
         if (row.isBlocked) {
           if (dayConfig.scheduleFix.length > 0)
             if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end))) {
-              log.warning("USRID " + row.id + " : Left early");
+              log.warning("USRID " + row.id + " : Left early. The accepted leaving time is " + math.secToHMS(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end));
               log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Left early (at " + moment(row.lastTagTime).format("H:mm:ss") + ")", row.timeDiff, row.timeDiffToday);
             }
         } else {
           if (dayConfig.schedule.length > 0)
             if (new Date(row.lastTagTime) < new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].end))) {
-              log.warning("USRID " + row.id + " : Left early");
+              log.warning("USRID " + row.id + " : Left early. The accepted leaving time is " + math.secToHMS(dayConfig.schedule[dayConfig.schedule.length - 1].end));
               log.save(global.LOGS.TIMEERROR, row.id, "", row.lastTagTime, "Left early (at " + moment(row.lastTagTime).format("H:mm:ss") + ")", row.timeDiff, row.timeDiffToday);
             }
         }
