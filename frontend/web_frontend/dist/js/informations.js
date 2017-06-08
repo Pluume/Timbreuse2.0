@@ -1121,6 +1121,10 @@ function getLR(tableId, cb) {
             id: arg.data[i].id,
             dateFrom: arg.data[i].dateFrom,
             dateTo: arg.data[i].dateTo,
+            missedTest: arg.data[i].missedTest,
+            reason: arg.data[i].reason,
+            reasonDesc: arg.data[i].reasonDesc,
+            proof: arg.data[i].proof,
             acpt: arg.data[i].acpt
           });
         }

@@ -9,7 +9,7 @@ const log = require("./utils/log.js");
 const math = require("./utils/math.js");
 const csv = require("./utils/csv.js");
 const crypto = require("crypto-js");
-const lodash = require("lodash");
+const _ = require("lodash");
 const request = require("./request.js");
 const knex = require('knex')({
   client: 'sqlite3',
@@ -60,7 +60,7 @@ function pushNotifications(profid, type, message) {
     date: now,
     read: 0
   }).toString(), function() {
-    var arr = lodash.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) {
       try {
         return o.user.id == profid
       } catch (err) {
@@ -90,7 +90,7 @@ function updateNotification(profid, notifid) {
       log.error("Error querrying the database : " + err);
       return;
     }
-    var arr = lodash.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) {
       try {
         return o.user.id == profid
       } catch (err) {
@@ -107,7 +107,7 @@ function updateNotification(profid, notifid) {
 }
 
 function sendUpdate(id, arg) {
-  var arr = lodash.filter(global.clients, function(o) {
+  var arr = _.filter(global.clients, function(o) {
     try {
       return o.user.id == id
     } catch (err) {
@@ -511,7 +511,7 @@ function getStudent(conn, ireq) {
         var finalArray = [];
         global.db.all(knex("users").select("id", "username", "rank", "fname", "lname", "dob", "email", "tag").toString(), (err, rows2) => {
           for (var ii = 0; ii < rows2.length; ii++) {
-            var tmp = lodash.filter(rows, {
+            var tmp = _.filter(rows, {
               "userid": rows2[ii].id
             });
             if (tmp[0] === undefined)
@@ -543,7 +543,7 @@ function getStudent(conn, ireq) {
         var finalArray = [];
         global.db.all(knex("users").select("id", "username", "rank", "fname", "lname", "dob", "email", "tag").toString(), (err, rows2) => {
           for (var ii = 0; ii < rows2.length; ii++) {
-            var tmp = lodash.filter(rows, {
+            var tmp = _.filter(rows, {
               "userid": rows2[ii].id
             });
             if (tmp[0] === undefined)
@@ -1385,7 +1385,7 @@ function getProf(conn, ireq) {
         return;
       }
       for (var i = 0; i < rows2.length; i++) {
-        var tmp = lodash.filter(rows, {
+        var tmp = _.filter(rows, {
           "id": rows2[i].profid
         });
         tmp[0].class = rows2[i];
@@ -1615,7 +1615,7 @@ function getClassList(conn, ireq) {
       return;
     }
 
-    global.db.each(knex("users").where("id", "in", lodash.map(rows, "profid")).toString(), (err, row) => {
+    global.db.each(knex("users").where("id", "in", _.map(rows, "profid")).toString(), (err, row) => {
         if (err) {
           log.error("Error : " + err);
 
@@ -1623,7 +1623,7 @@ function getClassList(conn, ireq) {
           conn.socket.write(JSON.stringify(oreq) + "\0");
           return;
         }
-        var classObj = lodash.filter(rows, ['profid', row.id]);
+        var classObj = _.filter(rows, ['profid', row.id]);
         classObj[0].prof = row;
         delete classObj[0].prof.password;
         classData.push(classObj[0]);
@@ -1796,6 +1796,7 @@ function getLeaveRequest(conn, ireq) {
           return;
         }
         oreq.data = rows;
+        oreq.student = rows0;
         conn.socket.write(JSON.stringify(oreq) + "\0");
       })
     });
@@ -1828,6 +1829,7 @@ function getLeaveRequest(conn, ireq) {
           return;
         }
         oreq.data = rows;
+        oreq.student = row;
         conn.socket.write(JSON.stringify(oreq) + "\0");
       })
     });

@@ -11,4 +11,4 @@ tests
 Schema block
   Code:
 Interface eleve
-Ouput db + CSV sur le server
++ d'information sur les demandes de congées
