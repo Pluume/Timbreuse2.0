@@ -61,7 +61,7 @@
             <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
           </a>
           <ul class="dropdown-menu dropdown-user">
-            <li><a href="settings.html"><i class="fa fa-gear fa-fw"></i> Settings</a>
+            <li><a href="#" onclick="$('#changePasswordModal').modal('show');"><i class="fa fa-gear fa-fw"></i> Settings</a>
             </li>
             <li class="divider"></li>
             <li><a onclick="logout();"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
@@ -111,9 +111,34 @@
         });
       </script>
     </div>
-    <!-- /.row -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form id="changePasswordForm">
+            <div class="modal-header">
+              <h2 class="modal-title" id="changePasswordModalTitle">Change your password</h2>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="firstPassText">Type your password</label>
+                <input name="firstPassText" id="firstPassText" class="form-control" type="password" value="">
+                <span class="help-block" id="error"></span>
+              </div>
+              <div class="form-group">
+                <label for="secondPassText">Retype your password</label>
+                <input name="secondPassText" id="secondPassText" class="form-control" type="password" value="">
+                <span class="help-block" id="error"></span>
+              </div>
 
-    <!-- jQuery -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success">Apply</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <script>
       window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
     </script>
@@ -127,13 +152,56 @@
     <!-- Morris Charts JavaScript -->
     <script src="../vendor/raphael/raphael.min.js"></script>
     <script src="../vendor/morrisjs/morris.min.js"></script>
-    
+
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
     <script src="../dist/js/utils.js"></script>
+    <script src="../vendor/moment/moment.js"></script>
+    <script src="../vendor/validator/jquery.validate.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#changePasswordForm").validate({
 
-
+          rules: {
+            firstPassText: {
+              required: true,
+              minlength: 8
+            },
+            secondPassText: {
+              required: true,
+              equalTo: "#firstPassText",
+              minlength: 8
+            }
+          },
+          messages: {
+            firstPassText: {
+              required: "Type in your password",
+              minlength: "Minimum password length is 8 characters"
+            },
+            secondPassText: {
+              required: "Confirm your password",
+              equalTo: "Passwords don't match",
+              minlength: "Minimum password length is 8 characters"
+            }
+          },
+          errorPlacement: function(error, element) {
+            $(element).closest('.form-group').find('.help-block').html(error.html());
+          },
+          highlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+          },
+          unhighlight: function(element, errorClass, validClass) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).closest('.form-group').find('.help-block').html('');
+          },
+          submitHandler: function(form) {
+            webview.send("changepassword_index", document.getElementById("secondPassText").value);
+            $("#changePasswordModal").modal("hide");
+          }
+        });
+      });
+    </script>
 
 </body>
 

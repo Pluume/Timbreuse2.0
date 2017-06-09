@@ -1,0 +1,105 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<head>
+  <!-- Bootstrap Core CSS -->
+  <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- MetisMenu CSS -->
+  <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+  <link href="../dist/css/style.css" rel="stylesheet">
+  <link href="../dist/css/bootstrap-table.css" rel="stylesheet">
+
+  <!-- Morris Charts CSS -->
+  <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <title>Timbreuse - Student panel</title>
+  <script src="../dist/js/pages.js"></script>
+</head>
+
+<body>
+  <div class="container" id="pageContainer" style="width: 100%;margin: 0;margin-right: 10px;">
+  </div>
+
+  <!-- jQuery -->
+  <script>
+    window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
+    window.secToHMS = require('../../../utils/math.js').secondsToHms;
+    window.ERROR = require('../../../request.js').ERROR;
+    window.PAGES = require('../../../request.js').PAGES;
+    window.SCOPE = require('../../../request.js').SCOPE;
+    window.RANK = require('../../../db/db.js').RANK;
+    window.STATUS = require('../../../db/db.js').STATUS;
+    window.LOGS = require('../../../db/db.js').LOGS;
+    setPage(window.PAGES.STUDENT);
+    var stdToApply = [];
+  </script>
+  <div id="calendar">
+
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      getLogs(null, (data) => {
+        var moment = require("electron").remote.require("moment");
+        for (var i = 0; i < data.format.length; i++) {
+          if (!moment(data.format[i].start).isValid()) {
+            data.format.splice(i, 1);
+            i = i - 1;
+          }
+        }
+        $('#calendar').fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,listWeek'
+          },
+          navLinks: true,
+          editable: false,
+          defaultView: 'listWeek',
+          events: data.format,
+          weekNumbers: true,
+          eventLimit: true,
+          timeFormat: 'H:mm',
+          firstDay: 1,
+          weekNumbersWithinDays: true,
+          dayClick: function(date, jsEvent, view) {
+            $('#calendar').fullCalendar('gotoDate', date);
+            $('#calendar').fullCalendar('changeView', 'list');
+          }
+        });
+        $('#calendar').fullCalendar('render');
+
+      });
+    });
+  </script>
+  <!-- Bootstrap Core JavaScript -->
+  <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  <!-- Metis Menu Plugin JavaScript -->
+  <script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+  <!-- Morris Charts JavaScript -->
+  <script src="../vendor/raphael/raphael.min.js"></script>
+  <script src="../vendor/morrisjs/morris.min.js"></script>
+
+
+  <!-- Custom Theme JavaScript -->
+    <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+  <script src="../vendor/moment/moment.js"></script>
+  <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
+  <script src="../dist/js/sb-admin-2.js"></script>
+  <script src="../dist/js/bootstrap-table.js"></script>
+  <script src="../dist/js/informations.js"></script>
+  <script src="../dist/js/redirect.js"></script>
+  <script src="../dist/js/utils.js"></script>
+
+  <script src="../vendor/validator/jquery.validate.min.js"></script>
+  <script src="../dist/js/validate.js"></script>
+</body>
+
+</html>

@@ -479,7 +479,7 @@ function socketExit(conn) {
  **/
 function getStudent(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined || (conn.user.rank != global.RANK.PROF && conn.user.rank != global.RANK.ADMIN)) {
+  if (conn.user === undefined || (conn.user.rank == global.RANK.PROF && conn.user.rank == global.RANK.ADMIN && conn.user.rank == global.RANK.STUDENT)) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
@@ -496,9 +496,16 @@ function getStudent(conn, ireq) {
   oreq.student = [];
   if (ireq.scope == request.SCOPE.UNIQUE) {
     var index = 0;
-    global.db.all(knex("students").select().where({
+    var whereParam;
+    if (conn.user.rank == global.RANK.STUDENT)
+      whereParam = {
+        userid: conn.user.id
+      };
+    else
+      whereParam = {
         profid: conn.user.id
-      }).toString(), (err, rows) => //Get the students
+      };
+    global.db.all(knex("students").select().where(whereParam).toString(), (err, rows) => //Get the students
       {
         if (err) {
           log.error("Error : " + err);
@@ -979,31 +986,57 @@ function setTime(conn, ireq) {
  **/
 function getLogs(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
+  if (conn.user === undefined || conn.user.rank == global.RANK.ADMIN) {
 
     oreq.error = request.ERROR.NOTLOGEDIN;
     conn.socket.write(JSON.stringify(oreq) + "\0");
     return;
   }
-  if (ireq.id === undefined) {
+  if (conn.user.rank == global.RANK.PROF) {
+    if (ireq.id === undefined) {
 
-    oreq.error = request.ERROR.UNKNOWN;
-    conn.socket.write(JSON.stringify(oreq) + "\0");
-    return;
-  }
-  log.get(ireq.id, (err, data) => {
-    if (err) {
-
-      oreq.error = err;
+      oreq.error = request.ERROR.UNKNOWN;
       conn.socket.write(JSON.stringify(oreq) + "\0");
       return;
     }
+    log.get(ireq.id, (err, data) => {
+      if (err) {
 
-    oreq.error = request.ERROR.OK;
-    oreq.data = data;
-    conn.socket.write(JSON.stringify(oreq) + "\0");
-    return;
-  });
+        oreq.error = err;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+
+      oreq.error = request.ERROR.OK;
+      oreq.data = data;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    });
+  } else if (conn.user.rank == global.RANK.STUDENT) {
+    global.db.get(knex("students").where({
+      userid: conn.user.id
+    }).toString(), (err, row) => {
+      if (err || row == undefined) {
+        oreq.error = err;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      }
+      log.get(row.id, (err, data) => {
+        if (err) {
+
+          oreq.error = err;
+          conn.socket.write(JSON.stringify(oreq) + "\0");
+          return;
+        }
+
+        oreq.error = request.ERROR.OK;
+        oreq.data = data;
+        conn.socket.write(JSON.stringify(oreq) + "\0");
+        return;
+      });
+    });
+  }
+
 }
 /**
  * Set a students as absent
@@ -1200,7 +1233,7 @@ function toggleNotification(conn, ireq) {
  **/
 function getHolidays(conn, ireq) {
   var oreq = getBaseReq(ireq.fnc);
-  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
+  if (conn.user === undefined || (conn.user.rank != global.RANK.PROF && conn.user.rank != global.RANK.STUDENT)) {
 
     log.error("Not logged in");
     return;
@@ -1576,6 +1609,8 @@ function changePassword(conn, ireq) {
   }
   global.db.run(knex("users").update({
     password: ireq.data
+  }).where({
+    id: conn.user.id
   }).toString(), (err) => {
     if (err) {
       log.error("Error : " + err);
@@ -1766,6 +1801,68 @@ function getLeaveRequest(conn, ireq) {
     log.error("Not logged in");
     return;
   }
+  var whereParam;
+  if (ireq.scope != undefined)
+    whereParam = {
+      profid: conn.user.id
+    };
+  else
+    whereParam = {
+      userid: conn.user.id
+    };
+  async.waterfall([
+    function(callback) {
+      var res = [];
+      global.db.each(knex("students").select("userid", "id").where(whereParam).toString(), (err, row) => {
+        if (err)
+          callback(err);
+        else {
+          delete row.details;
+          res.push(row);
+        }
+
+      }, (err) => {
+        callback(err, res);
+      });
+    },
+    function(res, callback) {
+      global.db.each(knex("users").select("lname", "fname", "username", "id").where("id", "in", _.map(res, 'userid')).toString(), (err, row) => {
+        if (err)
+          callback(err);
+        else {
+          delete row.password;
+          res[_.findIndex(res, ['userid', row.id])].user = row;
+        }
+        res[_.findIndex(res, ['userid', row.id])].user = row;
+      }, (err) => {
+        callback(err, res);
+      });
+    },
+    function(res, callback) {
+      var nres = [];
+      global.db.each(knex("leavereq").where("studentid", "in", _.map(res, 'id')).toString(), (err, row) => {
+        if (err)
+          callback(err);
+        else {
+          row.student = res[_.findIndex(res, ['id', row.studentid])];
+          nres.push(row);
+        }
+      }, (err) => {
+        callback(err, nres);
+      });
+    }
+  ], function(err, result) {
+    if (err) {
+      log.error("Error : " + err);
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    oreq.data = result;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+  /*
+
   if (ireq.scope != undefined) {
     global.db.all(knex("students").select().where({
       profid: conn.user.id
@@ -1834,6 +1931,9 @@ function getLeaveRequest(conn, ireq) {
       })
     });
   }
+
+   */
+
 }
 /**
  * Toggle the accepted status of a leave application

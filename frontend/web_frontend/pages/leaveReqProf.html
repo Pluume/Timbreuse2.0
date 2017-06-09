@@ -27,12 +27,15 @@
 
 <body>
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="LRTable" data-unique-id="id" data-detail-view="true" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
+    <table id="LRTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="state" data-checkbox="true"></th>
-          <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">LeaveReq ID</th>
-          <th data-field="dateFrom" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Start date</th>
+          <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true"></th>
+          <th data-field="lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
+          <th data-field="fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
+          <th data-field="username" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Username</th>
+          <th data-field="dateFrom" style="text-align: center; vertical-align: middle; width: 36px; "  data-formatter="timeFormatter" data-sortable="true">Start date</th>
           <th data-field="dateTo" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">End date</th>
           <th data-field="missedTest" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Missed Test</th>
           <th data-field="reason" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Reason</th>
@@ -69,8 +72,12 @@
       });
 
     }
-
+    function detailsFormatter(index,row)
+    {
+      //TODO
+    }
     function actionFormatter(val, row) {
+      console.log(JSON.stringify(row));
       if (row.acpt)
         return "<button data-toggle='tooltip' data-placement='left' title='Set denied' href='#' onclick='toggleAcpt(" + row.id + "," + "false);' class='btn btn-success'><i class='glyphicon glyphicon-remove'></i></button>";
       else
@@ -218,7 +225,7 @@
   <!-- Morris Charts JavaScript -->
   <script src="../vendor/raphael/raphael.min.js"></script>
   <script src="../vendor/morrisjs/morris.min.js"></script>
-  
+
 
   <!-- Custom Theme JavaScript -->
   <script src="../dist/js/sb-admin-2.js"></script>

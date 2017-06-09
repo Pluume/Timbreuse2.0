@@ -1,4 +1,4 @@
-  Documentation :
+﻿  Documentation :
 Rapport
 Journal
 Gantt
@@ -11,4 +11,6 @@ tests
 Schema block
   Code:
 Interface eleve
-+ d'information sur les demandes de congées
++ d'information sur les demandes de congés
+Ne pas pouvoir cree des demandes de conge avec des temps faux
+

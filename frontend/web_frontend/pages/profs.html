@@ -394,15 +394,14 @@
           firstDay: 1,
           weekNumbersWithinDays: true,
           dayClick: function(date, jsEvent, view) {
-            $('#calendar').fullCalendar('gotoDate', date);
-            $('#calendar').fullCalendar('changeView', 'list');
+            $('#detailsCalendar').fullCalendar('gotoDate', date);
+            $('#').fullCalendar('changeView', 'list');
           }
         });
         $('#detailsCalendar').fullCalendar('option', 'height', modalDialogHeight - modalHeaderHeight - modalFooterHeight - modalBodyHeight);
 
         getLogs(id, (data) => {
           var moment = require("electron").remote.require("moment");
-          var toDelete = [];
 
           for (var i = 0; i < data.format.length; i++) {
             if (!moment(data.format[i].start).isValid()) {

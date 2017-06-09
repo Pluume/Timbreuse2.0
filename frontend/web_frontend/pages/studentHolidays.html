@@ -18,7 +18,6 @@
 
   <!-- Custom Fonts -->
   <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-  <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
   <title>Timbreuse - Student panel</title>
   <script src="../dist/js/pages.js"></script>
 </head>
@@ -40,7 +39,14 @@
     setPage(window.PAGES.STUDENT);
     var stdToApply = [];
   </script>
+  <div id="calendar">
 
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      getHolidays("calendar", true);
+    });
+  </script>
   <!-- Bootstrap Core JavaScript -->
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -53,13 +59,15 @@
 
 
   <!-- Custom Theme JavaScript -->
+  <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+  <script src="../vendor/moment/moment.js"></script>
+  <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
   <script src="../dist/js/sb-admin-2.js"></script>
   <script src="../dist/js/bootstrap-table.js"></script>
   <script src="../dist/js/informations.js"></script>
   <script src="../dist/js/redirect.js"></script>
   <script src="../dist/js/utils.js"></script>
-  <script src="../vendor/moment/moment.js"></script>
-  <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
+
   <script src="../vendor/validator/jquery.validate.min.js"></script>
   <script src="../dist/js/validate.js"></script>
 </body>

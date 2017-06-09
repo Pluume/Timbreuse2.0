@@ -56,6 +56,7 @@ function formatForStdTable(data) {
   }
   return ndata;
 }
+
 /**
  * Print a red notification on screen
  * @method redAlert
@@ -146,7 +147,7 @@ function getStudents(tableId, cb) {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
     }
-    switch(arg.error) {
+    switch (arg.error) {
       case window.ERROR.OK:
         var data = formatForStdTable(arg);
         $('#' + tableId).bootstrapTable('load', data);
@@ -349,7 +350,7 @@ function editStudent(id, fname, lname, username, email, tag, dob, project, pass,
  * @method resetTime
  * @param  {Interger}  id The student's id
  */
-function resetTime(id,comments) {
+function resetTime(id, comments) {
   ipcRenderer.once("resetTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -369,7 +370,10 @@ function resetTime(id,comments) {
         redAlert("Ill formed request...");
     }
   });
-  ipcRenderer.send("resetTime", {id,comments});
+  ipcRenderer.send("resetTime", {
+    id,
+    comments
+  });
 }
 /**
  * Add/Sub time to a student
@@ -410,7 +414,7 @@ function modTime(id, ntime, comments) {
  * @param  {Interger} id    The student's id
  * @param  {Interger} ntime The new time
  */
-function setTime(id, ntime,comments) {
+function setTime(id, ntime, comments) {
   ipcRenderer.once("setTime", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
       redAlert("Unable to contact the server...");
@@ -582,7 +586,7 @@ function onUpdate(event, arg) {
   {
     console.log(arg.id);
     var oldData = $("#stdTable").bootstrapTable('getRowByUniqueId', arg.id);
-    console.log(JSON.stringify(arg,null,1));
+    console.log(JSON.stringify(arg, null, 1));
     var formatData = { //FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Todo : verifie arg.user a part + faire en sorte que l'on puisse donne autant d'info qu'on le souhaite
       id: (arg.id ? arg.id : oldData.id),
       lname: ((arg.user !== undefined && arg.user.lname !== undefined) ? arg.user.lname : oldData.lname),
@@ -699,7 +703,7 @@ function delHolidays(id, calId) {
  * @method getHolidays
  * @param  {Interger}    calendarId The calendar's id to update
  */
-function getHolidays(calendarId) {
+function getHolidays(calendarId, isStudent) {
   ipcRenderer.send("getHolidays", null);
   ipcRenderer.once("getHolidays", (event, arg) => {
     if (arg === window.ERROR.UNKNOWN) {
@@ -733,10 +737,12 @@ function getHolidays(calendarId) {
           firstDay: 1,
           weekNumbersWithinDays: true,
           eventClick: function(calEvent, jsEvent, view) {
-            document.getElementById("confirmDeleteEvent").onclick = function() {
-              delHolidays(calEvent.id, calendarId);
-            };
-            $("#delEventModal").modal("show");
+            if (isStudent === undefined) {
+              document.getElementById("confirmDeleteEvent").onclick = function() {
+                delHolidays(calEvent.id, calendarId);
+              };
+              $("#delEventModal").modal("show");
+            }
           }
         });
         break;
@@ -1082,7 +1088,14 @@ function getLRForStudent(tableId, cb) {
             id: arg.data[i].id,
             dateFrom: arg.data[i].dateFrom,
             dateTo: arg.data[i].dateTo,
-            acpt: arg.data[i].acpt
+            missedTest: arg.data[i].missedTest,
+            reason: arg.data[i].reason,
+            reasonDesc: arg.data[i].reasonDesc,
+            proof: arg.data[i].proof,
+            acpt: arg.data[i].acpt,
+            lname: arg.data[i].student.user.lname,
+            fname: arg.data[i].student.user.fname,
+            username: arg.data[i].student.user.username
           });
         }
         $('#' + tableId).bootstrapTable('load', data);
@@ -1125,8 +1138,12 @@ function getLR(tableId, cb) {
             reason: arg.data[i].reason,
             reasonDesc: arg.data[i].reasonDesc,
             proof: arg.data[i].proof,
-            acpt: arg.data[i].acpt
+            acpt: arg.data[i].acpt,
+            lname: arg.data[i].student.user.lname,
+            fname: arg.data[i].student.user.fname,
+            username: arg.data[i].student.user.username
           });
+          console.log(data);
         }
         $('#' + tableId).bootstrapTable('load', data);
 
