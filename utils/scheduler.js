@@ -130,8 +130,7 @@ function endOfDay() {
         }
 
       }
-      //TODO Notification on student's status == IN at end of day
-      updateDetails(ndetails, ntimeDiff);
+        updateDetails(ndetails, ntimeDiff);
       updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
     }, (err, nb) => {
       if (err) {
