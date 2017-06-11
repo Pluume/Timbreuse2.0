@@ -46,7 +46,7 @@ Projet : & P1699
 \end{center}
 
 \section{Introduction}
-Cette procédure consiste à faciliter la lecture d'autres rapport de testes afin de modulariser au maximum la documentation et la rendre la plus clair possible.
+Les tests effectués sur l'interface graphique de la timbreuse ont des procédures et des résultats similaires. De ce fait toutes les fonctionnalités peuvent être testé grâce à la méthode suivante.
 \section{Organisation visuelle}
 Les méthodes de test sont similaires entre tout les tests concernant les panneaux des administrateurs, des enseignants et des élèves. Sur ces panneaux, une interface parentes que l'on nomera «Conteneur» contiens des liens vers les différentes page du panel correspondant. 
 Chaque lien redirige la page enfant que l'on nomera «Hôte».\\
@@ -60,6 +60,8 @@ Pour tester la fonctionnalité étudiée, l'utilisateur doit naviguer dans le lo
 On identifie un succès généralement par un affichage de informations recherchés lors de l'execution de la fonction étudié ou bien par un boite de texte de fond vert au sommet de l'application avec un message décrivant le résultat de la fonction. Cette boîte de texte disparaît au bout de 2 secondes.
 \subsection{Erreurs}
 On identifie généralement une erreur par une absence de réaction après avoir déclenché la fonction. Si la fonction cette executé correctement mais qu'une erreur connu à été détecté, alors une boite de texte de fond rouge apparaîtra pendant 15 secondes avec un cour message décrivant l'erreur.
+\\
+Pour avoir plus d'information sur une erreur on doit, lorsque la fenêtre du logiciel de la timbreuse est selectionné, faire la combinaison de touche "Ctrl+I". Un panneau s'ouvrira sur la droite avec un champs de texte nommé console. Des messages d'erreur pourrait être affiché ici si l'erreur provient du processus de rendu graphique. Si l'erreur venait du processus principale, alors l'erreur serait affiché dans le fichier de log situé à la racine du logiciel.
 \section{Conclusion}
 Si la fonctionnalité à été un succès, on peut donc définir cette fonctionnalité comme opérationnelle. 
 % \printbibliography
