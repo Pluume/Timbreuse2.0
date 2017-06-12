@@ -1,0 +1,60 @@
+\documentclass[10pt,a4paper,onecolumn]{article}
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry}
+\usepackage{a4wide}
+\usepackage{titling}
+\setlength{\droptitle}{-5em}
+\usepackage[version=3]{mhchem}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[english,francais]{babel}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage[pdftex]{hyperref}
+\setlength\parindent{0pt}
+\usepackage{xcolor}
+\hypersetup{colorlinks,urlcolor=blue}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\chead{Francis Le Roy}
+\lfoot{P1699/MCT}
+\cfoot{\today}
+\rfoot{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+% \bibliography{bib}
+\renewcommand{\labelenumi}{\alph{enumi}.}
+
+
+
+\title{Rapport de test \\ Exportation de la base de données \\ sur un support externe}
+
+\author{Francis \textsc{Le Roy}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{center}
+\begin{tabular}{l r}
+Date de réalisation : & 9 Mars, 2017 \\
+Projet : & P1699 \\
+\end{tabular}
+\end{center}
+
+\section{Introduction}
+Les professeurs peuvent avoir besoin de faire une sauvegarde de la base de données. Pour ce faire une fonction exportant la base de données paraît importante. Ce test va donc vérifié que la fonction exportant la base de données en CSV sur un support de stockage externe fonctionne.
+\section{Résultat attendu}
+Un dossier daté devrait être crée sur la clé USB. De plus, tout les CSV de la timbreuse ainsi qu'un version CSV de la base de données devraient être stockés sur la clé dans le dossier daté.
+\section{Procédure de test}
+Il faut utiliser le fichier \href{run:../../../test/export_db.js}{script} Node JS, qui va effectuer la fonction exportant les CSV et la base de données. Si la fonction s'execute correctement, le message "Done" sera affiché dans la console
+\section{Résultats obtenus}
+Lorsque le script est executé, tous les CSV sont copiés dans un dossier daté sur la clé USB. Le message "Done" est apparu dans la console.
+\section{Conclusion}
+Cette fonctionnalité est donc opérationnelle.
+% \printbibliography
+
+\end{document}

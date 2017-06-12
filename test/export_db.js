@@ -7,4 +7,6 @@ const config = require("./utils/config.js");
 log.info("Initializing database...");
 const db = require("./db/db.js");
 db.init();//Init the database
-csv.exportDBtoCSV(() => {});
+csv.exportDBtoCSV(() => {
+  console.log("Done");
+});

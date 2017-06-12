@@ -92,7 +92,7 @@ function updateNotification(profid, notifid) {
     }
     var arr = _.filter(global.clients, function(o) {
       try {
-        return o.user.id == profid
+        return o.user.id == profid;
       } catch (err) {
         return false;
       }
@@ -109,7 +109,7 @@ function updateNotification(profid, notifid) {
 function sendUpdate(id, arg) {
   var arr = _.filter(global.clients, function(o) {
     try {
-      return o.user.id == id
+      return o.user.id == id;
     } catch (err) {
       return false;
     }
@@ -163,11 +163,11 @@ function tagRoutine(conn, user, ireq, done) {
       nstatus = global.STATUS.OUT;
       var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
       nTimeDiffToday = row2.timeDiffToday + delta;
-      var missedPause = Math.floor(delta / global.config.pause.interval); //Calculate the number of missedPause
+      var missedPause = delta / global.config.pause.interval; //Calculate the number of missedPause
       if (missedPause) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
-        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't take a pause in a " + math.secondsToHms(delta) + " session.");
+        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't take a pause in a " + Math.floor(math.secondsToHms(delta)) + " session.");
       }
       global.db.serialize(() => {
         global.db.run(knex("students").update({

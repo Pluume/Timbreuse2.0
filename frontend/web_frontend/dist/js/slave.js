@@ -42,7 +42,7 @@ function displayTaggedStudent(event, std) {
     body.setAttribute("class", "panel-body ");
     body.innerHTML = "Your daily timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiffToday) + "</b>";
     body.innerHTML += "<br />Your total timer is set to : <b>" + require("../../../utils/math.js").secondsToHms(std.timeDiff) + "</b>";
-    body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : std.missedPause) + "</b> missed pause";
+    body.innerHTML += "<br />You have : <b>" + (std.missedPause < 0 ? 0 : Math.floor(std.missedPause)) + "</b> missed pause";
     body.innerHTML += "<br />Remaining time to do today : <b>" + require("../../../utils/math.js").secondsToHms(remaining);
     body.innerHTML += "<br /><span class='glyphicon glyphicon-cutlery black'/>  ";
     if (std.hadLunch)
