@@ -21,6 +21,7 @@ const moment = require("moment");
 const config = require("./utils/config.js");
 const db = require("./db/db.js");
 const async = require("async");
+var tagReqQueue = async.queue(tagRequest,1);
 var clone = require('clone');
 /**
  * Generate the a base for an outgoing request
@@ -294,11 +295,10 @@ function tagRoutine(conn, user, ireq, done) {
  * Handle a tag request (When a student arrive or leave)
  * @method tagRequest
  **/
-function tagRequest(item, index, done) {
+function tagRequest(item, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
   var ireq = item.ireq;
   var conn = item.connection;
-  tagReqList.splice(index, 1); // Remove current item
   if (ireq.time != undefined && !ireq.delayed && !(moment(ireq.time).isBetween(moment().subtract(20, "seconds"), moment().add(20, "seconds"))))
     ireq.time = moment().format().toString();
   if (ireq.tag != undefined && ireq.time != undefined)
@@ -1997,7 +1997,13 @@ function sortRequest(connection, data) {
 
 function serializedTagRequest() {
   tagReqList.sort('ireq.time', 'ascending');
-  new EventedArray(tagReqList.toArray()).forEachEmission(tagRequest);
+  var tmp = tagReqList.pop();
+  while(tmp)
+  {
+    tagReqQueue.push(tmp);
+    tmp = tagReqList.pop();
+  }
+
 }
 module.exports = {
 

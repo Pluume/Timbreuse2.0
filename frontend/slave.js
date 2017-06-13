@@ -70,9 +70,6 @@ function tag(stag, ntime) {
     class: global.config.class
   };
   csv.writeBruteLoggingToCSV(stag, ntime);
-  console.log("TAG : " + stag);
-  console.log("CONNECTED : " + connected);
-  console.log("oreqPile")
   if (connected) {
     slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
   } else {
@@ -108,10 +105,17 @@ function compileRequest(ireq) {
 /**
  * Handle the incoming data from the outgoing socket
  * @method onSocketData
- * @param {Object} ireq The json request
+ * @param {Object} nireq The json request
  **/
-function onSocketData(ireq) {
-  ireq = JSON.parse(ireq);
+function onSocketData(nireq) {
+  var ireq;
+  try {
+    ireq = JSON.parse(nireq);
+  } catch(err)
+  {
+    log.error("Error parsing : " + ireq);
+  }
+
   if (ireq.fnc === undefined)
     return;
 
@@ -186,8 +190,13 @@ function foreverConnect() {
     slaves[i].conn.class = slaves[i].class;
     slaves[i].conn.connected = false;
     slaves[i].conn.on("close", slavesClose);
+    slaves[i].on("timeout", () => {
+      log.error("Connection to the slave " + slaves[i].class + " timed out");
+      slaves[i].conn.connected = false;
+      slaves[i].conn.destroy();
+    });
     slaves[i].conn.ip = slaves[i].ip;
-    slaves[i].conn.setKeepAlive(true, 60000);
+    slaves[i].conn.setKeepAlive(true, 10000);
     slaves[i].conn.connect({
       host: slaves[i].ip,
       port: 703
@@ -196,6 +205,8 @@ function foreverConnect() {
   }
   slaveconn.on("timeout", () => {
     log.error("Connection to server timed out");
+    connected = false;
+    slaveconn.destroy();
   });
   slaveconn.on("close", (err) => {
     slaveconn.destroy();
