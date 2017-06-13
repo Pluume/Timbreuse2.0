@@ -105,19 +105,19 @@ function endOfDay() {
       }
       if (isTodayOff) {
         ntimeDiff = row.timeDiff + row.timeDiffToday;
-        ntimeDiff += (row.missedPause <= 0) ? 0 : (row.missedPause * (-20 * 60));
+        ntimeDiff += (row.missedPause <= 0) ? 0 : (Math.floor(row.missedPause) * (-20 * 60));
         log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "Function executed (Holidays) ", ntimeDiff, 0);
       } else {
         if (row.status != global.STATUS.ABS) {
 
-          ntimeDiff -= (row.missedPause <= 0) ? 0 : (row.missedPause * (20 * 60));
+          ntimeDiff -= (row.missedPause <= 0) ? 0 : (Math.floor(row.missedPause) * (20 * 60));
           lr.getTimeToRefund(row.id, (res) => {
             ntimeDiff += res;
             if (dayConfig.lunch && !res)
               ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
             if (res) {
               log.info("Time refunded to student " + row.id + " : " + res + " seconds");
-              log.save(global.LOGS.LEAVEREQ, row.id, "", moment().format(), "Time refunded " + res + " secb", ntimeDiff, 0);
+              log.save(global.LOGS.LEAVEREQ, row.id, "", moment().format(), "Time refunded " + math.secondsToHms(res) , ntimeDiff, 0);
             }
             log.save(global.LOGS.ENDOFDAY, row.id, "", moment().format(), "Function executed", ntimeDiff, 0);
             updateDetails(ndetails, ntimeDiff);

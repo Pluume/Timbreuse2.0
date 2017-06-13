@@ -14,7 +14,7 @@ const math = require("./math.js");
  * @method createNewLogFile
  */
 function createNewLogFile() {
-  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? "./":path.join(__dirname,".."));
+  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? "./" : path.join(__dirname, ".."));
   if (fs.existsSync(path.join(basePath, "Timbreuse.10.log")))
     fs.unlinkSync(path.join(basePath, "Timbreuse.10.log"));
   for (var i = 9; i > 0; i--)
@@ -229,14 +229,20 @@ function format(data) {
         curr.color = "rgb(0, 0, 0)"
         curr.textColor = "rgb(255, 255, 255)"
         break;
-        case global.LOGS.ENDOFDAY:
-          curr.title = "END OF DAY >" + math.secondsToHms(data.logs[i].timeDiff) + "< ";
-          curr.start = data.logs[i].date;
-          if (data.logs[i].description)
-            curr.title += " - " + data.logs[i].description
-          curr.color = "rgb(223, 222, 179)"
-          curr.textColor = "rgb(0, 0, 0)"
-          break;
+      case global.LOGS.ENDOFDAY:
+        curr.title = "END OF DAY >" + math.secondsToHms(data.logs[i].timeDiff) + "< ";
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += " - " + data.logs[i].description
+        curr.color = "rgb(223, 222, 179)"
+        curr.textColor = "rgb(0, 0, 0)";
+        break;
+      case global.LOGS.LEAVEREQ:
+        curr.title = "LEAVE APPLICATION > " + data.logs[i].description;
+        curr.color = "rgb(223, 222, 179)"
+        curr.textColor = "rgb(0, 0, 0)";
+        curr.start = data.logs[i].date;
+        break;
       default:
         continue;
     }

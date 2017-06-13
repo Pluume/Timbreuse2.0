@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -108,14 +123,13 @@
 const log = require(&quot;./utils/log.js&quot;);
 net = require(&#x27;net&#x27;);
 const method = require(&quot;./server_methods&quot;);
-var clients = [];
 /**
  * Remove a client from the client list
  * @method removeClient
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function removeClient(conn) {
-    clients.splice(clients.indexOf(conn), 1);
+    global.clients.splice(clients.indexOf(conn), 1);
 }
 /**
  * Add a client to the client list
@@ -123,7 +137,7 @@ function removeClient(conn) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function addClient(conn) {
-    clients.push(conn);
+    global.clients.push(conn);
 }
 module.exports = {
   /**
@@ -131,24 +145,33 @@ module.exports = {
    * @method start
    **/
   start: () =&gt; {
+    global.clients = [];
+    method.initialize();
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
+      connection.currentBuf = &quot;&quot;;
       addClient(connection);
+      socket.setKeepAlive(true,60000);
+      if(global.DEBUG)
+      log.info(socket.remoteAddress + &quot; just connected&quot;);
         socket.on(&#x27;error&#x27;, function() {
             removeClient(connection);
         });
         socket.on(&#x27;timeout&#x27;, function() {
+          log.warning(socket.remoteAddress +&quot; timed out&quot;)
             removeClient(connection);
             socket.end();
         });
         socket.on(&#x27;data&#x27;, function(data) {
-          method.sortRequest(connection,data.toString(&quot;utf8&quot;));
+          method.compileRequest(connection,data.toString(&quot;utf8&quot;));
         });
         socket.on(&#x27;end&#x27;, function() {
             removeClient(connection);
         });
         socket.on(&#x27;close&#x27;, function(hadError) {
             removeClient(connection);
+            if(global.DEBUG)
+            log.info(socket.remoteAddress + &quot; just disconnected&quot;);
         });
     }).listen(703).on(&#x27;listening&#x27;, function() {
       log.info(&quot;The server up on the port 703&quot;);

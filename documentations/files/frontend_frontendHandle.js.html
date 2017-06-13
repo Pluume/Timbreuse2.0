@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>frontend\frontendHandle.js - Timbreuse</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="Timbreuse" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 2.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/client.html">client</a></li>
+                                <li><a href="../classes/config.html">config</a></li>
+                                <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
+                                <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
+                                <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
+                                <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
+                                <li><a href="../classes/server.html">server</a></li>
+                                <li><a href="../classes/server_methods.html">server_methods</a></li>
+                                <li><a href="../classes/slave.html">slave</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/client.html">client</a></li>
+                                <li><a href="../modules/config.html">config</a></li>
+                                <li><a href="../modules/csv.html">csv</a></li>
+                                <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
+                                <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
+                                <li><a href="../modules/main.html">main</a></li>
+                                <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
+                                <li><a href="../modules/request.html">request</a></li>
+                                <li><a href="../modules/server.html">server</a></li>
+                                <li><a href="../modules/server_methods.html">server_methods</a></li>
+                                <li><a href="../modules/slave.html">slave</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: frontend\frontendHandle.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Handle the communication between electron&#x27;s main process and electron&#x27;s renderer process
+ *
+ * @module frontendHandle
+ * @class frontendHandle
+ */
+const {
+  ipcMain
+} = require(&#x27;electron&#x27;);
+const client = require(&quot;./client.js&quot;);
+const request = require(&quot;../request.js&quot;);
+const log = require(&quot;../utils/log.js&quot;);
+const crypto = require(&quot;crypto-js&quot;);
+const path = require(&#x27;path&#x27;);
+const array = require(&#x27;array&#x27;)();
+/**
+ * Get the students from the server
+ * @method getStudents
+ * @param {Event} event The event object
+ * @param {Object} arg The scope of the search (see the server_methods.js)
+ **/
+function getStudents(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETSTUDENT,
+    error: request.ERROR.OK,
+    scope: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;students&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Log into the server
+ * @method logIn
+ * @param {Event} event The event object
+ * @param {Object} arg Raw credentials entered by the user
+ **/
+function logIn(event, arg) {
+  var passhash = crypto.SHA256(arg.pass).toString(crypto.enc.utf8);
+  var oreq = [{
+    fnc: request.REQUEST.AUTH,
+    error: request.ERROR.OK,
+    user: arg.user,
+    pass: passhash
+  }];
+
+  client.connect((err) =&gt; {
+
+    if (err !== null) {
+      log.error(&quot;Error connecting to server : &quot; + err);
+      event.sender.send(&quot;login&quot;, request.ERROR.UNKNOWN);
+      return;
+    }
+    client.send(JSON.stringify(oreq), (err, data) =&gt; {
+      try {
+        var ireq = JSON.parse(data);
+        if (ireq.fnc != oreq[0].fnc)
+          return;
+        event.sender.send(&quot;login&quot;, ireq);
+      } catch (err1) {
+        log.error(&quot;Error parsing request : &quot; + err1);
+      }
+    });
+  });
+}
+/**
+ * Redirect the renderer process to another page
+ * @method redirect
+ * @param {Event} event The event object
+ * @param {Integer} arg Which page to redirect to
+ **/
+function redirect(event, arg) {
+  switch (arg) {
+    case request.PAGES.PROFS:
+      global.mwin.loadURL(&quot;file://&quot; + path.join(__dirname, &#x27;web_frontend/pages/index.html&#x27;));
+      break;
+    case request.PAGES.ADMIN:
+      global.mwin.loadURL(&quot;file://&quot; + path.join(__dirname, &#x27;web_frontend/pages/indexAdmin.html&#x27;));
+      break;
+    case request.PAGES.STUDENT:
+      global.mwin.loadURL(&quot;file://&quot; + path.join(__dirname, &#x27;web_frontend/pages/indexStudent.html&#x27;));
+      break;
+  }
+}
+/**
+ * Set the global variable to the current page
+ * @method setPage
+ * @param {Event} event The event object
+ * @param {Object} arg The page ID
+ **/
+function setPage(event, arg) {
+  global.currentPage = arg;
+}
+/**
+ * Get the current class object
+ * @method getClass
+ * @param {Event} event The event object
+ * @param {Object} arg The scope (see server_methods.js)
+ **/
+function getClass(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETCLASS,
+    error: request.ERROR.OK,
+    scope: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;class&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Create a new students
+ * @method createStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function createStudent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.ADDSTUDENT,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;createStudent&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Delete a student from the database
+ * @method deleteStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function deleteStudent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELSTUDENT,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;deleteStudent&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Edit a student
+ * @method editStudent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function editStudent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.EDITSTUDENT,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;editStudent&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Reset the time and last tagged time of student
+ * @method resetTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function resetTime(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.RESETTIME,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;resetTime&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Add/Sub time to a student
+ * @method modTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function modTime(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.MODTIME,
+    error: request.ERROR.OK,
+    id: arg.id,
+    time: arg.time,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;modTime&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Set the time of a student
+ * @method setTime
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function setTime(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.SETTIME,
+    error: request.ERROR.OK,
+    id: arg.id,
+    time: arg.time,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;setTime&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Get the logs of a student
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function getLogs(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.LOGS,
+    error: request.ERROR.OK,
+    id: arg.id
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      ireq.format = log.format(ireq.data);
+      event.sender.send(&quot;logs&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Toggle the absent status of a student
+ * @method setAbsent
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function setAbsent(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.SETABSENT,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;absent&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Toggle the status blocked of student. If blocked the student must comply to the fixed schedule
+ * @method setFixed
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function setFixed(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.SETFIXED,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;fixed&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Tag a student
+ * @method tag
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function tag(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TAG,
+    error: request.ERROR.OK,
+    id: arg.id,
+    comments: arg.comments,
+    client: true
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;tag&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Get alls the notification relative to a student
+ * @method getNotifications
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function getNotifications(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETNOTIFICATIONS,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;notification&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Change the status (either read or unread) of notification
+ * @method toggleNotification
+ * @param {Event} event The event object
+ * @param {Integer} arg The notification id
+ **/
+function toggleNotification(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TOGGLENOTIFICATION,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {});
+}
+/**
+ * Get the holidays
+ * @method getHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function getHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETHOLIDAYS,
+    error: request.ERROR.OK
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;getHolidays&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Create a new holidays object in the database
+ * @method addHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function addHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.ADDHOLIDAYS,
+    error: request.ERROR.OK,
+    data: {
+      title: arg.title,
+      date1: arg.date1,
+      date2: arg.date2
+    }
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;addHolidays&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Delete holidays in the database
+ * @method delHolidays
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function delHolidays(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELHOLIDAYS,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;delHolidays&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+    }
+  });
+}
+/**
+ * Log out of the server
+ * @method logout
+ * @param {Event} event The event object
+ * @param {Object} arg Nothing
+ **/
+function logout(event, arg) {
+  client.disconnect();
+}
+/**
+ * Get all the informations relative to the professor currently connected if any
+ * @method getProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function getProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETPROF,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;getprof&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Create a new professor
+ * @method addProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function addProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CREATEPROF,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;addprof&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Delete a professor object from the database
+ * @method delProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function delProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELPROF,
+    error: request.ERROR.OK,
+    id: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;delprof&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Edit a professor object
+ * @method editProf
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function editProf(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.EDITPROF,
+    error: request.ERROR.OK,
+    data: arg
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;editprof&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Change the password of the currently connected user if any
+ * @method changePassword
+ * @param {Event} event The event object
+ * @param {Object} arg The new raw password
+ **/
+function changePassword(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CHANGEPASS,
+    error: request.ERROR.OK,
+    data: crypto.SHA256(arg).toString(crypto.enc.utf8)
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;changepassword&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Get a list of all the existings classes
+ * @method getClassList
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function getClassList(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETCLASSLIST,
+    error: request.ERROR.OK
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;getclasslist&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Change a student&#x27;s class
+ * @method changeStudentClass
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function changeStudentClass(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CHANGECLASS,
+    error: request.ERROR.OK,
+    stdid: arg.stdid,
+    profid: arg.profid
+  }];
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;changestdclass&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Create a new leave request in the database
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Validated data entered by the user
+ **/
+function createLeaveRequest(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.CREATELR,
+    error: request.ERROR.OK,
+    sDate: arg.sDate,
+    eDate: arg.eDate,
+    missedTest: arg.missedTest,
+    reason: arg.reason,
+    reasonDesc: arg.reasonDesc,
+    proof: arg.proof,
+    where: arg.where
+  }];
+  if(arg.id!=undefined)
+  oreq[0].id = arg.id;
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;createLR&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Get all the leaves request accessible for the currently connected user if any
+ * @method getLogs
+ * @param {Event} event The event object
+ * @param {Object} arg Nothing
+ **/
+function getLeaveRequest(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.GETLR,
+    error: request.ERROR.OK
+  }];
+  if (arg != undefined)
+    oreq[0].scope = arg;
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;getLR&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+/**
+ * Toggle the accepted status of a leave application&#x27;s
+ * @method toggleLR
+ * @param {Event} event The event object
+ * @param {Object} arg The id and the new value of the status
+ **/
+function toggleLR(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.TOGGLELR,
+    error: request.ERROR.OK,
+    id: arg.id,
+    status: arg.status
+  }];
+  if (arg != undefined)
+    oreq[0].scope = arg;
+  client.send(JSON.stringify(oreq), (err, data) =&gt; {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send(&quot;toggleLR&quot;, ireq);
+    } catch (err1) {
+      log.error(&quot;Error parsing request : &quot; + err1);
+      log.error(&quot;Error details : &quot; + err);
+    }
+  });
+}
+ipcMain.on(&quot;toggleLR&quot;,toggleLR);
+ipcMain.on(&quot;editStudent&quot;, editStudent);
+ipcMain.on(&quot;deleteStudent&quot;, deleteStudent);
+ipcMain.on(&quot;createStudent&quot;, createStudent);
+ipcMain.on(&quot;class&quot;, getClass);
+ipcMain.on(&quot;pages&quot;, setPage);
+ipcMain.on(&quot;redirect&quot;, redirect);
+ipcMain.on(&quot;students&quot;, getStudents);
+ipcMain.on(&quot;login&quot;, logIn);
+ipcMain.on(&quot;resetTime&quot;, resetTime);
+ipcMain.on(&quot;modTime&quot;, modTime);
+ipcMain.on(&quot;setTime&quot;, setTime);
+ipcMain.on(&quot;logs&quot;, getLogs);
+ipcMain.on(&quot;absent&quot;, setAbsent);
+ipcMain.on(&quot;fixed&quot;, setFixed);
+ipcMain.on(&quot;tag&quot;, tag);
+ipcMain.on(&quot;notification&quot;, getNotifications);
+ipcMain.on(&quot;notificationToggle&quot;, toggleNotification);
+ipcMain.on(&quot;getHolidays&quot;, getHolidays);
+ipcMain.on(&quot;addHolidays&quot;, addHolidays);
+ipcMain.on(&quot;delHolidays&quot;, delHolidays);
+ipcMain.on(&quot;logout&quot;, logout);
+ipcMain.on(&quot;getprof&quot;, getProf);
+ipcMain.on(&quot;addprof&quot;, addProf);
+ipcMain.on(&quot;delprof&quot;, delProf);
+ipcMain.on(&quot;editprof&quot;, editProf);
+ipcMain.on(&quot;changepassword&quot;, changePassword);
+ipcMain.on(&quot;getclasslist&quot;, getClassList);
+ipcMain.on(&quot;changestdclass&quot;, changeStudentClass);
+ipcMain.on(&quot;createLR&quot;, createLeaveRequest);
+ipcMain.on(&quot;getLR&quot;, getLeaveRequest);
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

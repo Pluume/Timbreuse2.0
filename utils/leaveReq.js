@@ -109,8 +109,8 @@ function routine(res) {
 
     }
   }
-  if (diff > today.timeToDo + global.config.lunch.time)
-    diff = today.timeToDo + global.config.lunch.time; //Never give more than the maximum
+  if (diff > today.timeToDo)
+    diff = today.timeToDo; //Never give more than the maximum
   return diff;
 }
 /**

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>utils\scheduler.js - Timbreuse</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="Timbreuse" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 2.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/client.html">client</a></li>
+                                <li><a href="../classes/config.html">config</a></li>
+                                <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
+                                <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
+                                <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
+                                <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
+                                <li><a href="../classes/server.html">server</a></li>
+                                <li><a href="../classes/server_methods.html">server_methods</a></li>
+                                <li><a href="../classes/slave.html">slave</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/client.html">client</a></li>
+                                <li><a href="../modules/config.html">config</a></li>
+                                <li><a href="../modules/csv.html">csv</a></li>
+                                <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
+                                <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
+                                <li><a href="../modules/main.html">main</a></li>
+                                <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
+                                <li><a href="../modules/request.html">request</a></li>
+                                <li><a href="../modules/server.html">server</a></li>
+                                <li><a href="../modules/server_methods.html">server_methods</a></li>
+                                <li><a href="../modules/slave.html">slave</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: utils\scheduler.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+var CronJob = require(&#x27;cron&#x27;).CronJob;
+var log = require(&quot;./log.js&quot;);
+var job;
+var knex = require(&#x27;knex&#x27;)({
+  client: &#x27;sqlite3&#x27;,
+  useNullAsDefault: true
+});
+var moment = require(&quot;moment&quot;);
+var math = require(&quot;./math.js&quot;);
+const config = require(&quot;./config.js&quot;);
+const lr = require(&quot;./leaveReq.js&quot;);
+const hd = require(&quot;./holidays.js&quot;);
+/**
+ * Function called when the end-of-day scheduler tick
+ * @method endOfDay
+ **/
+function endOfDay() {
+  var d = new Date();
+
+  var dayConfig = config.loadDay(d.getDay());
+  hd.isTodayOff((isTodayOff) =&gt; {
+    global.db.each(knex.select().from(&#x27;students&#x27;).toString(), (err, row) =&gt; {
+      if (err) {
+        log.error(&quot;Error while iterating through students in the database : &quot; + err);
+        return;
+      }
+      var updateStdForTheDay = function(id, status, ntimeDiff, details) {
+
+        if (isNaN(ntimeDiff)) {
+          log.error(&quot;New time diff is NaN&quot;);
+          ntimeDiff = row.timeDiff;
+        }
+        global.db.run(knex(&quot;students&quot;).where(&quot;id&quot;, id).update({
+          status: (status == global.STATUS.ABS) ? global.STATUS.ABS : global.STATUS.OUT,
+          timeDiff: ntimeDiff,
+          timeDiffToday: 0,
+          details: JSON.stringify(details),
+          hadLunch: 0,
+          missedPause: -1
+        }).toString());
+      };
+      var updateDetails = function(ndetails, ntimeDiff) {
+        ndetails.day.push({
+          time: moment().format(),
+          timeDiff: ntimeDiff
+        });
+        if (moment(moment().format()).isSame(moment().endOf(&quot;week&quot;), &#x27;day&#x27;)) {
+
+          ndetails.week.push({
+            time: moment().format(),
+            timeDiff: ntimeDiff
+          });
+        }
+        if (moment(moment().format()).isSame(moment().endOf(&quot;month&quot;), &#x27;day&#x27;)) {
+          ndetails.month.push({
+            time: moment().format(),
+            timeDiff: ntimeDiff
+          });
+        }
+      };
+      var ntimeDiff;
+      if (row.status == global.STATUS.IN) {
+        ntimeDiff = row.timeDiff - dayConfig.timeToDo;
+        log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Last status of the day was IN&quot;, row.timeDiff, row.timeDiffToday);
+      } else if (row.status == global.STATUS.ABS) {
+        ntimeDiff = row.timeDiff
+      } else if (!isTodayOff) {
+        ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
+        if (row.isBlocked) {
+          if (dayConfig.scheduleFix.length &gt; 0)
+            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end))) {
+              log.warning(&quot;USRID &quot; + row.id + &quot; : Left early. The accepted leaving time is &quot; + math.secondsToHms(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end));
+              log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Left early (at &quot; + moment(row.lastTagTime).format(&quot;H:mm:ss&quot;) + &quot;)&quot;, row.timeDiff, row.timeDiffToday);
+            }
+        } else {
+          if (dayConfig.schedule.length &gt; 0)
+            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].end))) {
+              log.warning(&quot;USRID &quot; + row.id + &quot; : Left early. The accepted leaving time is &quot; + math.secondsToHms(dayConfig.schedule[dayConfig.schedule.length - 1].end));
+              log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Left early (at &quot; + moment(row.lastTagTime).format(&quot;H:mm:ss&quot;) + &quot;)&quot;, row.timeDiff, row.timeDiffToday);
+            }
+        }
+
+      }
+      if (!row.hadLunch &amp;&amp; row.status != global.STATUS.ABS &amp;&amp; dayConfig.lunch &amp;&amp; !isTodayOff)
+      {
+        log.info(&quot;USRID &quot; + row.id + &quot; : Missed lunch&quot;);
+        log.save(global.LOGS.NOLUNCH, row.id, &quot;SERVER&quot;, null, &quot;&quot;, row.timeDiff, row.timeDiffToday);
+      }
+
+      var ndetails;
+      try {
+        ndetails = JSON.parse(row.details);
+        if (ndetails == null) {
+          ndetails.day = [];
+          ndetails.week = [];
+          ndetails.month = []
+        };
+      } catch (err2) {
+
+        ndetails = {
+          day: [],
+          week: [],
+          month: []
+        };
+      }
+      if (isTodayOff) {
+        ntimeDiff = row.timeDiff + row.timeDiffToday;
+        ntimeDiff += (row.missedPause &lt;= 0) ? 0 : (row.missedPause * (-20 * 60));
+        log.save(global.LOGS.ENDOFDAY, row.id, &quot;&quot;, moment().format(), &quot;Function executed (Holidays) &quot;, ntimeDiff, 0);
+      } else {
+        if (row.status != global.STATUS.ABS) {
+
+          ntimeDiff -= (row.missedPause &lt;= 0) ? 0 : (row.missedPause * (20 * 60));
+          lr.getTimeToRefund(row.id, (res) =&gt; {
+            ntimeDiff += res;
+            if (dayConfig.lunch &amp;&amp; !res)
+              ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
+            if (res) {
+              log.info(&quot;Time refunded to student &quot; + row.id + &quot; : &quot; + res + &quot; seconds&quot;);
+              log.save(global.LOGS.LEAVEREQ, row.id, &quot;&quot;, moment().format(), &quot;Time refunded &quot; + math.secondsToHms(res) , ntimeDiff, 0);
+            }
+            log.save(global.LOGS.ENDOFDAY, row.id, &quot;&quot;, moment().format(), &quot;Function executed&quot;, ntimeDiff, 0);
+            updateDetails(ndetails, ntimeDiff);
+            updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
+          });
+          return;
+        } else {
+
+          log.save(global.LOGS.ENDOFDAY, row.id, &quot;&quot;, moment().format(), &quot;Function executed (Absent)&quot;, ntimeDiff, 0);
+        }
+
+      }
+        updateDetails(ndetails, ntimeDiff);
+      updateStdForTheDay(row.id, row.status, ntimeDiff, ndetails);
+    }, (err, nb) =&gt; {
+      if (err) {
+        log.error(&quot;Error : &quot; + err);
+        return;
+      }
+      log.info(&quot;Function done ! &quot; + nb + &quot; students treated.&quot;);
+    });
+  });
+
+}
+module.exports = {
+  /**
+   * Start the end-of-day scheduler
+   * @method start
+   **/
+  start: function() {
+    job = new CronJob(&#x27;00 00 23 * * 1-7&#x27;, function() {
+        endOfDay();
+      }, function() {
+        log.info(&quot;Scheduler stopped !&quot;);
+      },
+      true);
+    log.info(&quot;Scheduler started !&quot;);
+  },
+  /**
+   * Stop the end-of-day scheduler
+   * @method stop
+   **/
+  stop: function() {
+    try {
+      job.stop();
+    } catch (ex) {
+      log.error(&quot;Error while stopping the end-of-day scheduler : &quot; + ex);
+    }
+
+  },
+  endOfDay
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

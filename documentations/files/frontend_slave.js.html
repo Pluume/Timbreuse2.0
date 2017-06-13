@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -107,7 +122,9 @@
  */
 const electron = require(&#x27;electron&#x27;);
 const app = electron.app;
+const ipcMain = electron.ipcMain;
 const BrowserWindow = electron.BrowserWindow;
+const globalShortcut = electron.globalShortcut;
 const path = require(&#x27;path&#x27;);
 const url = require(&#x27;url&#x27;);
 const net = require(&quot;net&quot;);
@@ -115,6 +132,7 @@ const log = require(&quot;./../utils/log.js&quot;);
 const csv = require(&quot;./../utils/csv.js&quot;);
 const request = require(&quot;./../request.js&quot;);
 const moment = require(&quot;moment&quot;);
+var clone = require(&#x27;clone&#x27;);
 var goingToClose = false;
 var connected = false;
 var slaveconn;
@@ -126,7 +144,7 @@ var oreqPile = [];
  * @return {String} the current time in a ISO string
  **/
 function getNow() {
-    return moment().toDate().toISOString();
+  return moment().format();
 }
 
 
@@ -134,14 +152,19 @@ function getNow() {
  * Execute the pile of saved request
  * @method executePile
  **/
-function executePile() { //TODO refaire pour gerer le cas par cas
-    if (oreqPile.length) {
-        slaveconn.write(JSON.stringify(oreqPile));
-        for (var i = 0; i &lt; slaves.length; i++) {
-            slaves[i].conn.write(JSON.stringify(oreqPile));
-        }
-        oreqPile = [];
+function executePile() {
+  if (oreqPile.length &amp;&amp; connected) {
+    slaveconn.write(JSON.stringify(oreqPile) + &quot;\0&quot;);
+    oreqPile = [];
+  }
+  for (var i = 0; i &lt; slaves.length; i++) {
+    if (slaves[i].pile.length &amp;&amp; slaves[i].conn.connected) {
+      slaves[i].conn.write(JSON.stringify(slaves[i].pile) + &quot;\0&quot;);
+      slaves[i].pile = [];
     }
+
+  }
+
 
 }
 /**
@@ -151,50 +174,72 @@ function executePile() { //TODO refaire pour gerer le cas par cas
  * @param {String} ntime the current time.
  **/
 function tag(stag, ntime) {
-    if (global.DEBUG) {
-        log.info(&quot;Tag : &quot; + stag + &quot; Time : &quot; + ntime);
-    }
-    var oreq = {
-        fnc: request.REQUEST.TAG,
-        error: request.ERROR.OK,
-        tag: stag,
-        time: ntime,
-        class: global.config.class
-    };
-    csv.writeBruteLoggingToCSV(stag, ntime);
-    if (connected) {
-        slaveconn.write(JSON.stringify(request.toArray(oreq)));
-        //TODO Handle data incoming
+  if (global.DEBUG) {
+    log.info(&quot;Tag : &quot; + stag + &quot; Time : &quot; + ntime);
+  }
+  stag = stag.replace(/\W/g, &#x27;&#x27;);
+  var oreq = {
+    fnc: request.REQUEST.TAG,
+    error: request.ERROR.OK,
+    tag: stag,
+    time: ntime,
+    class: global.config.class
+  };
+  csv.writeBruteLoggingToCSV(stag, ntime);
+  if (connected) {
+    slaveconn.write(JSON.stringify(request.toArray(oreq)) + &quot;\0&quot;);
+  } else {
+    oreq.delayed = true;
+    oreqPile.push(oreq);
+  }
+  var soreq = clone(oreq);
+  soreq.fnc = request.REQUEST.PROPAGATE_TAG;
+  for (var i = 0; i &lt; slaves.length; i++) {
+    if (slaves[i].conn.connected) {
+      slaves[i].conn.write(JSON.stringify(request.toArray(soreq)) + &quot;\0&quot;);
     } else {
-        oreq.delayed = true;
-        oreqPile.push(oreq);
-    }
-    for (var i = 0; i &lt; slaves.length; i++) {
-        if (slaves[i].conn.connected) {
-            slaves[i].conn.write(JSON.stringify(request.toArray(oreq)));
-        } else {
-            oreq.delayed = true;
-            slaves[i].pile.push(oreq);
-        }
+      soreq.delayed = true;
 
+      slaves[i].pile.push(soreq);
     }
+
+  }
 }
-//TODO Function that handle master card
 
 /**
- * Export all the CSV to USB key on master key
+ * Compile the complete request before using it
+ * @method compileRequest
+ * @param {Object} ireq The json request
+ **/
+function compileRequest(ireq) {
+  slaveconn.currentBuf += ireq;
+  if (slaveconn.currentBuf[slaveconn.currentBuf.length - 1] == &quot;\0&quot;) {
+    onSocketData(slaveconn.currentBuf.substring(0, slaveconn.currentBuf.length - 1).toString(&quot;utf8&quot;));
+    slaveconn.currentBuf = &quot;&quot;;
+  }
+}
+/**
+ * Handle the incoming data from the outgoing socket
  * @method onSocketData
- * @param {Object} ireq The json request 
+ * @param {Object} ireq The json request
  **/
 function onSocketData(ireq) {
-  for(var i = 0; i&lt;ireq.length;i++)
-  {
-    switch(ireq[i].fnc)
-    {
-      case MASTER:
-      csv.exportCSV(()=&gt;{});
+  ireq = JSON.parse(ireq);
+  if (ireq.fnc === undefined)
+    return;
+
+  switch (ireq.fnc) {
+    case request.REQUEST.MASTER:
+      global.mwin.webContents.send(&quot;CSV&quot;, false);
+      csv.exportCSV(() =&gt; {
+        global.mwin.webContents.send(&quot;CSV&quot;, true);
+      });
       break;
-    }
+    case request.REQUEST.TAG:
+      global.mwin.webContents.send(&quot;slaveStd&quot;, ireq.student);
+      break;
+    default:
+      break;
   }
 }
 
@@ -203,116 +248,171 @@ function onSocketData(ireq) {
  * @method foreverConnect
  **/
 function foreverConnect() {
-    slaveconn = new net.Socket();
-    var connectedToServer = function() {
-        log.info(&#x27;Connected to server!&#x27;);
-        executePile();
-        connected = true;
-    };
-    var slavesConnect = function() {
-        this.connected = true;
-        executePile();
-        log.info(&quot;The Timbreuse &quot; + this.class + &quot; is online.&quot;);
-    };
-    var slavesClose = function(err) {
-        this.connected = false;
-        if (!goingToClose) {
-            if (err) {
-                log.warning(&quot;The connection to the Timbreuse &quot; + this.class + &quot; was closed with an error. Connecting back in 5 seconds&quot;);
-                setTimeout(foreverConnect, 5000);
-            } else {
-                log.warning(&quot;The connection to the Timbreuse &quot; + this.class + &quot; was closed without an error. Connecting back in 5 seconds&quot;);
-                setTimeout(foreverConnect, 5000);
-            }
-        } else {
-            log.info(&quot;Connection closed. (&quot; + this.class + &quot;)&quot;);
-        }
-    };
-    for (var i = 0; i &lt; slaves.length; i++) {
-        slaves[i].conn = new net.Socket();
-        slaves[i].conn.class = slaves[i].class;
-        slaves[i].conn.connected = false;
-        slaves[i].conn.connect({
-            host: slaves.ip,
-            port: 704 //TODO REAL is 703
-        }, slavesConnect);
-        slaves[i].conn.on(&quot;close&quot;, slavesClose);
-    }
-    slaveconn.on(&quot;close&quot;, (err) =&gt; {
-        connected = false;
-        if (!goingToClose) {
-            if (err) {
-                log.warning(&quot;The connection was closed with an error. Connecting back in 5 seconds&quot;);
-                setTimeout(foreverConnect, 5000);
-            } else {
-                log.warning(&quot;The connection was closed without an error. Connecting back in 5 seconds&quot;);
-                setTimeout(foreverConnect, 5000);
-            }
-        } else {
-            log.info(&quot;Connection closed.&quot;);
-        }
+  slaveconn = new net.Socket();
+  slaveconn.currentBuf = &quot;&quot;;
+  var connectedToServer = function() {
+    if (connected)
+      return;
+    connected = true;
+    global.mwin.webContents.send(&quot;onlineServer&quot;, true);
+    log.info(&#x27;Connected to server!&#x27;);
+    slaveconn.on(&quot;data&quot;, compileRequest);
+    executePile();
 
-    });
-    slaveconn.connect({
-        host: global.config.server,
-        port: 703
-    });
+  };
+  var slavesConnect = function() {
+    if (this.connected)
+      return;
+    this.connected = true;
+    executePile();
+    log.info(&quot;The Timbreuse &quot; + this.class + &quot; is online.&quot;);
+  };
+  var slavesClose = function(err) {
+    this.connected = false;
+    var tsock = this;
+    tsock.removeAllListeners(&quot;connect&quot;);
+    tsock.on(&quot;connect&quot;, slavesConnect);
+    if (!goingToClose) {
+      if (err) {
+        log.warning(&quot;The connection to the Timbreuse &quot; + this.class + &quot; was closed with an error. Connecting back in 5 seconds&quot;);
+        setTimeout(() =&gt; {
+          tsock.connect({
+            host: tsock.ip,
+            port: 703
+          });
+        }, 5000);
+      } else {
+        log.warning(&quot;The connection to the Timbreuse &quot; + this.class + &quot; was closed without an error. Connecting back in 5 seconds&quot;);
+        setTimeout(() =&gt; {
+          tsock.connect({
+            host: tsock.ip,
+            port: 703
+          });
+        }, 5000);
+      }
+    } else {
+      log.info(&quot;Connection closed. (&quot; + this.class + &quot;)&quot;);
+    }
+  };
+  for (var i = 0; i &lt; slaves.length; i++) {
+    slaves[i].conn = new net.Socket();
+    slaves[i].conn.class = slaves[i].class;
+    slaves[i].conn.connected = false;
+    slaves[i].conn.on(&quot;close&quot;, slavesClose);
+    slaves[i].conn.ip = slaves[i].ip;
+    slaves[i].conn.setKeepAlive(true, 60000);
+    slaves[i].conn.connect({
+      host: slaves[i].ip,
+      port: 703
+    }, slavesConnect);
+
+  }
+  slaveconn.on(&quot;timeout&quot;, () =&gt; {
+    log.error(&quot;Connection to server timed out&quot;);
+  });
+  slaveconn.on(&quot;close&quot;, (err) =&gt; {
+    slaveconn.destroy();
+    connected = false;
+    global.mwin.webContents.send(&quot;onlineServer&quot;, false);
+    if (!goingToClose) {
+      if (err) {
+        log.warning(&quot;The connection with the server was closed with an error. Connecting back in 5 seconds&quot;);
+        setTimeout(() =&gt; {
+          slaveconn.connect({
+            host: global.config.server,
+            port: 703
+          }, connectedToServer);
+        }, 5000);
+      } else {
+        log.warning(&quot;The connection with the server was closed without an error. Connecting back in 5 seconds&quot;);
+        setTimeout(() =&gt; {
+          slaveconn.connect({
+            host: global.config.server,
+            port: 703
+          }, connectedToServer);
+        }, 5000);
+      }
+    } else {
+      log.info(&quot;Connection closed.&quot;);
+    }
+
+  });
+  log.info(&quot;Connecting to server : &quot; + global.config.server + &quot;:703&quot;);
+  slaveconn.connect({
+    host: global.config.server,
+    port: 703
+  }, connectedToServer);
+
 }
 /**
  * Create the slave frontend
  * @method createWindow
  **/
 function createWindow() {
-    global.mwin = new BrowserWindow({
-        width: 800,
-        height: 600,
-        show: false
-    });
-    global.mwin.loadURL(url.format({
-        pathname: path.join(__dirname, &#x27;slave.html&#x27;),
-        protocol: &#x27;file:&#x27;,
-        slashes: true
-    }));
-    global.mwin.webContents.openDevTools();
-    global.mwin.on(&#x27;closed&#x27;, function() {
-        global.mwin = null;
-    });
-    global.mwin.on(&quot;ready-to-show&quot;, () =&gt; {
-        global.mwin.show();
-    });
-    global.mwin.on(&quot;show&quot;, () =&gt; {
-        for (var i = 0; i &lt; global.config.slaves.length; i++) {
-            //if (global.config.slaves[i].class != global.config.class) { //TODO Uncomment in final version
-            slaves.push(global.config.slaves[i]);
 
-            slaves[i].pile = [];
-            //}
-        }
-        foreverConnect();
-    });
+  global.mwin = new BrowserWindow({
+    width: 800,
+    height: 600,
+    show: false
+  });
+  global.mwin.setMenu(null);
+  global.mwin.hide();
+  globalShortcut.register(&#x27;CommandOrControl+W&#x27;, () =&gt; {
+    app.quit();
+  });
+  globalShortcut.register(&#x27;CommandOrControl+I&#x27;, () =&gt; {
+    global.mwin.openDevTools();
+  });
+  global.mwin.loadURL(url.format({
+    pathname: path.join(__dirname, &#x27;web_frontend/pages/slave.html&#x27;),
+    protocol: &#x27;file:&#x27;,
+    slashes: true
+  }));
+  global.mwin.on(&#x27;closed&#x27;, function() {
+    global.mwin = null;
+  });
+  global.mwin.webContents.on(&#x27;did-finish-load&#x27;, function() {
+    global.mwin.show();
+  });
+  global.mwin.on(&quot;show&quot;, () =&gt; {
+    global.mwin.maximize();
+    global.mwin.setFullScreen(true);
+    for (var i = 0; i &lt; global.config.slaves.length; i++) {
+      if (global.config.slaves[i].class != global.config.class) {
+        slaves[i] = global.config.slaves[i];
+        slaves[i].pile = [];
+      }
+    }
+    foreverConnect();
+  });
 }
 /**
  * Load the slave frontend
  * @method load
  **/
 function load() {
-    app.on(&#x27;ready&#x27;, createWindow);
-    app.on(&#x27;window-all-closed&#x27;, function() {
-        if (process.platform !== &#x27;darwin&#x27;) {
-            app.quit();
-        }
-    });
-    app.on(&#x27;activate&#x27;, function() {
-        if (global.mwin === null) {
-            createWindow();
-        }
-    });
+  app.on(&#x27;ready&#x27;, createWindow);
+  app.on(&#x27;window-all-closed&#x27;, function() {
+    if (process.platform !== &#x27;darwin&#x27;) {
+      app.quit();
+    }
+  });
+  app.on(&#x27;activate&#x27;, function() {
+    if (global.mwin === null) {
+      createWindow();
+    }
+  });
 
 }
+
+function delCSV() {
+  csv.deleteAllCSV();
+}
 module.exports = {
-    load,
-    tag,
-    getNow
+  load,
+  tag,
+  getNow,
+  delCSV
 };
 
     </pre>

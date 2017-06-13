@@ -1,0 +1,61 @@
+\documentclass[10pt,a4paper,onecolumn]{article}
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry}
+\usepackage{a4wide}
+\usepackage{titling}
+\setlength{\droptitle}{-5em}
+\usepackage[version=3]{mhchem}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[english,francais]{babel}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage[pdftex]{hyperref}
+\setlength\parindent{0pt}
+\usepackage{xcolor}
+\hypersetup{colorlinks,urlcolor=blue}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\chead{Francis Le Roy}
+\lfoot{P1699/MCT}
+\cfoot{\today}
+\rfoot{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+\bibliography{bib}
+\renewcommand{\labelenumi}{\alph{enumi}.}
+
+
+\title{Étude \\ Choix du port logiciel du serveur \\ et des timbreuses esclaves}
+
+\author{Francis \textsc{Le Roy}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{center}
+\begin{tabular}{l r}
+Date de réalisation : & 13 Juin, 2017 \\
+Projet : & P1699 \\
+\end{tabular}
+\end{center}
+
+
+\section{Introduction}
+La Timbreuse serveur ainsi que les timbreuse esclave utilise un port TCP pour pour se connecter les unes aux autres. Il est nécessaire de choisir un port logicielle qui ne va pas rentrer en conflit avec d'autre logiciel précédemment installer ou qui seront succeptible d'être nécessaire dans le futur proche à venir.
+\section{Recherche}
+\subsection{Depuis une liste de ports communs}
+Il est possible de trouver sur Wikipedia\cite{Wikipedia} une liste des ports les plus commun occuper par d'autre application. Au hasard, j'ai choisi le port 703 car il n'était pas occupé.
+\subsection{Vérification locale}
+Bien que le port 703 ne soit habituellement pas pris par les application, il faut vérifier que le port n'est pas déjà utilisé par default sur les Raspberry Pi. Pour ce faire, on tape la commande \texttt{sudo netstat -tulpn | grep 704}. Si cette commande affiche une ligne sur l'interface de commande du Raspberry Pi, alors le port est utilisé. Après avoir tapé la commande, on se rend compte que le port 703 n'est pas utilisé par default sur les Raspberry Pi 3 model B avec comme système d'exploitation Raspbian version 4.4.50-v7+.
+
+\section{Conclusion}
+Le port 703 n'était globalement et localement pas utilisé on peut le définir comme le port utilisé par la timbreuse.
+
+\printbibliography
+
+\end{document}

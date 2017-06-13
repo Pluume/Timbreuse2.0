@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>frontend\web_frontend\dist\js\informations.js - Timbreuse</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="Timbreuse" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 2.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/client.html">client</a></li>
+                                <li><a href="../classes/config.html">config</a></li>
+                                <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
+                                <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
+                                <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
+                                <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
+                                <li><a href="../classes/server.html">server</a></li>
+                                <li><a href="../classes/server_methods.html">server_methods</a></li>
+                                <li><a href="../classes/slave.html">slave</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/client.html">client</a></li>
+                                <li><a href="../modules/config.html">config</a></li>
+                                <li><a href="../modules/csv.html">csv</a></li>
+                                <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
+                                <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
+                                <li><a href="../modules/main.html">main</a></li>
+                                <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
+                                <li><a href="../modules/request.html">request</a></li>
+                                <li><a href="../modules/server.html">server</a></li>
+                                <li><a href="../modules/server_methods.html">server_methods</a></li>
+                                <li><a href="../modules/slave.html">slave</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: frontend\web_frontend\dist\js\informations.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Handle the communication between electron&#x27;s renderer process and electron&#x27;s main process
+ *
+ * @module informations
+ * @class informations
+ */
+const {
+  ipcRenderer
+} = require(&#x27;electron&#x27;);
+/**
+ * Create a random string
+ * @method makeRdmString
+ **/
+function makeRdmString() //Thanks to http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+{
+  var text = &quot;&quot;;
+  var possible = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&quot;;
+
+  for (var i = 0; i &lt; 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+/**
+ * Format the data for the students&#x27; bootstap-table
+ * @method formatForStdTable
+ * @param  {Array}          data Array of students object
+ * @return {Array}               Formatted array of students object
+ */
+function formatForStdTable(data) {
+  var ndata = [];
+  for (var i = 0; i &lt; data.students.length; i++) {
+    ndata.push({
+      id: data.students[i].id,
+      lname: data.students[i].user.lname,
+      fname: data.students[i].user.fname,
+      username: data.students[i].user.username,
+      timeDiffToday: data.students[i].timeDiffToday,
+      timeDiff: data.students[i].timeDiff,
+      status: data.students[i].status,
+      lastTagTime: data.students[i].lastTagTime,
+      tag: data.students[i].user.tag,
+      dob: data.students[i].user.dob,
+      email: data.students[i].user.email,
+      pp: data.students[i].user.pp,
+      userid: data.students[i].userid,
+      profid: data.students[i].profid,
+      missedPause: data.students[i].missedPause,
+      hadLunch: data.students[i].hadLunch,
+      details: data.students[i].details,
+      isBlocked: data.students[i].isBlocked,
+      project: data.students[i].project,
+      firstClass: data.students[i].firstClass
+
+    });
+  }
+  return ndata;
+}
+
+/**
+ * Print a red notification on screen
+ * @method redAlert
+ * @param {String} msg The message to display
+ **/
+function redAlert(msg) {
+  var message = document.createElement(&quot;div&quot;);
+  message.setAttribute(&quot;class&quot;, &quot;alert alert-danger&quot;);
+  message.innerHTML = msg;
+  var closeMsg = document.createElement(&quot;button&quot;);
+  closeMsg.setAttribute(&quot;type&quot;, &quot;button&quot;);
+  closeMsg.setAttribute(&quot;class&quot;, &quot;close&quot;);
+  closeMsg.setAttribute(&quot;data-dismiss&quot;, &quot;alert&quot;);
+  closeMsg.innerHTML = &quot;x&quot;;
+  message.appendChild(closeMsg);
+  var id = &quot;ALERT&quot; + makeRdmString();
+  message.setAttribute(&quot;id&quot;, id);
+  document.getElementById(&quot;pageContainer&quot;).insertBefore(message, document.getElementById(&quot;pageContainer&quot;).firstChild);
+  window.setTimeout(function() { //Thanks to http://stackoverflow.com/a/8141065/6687983
+    $(&quot;#&quot; + id).fadeTo(500, 0).slideUp(500, function() {
+      $(this).remove();
+    });
+  }, 15000);
+  console.log(msg);
+}
+/**
+ * Print a green notification on screen
+ * @method greenAlert
+ * @param {String} msg The message to display
+ **/
+function greenAlert(msg) {
+  var message = document.createElement(&quot;div&quot;);
+  message.setAttribute(&quot;class&quot;, &quot;alert alert-success&quot;);
+  message.innerHTML = msg;
+  var closeMsg = document.createElement(&quot;button&quot;);
+  closeMsg.setAttribute(&quot;type&quot;, &quot;button&quot;);
+  closeMsg.setAttribute(&quot;class&quot;, &quot;close&quot;);
+  closeMsg.setAttribute(&quot;data-dismiss&quot;, &quot;alert&quot;);
+  closeMsg.innerHTML = &quot;x&quot;;
+  message.appendChild(closeMsg);
+  var id = &quot;ALERT&quot; + makeRdmString();
+  message.setAttribute(&quot;id&quot;, id);
+  document.getElementById(&quot;pageContainer&quot;).insertBefore(message, document.getElementById(&quot;pageContainer&quot;).firstChild);
+  window.setTimeout(function() { //Thanks to http://stackoverflow.com/a/8141065/6687983
+    $(&quot;#&quot; + id).fadeTo(500, 0).slideUp(500, function() {
+      $(this).remove();
+    });
+  }, 5000);
+  console.log(msg);
+}
+/**
+ * Get the classes
+ * @method getClass
+ * @param {Function} cb Callback function
+ **/
+function getClass(cb) {
+  ipcRenderer.once(&quot;class&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+      return;
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(arg.class);
+        return;
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in...&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;class&quot;, window.SCOPE.UNIQUE);
+}
+/**
+ * Get the students&#x27; informations
+ * @method getStudents
+ * @param {String} tableId The bootstrap table in which to load the informations
+ * @param {Function} cb Callback function
+ **/
+function getStudents(tableId, cb) {
+  ipcRenderer.send(&quot;students&quot;, window.SCOPE.UNIQUE);
+  ipcRenderer.once(&quot;students&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = formatForStdTable(arg);
+        $(&#x27;#&#x27; + tableId).bootstrapTable(&#x27;load&#x27;, data);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Get all the students
+ * @method getStudentsAll
+ * @param {Function} cb Callback function
+ **/
+function getStudentsAll(cb) {
+  ipcRenderer.send(&quot;students&quot;, window.SCOPE.ALL);
+  ipcRenderer.once(&quot;students&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(arg.students);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Get a student
+ * @method getStudent
+ * @param {Integer} id The student id
+ * @param {Function} cb Callback function
+ **/
+function getStudent(id, cb) {
+  ipcRenderer.send(&quot;students&quot;, id);
+  ipcRenderer.once(&quot;students&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(arg);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Create a student in the database
+ * @method createStudent
+ * @param {String} fname The student&#x27;s first name
+ * @param {String} lname The student&#x27;s last name
+ * @param {String} username The student&#x27;s username
+ * @param {String} email The student&#x27;s email
+ * @param {String} tag The student&#x27;s tag
+ * @param {String} tclass The student&#x27;s class
+ * @param {String} dob The student&#x27;s date of birth
+ * @param {String} project The student&#x27;s current project
+ * @param {String} tableid The bootstrap table id in which the informations will be loaded
+ **/
+function createStudent(fname, lname, username, email, tag, tclass, dob, project, tableid) {
+  var obj = {};
+  obj.fname = fname;
+  obj.lname = lname;
+  obj.username = username;
+  obj.tag = tag;
+  obj.class = tclass;
+  obj.dob = dob;
+  obj.project = project;
+  obj.email = email;
+  ipcRenderer.once(&quot;createStudent&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(tableid, () =&gt; {});
+        greenAlert(&quot;Student added !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      case window.ERROR.USEREXISTS:
+        redAlert(&quot;User already exists with this username...&quot;);
+        break;
+      case window.ERROR.TAGEXISTS:
+        redAlert(&quot;User already exists with this tag...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;createStudent&quot;, obj);
+}
+/**
+ * Delete a student
+ * @method deleteStudent
+ * @param {Integer} id The student id
+ * @param {String} tableid The bootstrap table to update
+ **/
+function deleteStudent(id, tableid) {
+
+  ipcRenderer.once(&quot;deleteStudent&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(&quot;stdTable&quot;, () =&gt; {});
+        greenAlert(&quot;Student deleted !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;deleteStudent&quot;, id);
+}
+/**
+ * Edit a student in the database
+ * @method editStudent
+ * @param {Interger} id The student&#x27;s id
+ * @param {String} fname The student&#x27;s first name
+ * @param {String} lname The student&#x27;s last name
+ * @param {String} username The student&#x27;s username
+ * @param {String} email The student&#x27;s email
+ * @param {String} tag The student&#x27;s tag
+ * @param {String} tclass The student&#x27;s class
+ * @param {String} dob The student&#x27;s date of birth
+ * @param {String} project The student&#x27;s current project
+ * @param {String} tableid The bootstrap table id in which the informations will be loaded
+ **/
+function editStudent(id, fname, lname, username, email, tag, dob, project, pass, tableid) {
+  var obj = {};
+  obj.id = id;
+  obj.fname = fname;
+  obj.lname = lname;
+  obj.username = username;
+  obj.tag = tag;
+  obj.dob = dob;
+  obj.project = project;
+  obj.email = email;
+  obj.pass = pass;
+  ipcRenderer.once(&quot;editStudent&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(&quot;stdTable&quot;, () =&gt; {});
+        greenAlert(&quot;Student(s) updated !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;editStudent&quot;, obj);
+}
+/**
+ * Reset the time and last tag time of student to null
+ * @method resetTime
+ * @param  {Interger}  id The student&#x27;s id
+ */
+function resetTime(id, comments) {
+  ipcRenderer.once(&quot;resetTime&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(&quot;stdTable&quot;, () =&gt; {});
+        greenAlert(&quot;Student(s) updated !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;resetTime&quot;, {
+    id,
+    comments
+  });
+}
+/**
+ * Add/Sub time to a student
+ * @method modTime
+ * @param  {Interger} id       The student&#x27;s id
+ * @param  {Interger} ntime    The time to add/sub
+ * @param  {String} comments A description
+ */
+function modTime(id, ntime, comments) {
+  ipcRenderer.once(&quot;modTime&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(&quot;stdTable&quot;, () =&gt; {});
+        greenAlert(&quot;Student(s) updated !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;modTime&quot;, {
+    id: id,
+    time: ntime,
+    comments: comments
+  });
+}
+/**
+ * Set the time of a student
+ * @method setTime
+ * @param  {Interger} id    The student&#x27;s id
+ * @param  {Interger} ntime The new time
+ */
+function setTime(id, ntime, comments) {
+  ipcRenderer.once(&quot;setTime&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        getStudents(&quot;stdTable&quot;, () =&gt; {});
+        greenAlert(&quot;Student(s) updated !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;setTime&quot;, {
+    id: id,
+    time: ntime,
+    comments: comments
+  });
+}
+/**
+ * Get the logs of student
+ * @method getLogs
+ * @param  {Interger}   id The student&#x27;s id
+ * @param  {Function} cb The callback function
+ */
+function getLogs(id, cb) {
+  ipcRenderer.once(&quot;logs&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        if (arg.data.logs == undefined)
+          cb(null);
+        else
+          cb(arg);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      case window.ERROR.SQLITE:
+        redAlert(&quot;Database error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;logs&quot;, {
+    id: id
+  });
+}
+/**
+ * Set an student as absent
+ * @method setAbsent
+ * @param  {Interger}  id       The student&#x27;s id
+ * @param  {String}  comments A description
+ */
+function setAbsent(id, comments) {
+  ipcRenderer.once(&quot;absent&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Student set absent !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      case window.ERROR.SQLITE:
+        redAlert(&quot;Database error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;absent&quot;, {
+    id: id,
+    comments: comments
+  });
+}
+/**
+ * Tag a student
+ * @method tag
+ * @param  {Interger} id       The student&#x27;s id
+ * @param  {String} comments A description
+ */
+function tag(id, comments) {
+  ipcRenderer.once(&quot;tag&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Tagged successfully !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      case window.ERROR.SQLITE:
+        redAlert(&quot;Database error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;tag&quot;, {
+    id: id,
+    comments: comments
+  });
+}
+/**
+ * Toggle a student is fixed schedule or not
+ * @method setFixed
+ * @param  {Interger} id       The student&#x27;s id
+ * @param  {String} comments A description
+ */
+function setFixed(id, comments) {
+  ipcRenderer.once(&quot;fixed&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Student set fixed !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      case window.ERROR.SQLITE:
+        redAlert(&quot;Database error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+  ipcRenderer.send(&quot;fixed&quot;, {
+    id: id,
+    comments: comments
+  });
+}
+/**
+ * Handle if the server sends update about the currently monitored students
+ * @method onUpdate
+ * @param  {Event} event The event object
+ * @param  {Object} arg   The object containing the informations
+ */
+function onUpdate(event, arg) {
+
+  if (require(&#x27;electron&#x27;).remote.getGlobal(&#x27;currentPage&#x27;) == window.PAGES.PROFS &amp;&amp; arg != undefined &amp;&amp; arg.id != undefined) //FIXME
+  {
+    console.log(arg.id);
+    var oldData = $(&quot;#stdTable&quot;).bootstrapTable(&#x27;getRowByUniqueId&#x27;, arg.id);
+    console.log(JSON.stringify(arg, null, 1));
+    var formatData = { //FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Todo : verifie arg.user a part + faire en sorte que l&#x27;on puisse donne autant d&#x27;info qu&#x27;on le souhaite
+      id: (arg.id ? arg.id : oldData.id),
+      lname: ((arg.user !== undefined &amp;&amp; arg.user.lname !== undefined) ? arg.user.lname : oldData.lname),
+      fname: ((arg.user !== undefined &amp;&amp; arg.user.fname !== undefined) ? arg.user.fname : oldData.fname),
+      username: ((arg.user !== undefined &amp;&amp; arg.user.username !== undefined) ? arg.user.username : oldData.username),
+      timeDiffToday: (arg.timeDiffToday !== undefined ? arg.timeDiffToday : oldData.timeDiffToday),
+      timeDiff: (arg.timeDiff !== undefined ? arg.timeDiff : oldData.id),
+      status: (arg.status !== undefined ? arg.status : oldData.status),
+      lastTagTime: (arg.lastTagTime !== undefined ? arg.lastTagTime : oldData.lastTagTime),
+      missedPause: (arg.missedPause !== undefined ? arg.missedPause : oldData.missedPause),
+      hadLunch: (arg.hadLunch !== undefined ? arg.hadLunch : oldData.hadLunch),
+      isBlocked: (arg.isBlocked !== undefined ? arg.isBlocked : oldData.isBlocked)
+    };
+    $(&quot;#stdTable&quot;).bootstrapTable(&#x27;updateByUniqueId&#x27;, {
+      id: arg.id,
+      row: arg
+    });
+  }
+
+}
+/**
+ * Get the notifications
+ * @method getNotifications
+ * @param  {Interger}       tableId The table&#x27;s id in which to put the informations
+ * @param  {Function}       cb      The callback function to call
+ */
+function getNotifications(tableId, cb) {
+  ipcRenderer.send(&quot;notification&quot;, null);
+  ipcRenderer.once(&quot;notification&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $(&#x27;#&#x27; + tableId).bootstrapTable(&#x27;load&#x27;, arg.data);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Toggle the read status of a notification
+ * @method toggleNotification
+ * @param  {Interger}           id The notification&#x27;s id
+ */
+function toggleNotification(id) {
+  ipcRenderer.send(&quot;notificationToggle&quot;, id);
+}
+/**
+ * Handle the incomming notifications
+ * @method onNotificationUpdate
+ * @param  {Event}             event The event object
+ * @param  {Object}             arg   The notification&#x27;s informations
+ */
+function onNotificationUpdate(event, arg) {
+  if (require(&#x27;electron&#x27;).remote.getGlobal(&#x27;currentPage&#x27;) == window.PAGES.NOTIFICATIONS &amp;&amp; arg != undefined &amp;&amp; arg.id != undefined) {
+    $(&quot;#notifTable&quot;).bootstrapTable(&#x27;updateByUniqueId&#x27;, {
+      id: arg.id,
+      row: arg
+    });
+  }
+}
+/**
+ * Append the notification at the beginning of the table
+ * @method onNotificationInsert
+ * @param  {Event}             event The event object
+ * @param  {Object}             arg   The notification&#x27;s informations
+ */
+function onNotificationInsert(event, arg) {
+  if (require(&#x27;electron&#x27;).remote.getGlobal(&#x27;currentPage&#x27;) == window.PAGES.NOTIFICATIONS &amp;&amp; arg != undefined) {
+    var tmp = [];
+    tmp.push(arg);
+    $(&quot;#notifTable&quot;).bootstrapTable(&#x27;prepend&#x27;, tmp);
+  }
+}
+/**
+ * Delete an holidays object from the database
+ * @method delHolidays
+ * @param  {Interger}    id    The holidays id
+ * @param  {Interger}    calId The calendar&#x27;s id to update
+ */
+function delHolidays(id, calId) {
+  ipcRenderer.send(&quot;delHolidays&quot;, id);
+  ipcRenderer.once(&quot;delHolidays&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $(&#x27;#&#x27; + calId).fullCalendar(&#x27;removeEvents&#x27;, id);
+        greenAlert(&quot;Event deleted successfully.&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Fetch the holidays from the server
+ * @method getHolidays
+ * @param  {Interger}    calendarId The calendar&#x27;s id to update
+ */
+function getHolidays(calendarId, isStudent) {
+  ipcRenderer.send(&quot;getHolidays&quot;, null);
+  ipcRenderer.once(&quot;getHolidays&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i &lt; arg.data.length; i++) {
+          data.push({
+            allDay: true,
+            id: arg.data[i].id,
+            title: arg.data[i].desc,
+            start: arg.data[i].date1,
+            end: arg.data[i].date2,
+          });
+        }
+        $(&#x27;#&#x27; + calendarId).fullCalendar({
+          header: {
+            left: &#x27;prev,next today&#x27;,
+            center: &#x27;title&#x27;,
+            right: &#x27;month&#x27;
+          },
+          navLinks: false, // can click day/week names to navigate views
+          editable: false,
+          defaultView: &#x27;month&#x27;,
+          weekNumbers: true,
+          eventLimit: true, // allow &quot;more&quot; link when too many events
+          events: data,
+          timeFormat: &#x27;H:mm&#x27;,
+          firstDay: 1,
+          weekNumbersWithinDays: true,
+          eventClick: function(calEvent, jsEvent, view) {
+            if (isStudent === undefined) {
+              document.getElementById(&quot;confirmDeleteEvent&quot;).onclick = function() {
+                delHolidays(calEvent.id, calendarId);
+              };
+              $(&quot;#delEventModal&quot;).modal(&quot;show&quot;);
+            }
+          }
+        });
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Create a new holidays object in the database
+ * @method addHolidays
+ * @param  {Interger}    calendarId The calendar&#x27;s id to update
+ * @param  {String}    title      The event title
+ * @param  {Date}    date1      The start date
+ * @param  {Date}    date2      The end date
+ */
+function addHolidays(calendarId, title, date1, date2) {
+  ipcRenderer.send(&quot;addHolidays&quot;, {
+    title: title,
+    date1: date1,
+    date2: date2
+  });
+  ipcRenderer.once(&quot;addHolidays&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $(&#x27;#&#x27; + calendarId).fullCalendar(&#x27;renderEvent&#x27;, {
+          allDay: true,
+          id: arg.data.id,
+          title: arg.data.desc,
+          start: arg.data.date1,
+          end: arg.data.date2
+        }, true);
+        greenAlert(&quot;Event created !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Get the professor object in the database
+ * @method getProf
+ * @param  {Interger}   tableId The table&#x27;s id to update
+ * @param  {Function} cb      The callback function
+ */
+function getProf(tableId, cb) {
+  ipcRenderer.send(&quot;getprof&quot;);
+  ipcRenderer.once(&quot;getprof&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i &lt; arg.data.length; i++) {
+          data.push({
+            id: arg.data[i].id,
+            lname: arg.data[i].lname,
+            fname: arg.data[i].fname,
+            username: arg.data[i].username,
+            class: arg.data[i].class.name,
+            dob: arg.data[i].dob,
+            email: arg.data[i].email,
+            tag: arg.data[i].tag
+          });
+        }
+        $(&#x27;#&#x27; + tableId).bootstrapTable(&#x27;load&#x27;, data);
+
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Create a new professor
+ * @method createProf
+ * @param  {String}   username The prof&#x27;s username
+ * @param  {String}   fname    The prof&#x27;s first name
+ * @param  {String}   lname    The prof&#x27;s last name
+ * @param  {String}   tag      The prof&#x27;s tag
+ * @param  {String}   tclass   The prof&#x27;s class name
+ * @param  {Date}   dob      The prof&#x27;s date of birth
+ * @param  {String}   email    The prof&#x27;s email
+ * @param  {Function} cb       The callback function
+ */
+function createProf(username, fname, lname, tag, tclass, dob, email, cb) {
+  ipcRenderer.send(&quot;addprof&quot;, {
+    username: username,
+    fname: fname,
+    lname: lname,
+    tag: tag,
+    class: tclass,
+    dob: dob,
+    email: email
+  });
+  ipcRenderer.once(&quot;addprof&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Teacher created !&quot;);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Delete a prof from the database
+ * @method delProf
+ * @param  {Interger}   id The prof&#x27;is
+ * @param  {Function} cb The callback function
+ */
+function delProf(id, cb) {
+  ipcRenderer.send(&quot;delprof&quot;, id);
+  ipcRenderer.once(&quot;delprof&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Teacher deleted !&quot;);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+
+function editProf(data, cb) {
+  ipcRenderer.send(&quot;editprof&quot;, data);
+  ipcRenderer.once(&quot;editprof&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Teacher updated !&quot;);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Change the current user&#x27;s password
+ * @method changePassword
+ * @param  {Event}       event The event object
+ * @param  {String}       data  The new password
+ */
+function changePassword(event, data) {
+  ipcRenderer.send(&quot;changepassword&quot;, data);
+  ipcRenderer.once(&quot;changepassword&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Password changed !&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Get a list of all the class
+ * @method getClassList
+ * @param  {Function}   cb The callback function
+ */
+function getClassList(cb) {
+  ipcRenderer.send(&quot;getclasslist&quot;, null);
+  ipcRenderer.once(&quot;getclasslist&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        if (arg.class == null)
+          redAlert(&quot;There is no class configured&quot;);
+        else
+          cb(arg.class);
+
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Change the student&#x27;s class
+ * @method changeStudentClass
+ * @param  {Interger}           stdid  The student&#x27;s id
+ * @param  {Interger}           profid The new prof&#x27;s id
+ */
+function changeStudentClass(stdid, profid) {
+  ipcRenderer.send(&quot;changestdclass&quot;, {
+    stdid: stdid,
+    profid: profid
+  });
+  ipcRenderer.once(&quot;changestdclass&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Student&#x27;s class updated successfully&quot;);
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Create a new leave application
+ * @method createLeaveRequest
+ * @param  {Date}           sDate      The start Date
+ * @param  {Date}           eDate      The end Date
+ * @param  {Boolean}           missedTest 0 if no tests was missed, 1 otherwise
+ * @param  {Interger}           reason     The reason code
+ * @param  {String}           reasonDesc A description
+ * @param  {Interger}           proof      The proof code
+ * @param  {String}           where      Where the application was filled
+ * @param  {Function}         cb         [description]
+ * @param  {Interger}           id         (Optional) if a professor create a leave request for a student, this parameter is the student&#x27;s id
+ * @return {[type]}                      [description]
+ */
+function createLeaveRequest(sDate, eDate, missedTest, reason, reasonDesc, proof, where, cb, id) {
+  var obj = {
+    sDate: sDate,
+    eDate: eDate,
+    missedTest: missedTest,
+    reason: reason,
+    reasonDesc: reasonDesc,
+    proof: proof,
+    where: where
+  };
+  if (id != undefined)
+    obj.id = id;
+  ipcRenderer.send(&quot;createLR&quot;, obj);
+  ipcRenderer.once(&quot;createLR&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        greenAlert(&quot;Leave application created&quot;);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+  });
+}
+/**
+ * Get the leave application for the connected student
+ * @method getLRForStudent
+ * @param  {String}        tableId The table&#x27;s id
+ * @param  {Function}      cb      A callback function
+ */
+function getLRForStudent(tableId, cb) {
+  ipcRenderer.send(&quot;getLR&quot;);
+  ipcRenderer.once(&quot;getLR&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i &lt; arg.data.length; i++) {
+          data.push({
+            id: arg.data[i].id,
+            dateFrom: arg.data[i].dateFrom,
+            dateTo: arg.data[i].dateTo,
+            missedTest: arg.data[i].missedTest,
+            reason: arg.data[i].reason,
+            reasonDesc: arg.data[i].reasonDesc,
+            proof: arg.data[i].proof,
+            acpt: arg.data[i].acpt,
+            lname: arg.data[i].student.user.lname,
+            fname: arg.data[i].student.user.fname,
+            username: arg.data[i].student.user.username
+          });
+        }
+        $(&#x27;#&#x27; + tableId).bootstrapTable(&#x27;load&#x27;, data);
+
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Get all the leave application
+ * @method getLR
+ * @param  {Interger}   tableId The table&#x27;s id
+ * @param  {Function} cb      A callback function
+ */
+function getLR(tableId, cb) {
+  ipcRenderer.send(&quot;getLR&quot;, window.SCOPE.ALL);
+  ipcRenderer.once(&quot;getLR&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = [];
+        for (var i = 0; i &lt; arg.data.length; i++) {
+          data.push({
+            id: arg.data[i].id,
+            dateFrom: arg.data[i].dateFrom,
+            dateTo: arg.data[i].dateTo,
+            missedTest: arg.data[i].missedTest,
+            reason: arg.data[i].reason,
+            reasonDesc: arg.data[i].reasonDesc,
+            proof: arg.data[i].proof,
+            acpt: arg.data[i].acpt,
+            lname: arg.data[i].student.user.lname,
+            fname: arg.data[i].student.user.fname,
+            username: arg.data[i].student.user.username
+          });
+          console.log(data);
+        }
+        $(&#x27;#&#x27; + tableId).bootstrapTable(&#x27;load&#x27;, data);
+
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+
+  });
+}
+/**
+ * Toggle a leave application accepted status
+ * @method changeLRStatus
+ * @param  {Interger} id The leave application&#x27;s id
+ * @param  {Interger} status The leave application&#x27;s new status
+ * @param  {Function} cb      A callback function
+ */
+function changeLRStatus(id, status, cb) {
+  ipcRenderer.send(&quot;toggleLR&quot;, {
+    id: id,
+    status: status
+  });
+  ipcRenderer.once(&quot;toggleLR&quot;, (event, arg) =&gt; {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert(&quot;Unable to contact the server...&quot;);
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        cb(true);
+        return;
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert(&quot;Not logged in !&quot;);
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert(&quot;Unkown error...&quot;);
+        break;
+      default:
+        redAlert(&quot;Ill formed request...&quot;);
+    }
+    cb(false);
+  });
+}
+ipcRenderer.on(&quot;update&quot;, onUpdate);
+ipcRenderer.on(&quot;toggleNotification&quot;, onNotificationUpdate);
+ipcRenderer.on(&quot;changepassword_index&quot;, changePassword);
+ipcRenderer.on(&quot;updateNotification&quot;, onNotificationInsert);
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

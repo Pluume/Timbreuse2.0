@@ -70,6 +70,9 @@ function tag(stag, ntime) {
     class: global.config.class
   };
   csv.writeBruteLoggingToCSV(stag, ntime);
+  console.log("TAG : " + stag);
+  console.log("CONNECTED : " + connected);
+  console.log("oreqPile")
   if (connected) {
     slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
   } else {

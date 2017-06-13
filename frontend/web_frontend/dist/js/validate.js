@@ -404,7 +404,7 @@ function activateValidator() {
   $.validator.addMethod("validClass", function(value, element) {
   return this.optional(element) || classregex.test(value);
   });
-  var usernameregex = /^[a-zA-Z1-9 \-\.\_]+$/;
+  var usernameregex = /^[a-zA-Z1-9\-\.\_]+$/;
   $.validator.addMethod("validUsername", function(value, element) {
     return this.optional(element) || usernameregex.test(value);
   });

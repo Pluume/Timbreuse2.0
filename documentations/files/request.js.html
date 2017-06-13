@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -114,31 +129,86 @@ function isArray(obj) {
  * @method toArray
  * @param {String} singleItem the item to turn into an arrays.
  **/
-function toArray(singleItem)
-{
-  if(isArray(singleItem))
-  {
-    return singleItem;
-  }
-  var somearray = [];
-  somearray.push(singleItem);
-  return somearray;
+function toArray(singleItem) {
+    if (isArray(singleItem)) {
+        return singleItem;
+    }
+    var somearray = [];
+    somearray.push(singleItem);
+    return somearray;
 }
-module.exports = {
-  toArray,
-  ERROR: {
+ERROR = {
     OK: 0,
     UNKNOWN: 1,
     WRONGTAG: 2,
-    SQLITE: 3
-},
-REQUEST: {
+    SQLITE: 3,
+    WRONGCREDS: 4,
+    NOTLOGEDIN: 5,
+    USEREXISTS: 6,
+    TAGEXISTS: 7
+};
+REQUEST ={
     EXIT: -1,
-    PING: 0,
+    OK: 0,
     TAG: 1,
     AUTH: 2,
-    MASTER: 3
-}
+    MASTER: 3,
+    PROPAGATE_TAG: 4,
+    GETSTUDENT: 5,
+    GETCLASS: 6,
+    ADDSTUDENT: 7,
+    DELSTUDENT: 8,
+    EDITSTUDENT: 9,
+    SETTIME: 10,
+    MODTIME: 11,
+    RESETTIME: 12,
+    LOGS: 13,
+    SETABSENT: 14,
+    SETFIXED: 15,
+    UPDATESTD: 16,
+    GETNOTIFICATIONS: 17,
+    TOGGLENOTIFICATION: 18,
+    UPDATENOTIF: 19,
+    GETHOLIDAYS: 20,
+    ADDHOLIDAYS: 21,
+    DELHOLIDAYS: 22,
+    CREATEPROF: 23,
+    DELPROF: 24,
+    EDITPROF: 25,
+    GETPROF: 26,
+    CHANGEPASS: 27,
+    GETCLASSLIST: 28,
+    CHANGECLASS: 29,
+    CREATELR: 30,
+    GETLR: 31,
+    TOGGLELR: 32
+};
+PAGES ={
+    LOGIN: 0,
+    PROFS: 1,
+    SLAVE: 2,
+    NOTIFICATIONS: 3,
+    HOLIDAYS: 4,
+    ADMIN: 5,
+    CLASS: 6,
+    STUDENT: 7,
+    LEAVEREQ_STUDENT: 8,
+    LEAVEREQ_PROF: 9
+};
+SCOPE ={
+    UNIQUE: -1,
+    ALL: &quot;*&quot;
+};
+global.ERROR = ERROR;
+global.REQUEST = REQUEST;
+global.PAGES = PAGES;
+global.SCOPE = SCOPE;
+module.exports = {
+    toArray,
+    ERROR: ERROR,
+    REQUEST: REQUEST,
+    PAGES: PAGES,
+    SCOPE: SCOPE
 };
 
     </pre>

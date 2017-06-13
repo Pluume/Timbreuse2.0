@@ -60,7 +60,6 @@ var factory = function( $, DataTable ) {
  *   can also be used to specify the configuration options, or simply set to
  *   `true` to use the defaults.
  *
- *  @class
  *  @param {object} settings DataTables settings object for the host table
  *  @param {object} [opts] Configuration options
  *  @requires jQuery 1.7+
@@ -573,7 +572,7 @@ Responsive.prototype = {
 				break;
 			}
 		}
-		
+
 		// Show the columns for that break point
 		var columnsVis = this._columnsVisiblity( breakpoint );
 
@@ -633,7 +632,7 @@ Responsive.prototype = {
 		// includes all columns. As such, try to do this as little as possible.
 		dt.rows( { page: 'current' } ).indexes().flatten().each( function ( idx ) {
 			var clone = dt.row( idx ).node().cloneNode( true );
-			
+
 			if ( dt.columns( ':hidden' ).flatten().length ) {
 				$(clone).append( dt.cells( idx, ':hidden' ).nodes().to$().clone() );
 			}

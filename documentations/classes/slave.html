@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -130,7 +145,19 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
+                                <a href="#method_compileRequest">compileRequest</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_createWindow">createWindow</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_displayCSV">displayCSV</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_displayTaggedStudent">displayTaggedStudent</a>
 
                             </li>
                             <li class="index-item method">
@@ -154,6 +181,10 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_showOnline">showOnline</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_tag">tag</a>
 
                             </li>
@@ -167,6 +198,60 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_compileRequest" class="method item">
+    <h3 class="name"><code>compileRequest</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>ireq</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_slave.js.html#l93"><code>frontend\slave.js:93</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Compile the complete request before using it</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">ireq</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The json request</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_createWindow" class="method item">
     <h3 class="name"><code>createWindow</code></h3>
 
@@ -182,7 +267,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l160"><code>frontend\slave.js:160</code></a>
+        <a href="../files/frontend_slave.js.html#l231"><code>frontend\slave.js:231</code></a>
         </p>
 
 
@@ -194,6 +279,142 @@
 
     </div>
 
+
+
+
+</div>
+<div id="method_displayCSV" class="method item">
+    <h3 class="name"><code>displayCSV</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+                <li class="arg">
+                        <code>val</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_slave.js.html#l83"><code>frontend\web_frontend\dist\js\slave.js:83</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Display the status of the CSV Copying</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+
+
+                    <div class="param-description">
+                        <p>The event object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">val</code>
+                        <span class="type">Boolean</span>
+
+
+                    <div class="param-description">
+                        <p>0 if still being copied, 1 if copied</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_displayTaggedStudent" class="method item">
+    <h3 class="name"><code>displayTaggedStudent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+                <li class="arg">
+                        <code>std</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_slave.js.html#l7"><code>frontend\web_frontend\dist\js\slave.js:7</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Display the student that just Tagged</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+
+
+                    <div class="param-description">
+                        <p>The event object</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">std</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The student object</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
 
 
@@ -213,7 +434,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l32"><code>frontend\slave.js:32</code></a>
+        <a href="../files/frontend_slave.js.html#l35"><code>frontend\slave.js:35</code></a>
         </p>
 
 
@@ -244,7 +465,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l100"><code>frontend\slave.js:100</code></a>
+        <a href="../files/frontend_slave.js.html#l130"><code>frontend\slave.js:130</code></a>
         </p>
 
 
@@ -278,7 +499,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l22"><code>frontend\slave.js:22</code></a>
+        <a href="../files/frontend_slave.js.html#l25"><code>frontend\slave.js:25</code></a>
         </p>
 
 
@@ -318,7 +539,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l193"><code>frontend\slave.js:193</code></a>
+        <a href="../files/frontend_slave.js.html#l273"><code>frontend\slave.js:273</code></a>
         </p>
 
 
@@ -355,7 +576,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l83"><code>frontend\slave.js:83</code></a>
+        <a href="../files/frontend_slave.js.html#l105"><code>frontend\slave.js:105</code></a>
         </p>
 
 
@@ -363,7 +584,7 @@
     </div>
 
     <div class="description">
-        <p>Export all the CSV to USB key on master key</p>
+        <p>Handle the incoming data from the outgoing socket</p>
 
     </div>
 
@@ -378,6 +599,74 @@
 
                     <div class="param-description">
                         <p>The json request</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_showOnline" class="method item">
+    <h3 class="name"><code>showOnline</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>event</code>
+                </li>
+                <li class="arg">
+                        <code>val</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_slave.js.html#l137"><code>frontend\web_frontend\dist\js\slave.js:137</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Display the offline statusGroup</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+
+
+                    <div class="param-description">
+                        <p>The event statusGroup</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">val</code>
+                        <span class="type">Interger</span>
+
+
+                    <div class="param-description">
+                        <p>If 0 then display has disconnected, if 1 remove the disconnected panel</p>
 
                     </div>
 
@@ -412,7 +701,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_slave.js.html#l46"><code>frontend\slave.js:46</code></a>
+        <a href="../files/frontend_slave.js.html#l54"><code>frontend\slave.js:54</code></a>
         </p>
 
 

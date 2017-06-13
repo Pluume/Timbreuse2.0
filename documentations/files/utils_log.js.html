@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -109,65 +124,267 @@ const moment = require(&quot;moment&quot;);
 const at = require(&quot;console-at&quot;);
 var path = require(&quot;path&quot;);
 const fs = require(&quot;fs&quot;);
-var access = fs.createWriteStream(&quot;Timbreuse.log&quot;,{ flags: &#x27;w&#x27; });
+const math = require(&quot;./math.js&quot;);
+/**
+ * Create a new log file
+ * @method createNewLogFile
+ */
+function createNewLogFile() {
+  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? &quot;./&quot; : path.join(__dirname, &quot;..&quot;));
+  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.10.log&quot;)))
+    fs.unlinkSync(path.join(basePath, &quot;Timbreuse.10.log&quot;));
+  for (var i = 9; i &gt; 0; i--)
+    if (fs.existsSync(path.join(basePath, &quot;Timbreuse.&quot; + i + &quot;.log&quot;)))
+      fs.renameSync(path.join(basePath, &quot;Timbreuse.&quot; + i + &quot;.log&quot;), path.join(basePath, &quot;Timbreuse.&quot; + (i + 1) + &quot;.log&quot;));
+  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.log&quot;)))
+    fs.renameSync(path.join(basePath, &quot;Timbreuse.log&quot;), path.join(basePath, &quot;Timbreuse.1.log&quot;));
+  global.logFile = fs.createWriteStream(path.join(basePath, &quot;Timbreuse.log&quot;), {
+    flags: &#x27;w&#x27;
+  });
+}
+const knex = require(&#x27;knex&#x27;)({
+  client: &#x27;sqlite3&#x27;,
+  useNullAsDefault: true
+});
 /**
  * Print a user friendly information message to the console
  * @method info
  * @param {String} msg the message.
  **/
-var info = (msg) =&gt;
-{
+var info = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + process.uptime() + &quot;] &quot; + &quot;[INFO] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[INFO] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
   console.log(cmsg);
-  access.write(cmsg + &quot;\n&quot;);
+  global.logFile.write(cmsg + &quot;\n&quot;);
+};
+/**
+ * Print the stacj
+ * @method stack
+ */
+var printStack = function() {
+  console.error(new Error().stack);
 };
 /**
  * Print a user friendly error message to the console
  * @method error
  * @param {String} msg the message.
  **/
-var error = (msg) =&gt;
-{
+var error = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + process.uptime() + &quot;] &quot; + &quot;[ERROR] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[ERROR] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
   console.log(cmsg);
-  access.write(cmsg + &quot;\n&quot;);
+  printStack();
+  global.logFile.write(cmsg + &quot;\n&quot;);
 };
+
 /**
  * Print a user friendly information warning to the console
  * @method warning
  * @param {String} msg the message.
  **/
-var warning = (msg) =&gt;
-{
+var warning = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + process.uptime() + &quot;] &quot; + &quot;[WARNING] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[WARNING] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
   console.log(cmsg);
-  access.write(cmsg + &quot;\n&quot;);
+  global.logFile.write(cmsg + &quot;\n&quot;);
 };
 process.on(&#x27;uncaughtException&#x27;, function(err) {
   error((err &amp;&amp; err.stack) ? err.stack : err);
 });
-process.on(&quot;exit&quot;,(code) =&gt; {
+process.on(&quot;exit&quot;, (code) =&gt; {
   info(&quot;Exiting with code &quot; + code);
-  access.end();
+  global.logFile.end();
 });
+
+var save = function(type, stdid, tclass, time, comments, td, tdT) {
+  global.db.run(knex(&quot;logs&quot;).insert({
+    type: type,
+    studentid: stdid,
+    date: time,
+    class: tclass,
+    description: comments,
+    timeDiff: td,
+    timeDiffToday: tdT
+  }).toString());
+};
+var get = function(stdid, cb) {
+  var obj = {};
+  global.db.all(knex(&quot;logs&quot;).select().where({
+    studentid: stdid
+  }).toString(), (err, rows) =&gt; {
+    if (err || rows == undefined || rows == []) {
+      error(&quot;SQLITE Error : &quot; + err);
+      cb(global.ERROR.SQLITE);
+      return;
+    }
+    obj.logs = rows;
+    global.db.get(knex(&quot;students&quot;).select().where({
+      id: stdid
+    }).toString(), (err, row0) =&gt; {
+      if (err) {
+        error(&quot;SQLITE Error : &quot; + err);
+        cb(global.ERROR.SQLITE);
+        return;
+      }
+      obj.student = row0;
+      global.db.get(knex(&quot;users&quot;).select().where({
+        id: row0.userid
+      }).toString(), (err, row) =&gt; {
+        if (err) {
+          error(&quot;SQLITE Error : &quot; + err);
+          cb(global.ERROR.SQLITE);
+          return;
+        }
+        obj.user = row;
+        cb(null, obj);
+      })
+    });
+
+  });
+};
+
+function format(data) {
+  var obj = [];
+  for (var i = 0; i &lt; data.logs.length; i++) {
+    var curr = {};
+
+    switch (data.logs[i].type) {
+      case global.LOGS.IN:
+        curr.title = &quot;IN&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(25, 124, 67)&quot;;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.OUT:
+        curr.title = &quot;OUT&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(193, 57, 43)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.ABSENT:
+        curr.title = &quot;ABSENT&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(53, 113, 133)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.SETTIME:
+        curr.title = &quot;TIME SET&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(170, 13, 159)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.MODTIME:
+        curr.title = &quot;TIME ALTERED&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(170, 13, 159)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.RESETTIME:
+        curr.title = &quot;ACCOUNT RESET&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(170, 13, 159)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.MINIMUMPAUSE:
+        curr.title = &quot;MINIMUMPAUSE RULE BROKEN&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(233, 119, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.NOPAUSE:
+        curr.title = &quot;NO PAUSE TAKEN&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(233, 119, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.NOLUNCH:
+        curr.title = &quot;NO LUNCH TAKEN&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(233, 119, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.TIMEERROR:
+        curr.title = &quot;TIME RULE BROKEN&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(233, 119, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.BLOCKED:
+        curr.title = &quot;SCHEDULE BLOCKED&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(0, 0, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.UNBLOCKED:
+        curr.title = &quot;SCHEDULE UNBLOCKED&quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(0, 0, 0)&quot;
+        curr.textColor = &quot;rgb(255, 255, 255)&quot;
+        break;
+      case global.LOGS.ENDOFDAY:
+        curr.title = &quot;END OF DAY &gt;&quot; + math.secondsToHms(data.logs[i].timeDiff) + &quot;&lt; &quot;;
+        curr.start = data.logs[i].date;
+        if (data.logs[i].description)
+          curr.title += &quot; - &quot; + data.logs[i].description
+        curr.color = &quot;rgb(223, 222, 179)&quot;
+        curr.textColor = &quot;rgb(0, 0, 0)&quot;;
+        break;
+      case global.LOGS.LEAVEREQ:
+        curr.title = &quot;LEAVE APPLICATION &gt; &quot; + data.logs[i].description;
+        curr.color = &quot;rgb(223, 222, 179)&quot;
+        curr.textColor = &quot;rgb(0, 0, 0)&quot;;
+        curr.start = data.logs[i].date;
+        break;
+      default:
+        continue;
+    }
+    obj.push(curr);
+  }
+  obj.today = moment().toString();
+  return obj;
+}
 module.exports = {
   info,
   error,
-  warning
+  warning,
+  save,
+  get,
+  format,
+  createNewLogFile
 };
 /**
  * On SIGINT (Ctrl + C), quit the app nicely
  * @method interruption
  **/
-function interruption()
-{
+function interruption() {
   warning(&quot;Interruption caught !&quot;);
   try {
     test.stop();
-  } catch(err) {
+  } catch (err) {
     //Don&#x27;t handle error.
   }
   process.exit();
@@ -178,12 +395,12 @@ if (process.platform === &quot;win32&quot;) {
     output: process.stdout
   });
 
-  rl.on(&quot;SIGINT&quot;, function () {
+  rl.on(&quot;SIGINT&quot;, function() {
     interruption();
   });
 }
 
-process.on(&quot;SIGINT&quot;, function () {
+process.on(&quot;SIGINT&quot;, function() {
   interruption();
 });
 

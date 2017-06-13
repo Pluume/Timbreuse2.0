@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -110,51 +125,198 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require(&#x27;path&#x27;);
 const url = require(&#x27;url&#x27;);
+const net = require(&quot;net&quot;);
+const request = require(&quot;../request.js&quot;);
+const log = require(&quot;./../utils/log.js&quot;);
+var currentCb = function(err, data) {}; //Proto
+var currentBuf = &quot;&quot;;
+
+function clientServer(data) {
+  try {
+    var ireq = JSON.parse(data);
+  } catch (err) {
+    return;
+  }
+  if (ireq.fnc != undefined) {
+    switch (ireq.fnc) {
+      case request.REQUEST.UPDATESTD:
+        global.mwin.webContents.send(&quot;update&quot;, ireq.data);
+        break;
+      case request.REQUEST.TOGGLENOTIFICATION:
+        global.mwin.webContents.send(&quot;toggleNotification&quot;, ireq.data)
+        break;
+      case request.REQUEST.UPDATENOTIF:
+        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) {
+          var title;
+          switch (ireq.data.type) {
+            case global.LOGS.MINIMUMPAUSE:
+              title = &quot;Minimum pause&quot;;
+              break;
+            case global.LOGS.NOPAUSE:
+              title = &quot;No pause&quot;;
+              break;
+            case global.LOGS.NOLUNCH:
+              title = &quot;No lunch&quot;;
+              break;
+            case global.LOGS.TIMEERROR:
+              title = &quot;Time error&quot;;
+              break;
+            default:
+              title = &quot;ERROR&quot;;
+          }
+          log.info(&quot;Displaying notification&quot;);
+          var iconPath = path.join(__dirname, &quot;..&quot;, &quot;graphics&quot;, &quot;ico.png&quot;);
+          global.tray.displayBalloon({
+            icon: iconPath,
+            title: title,
+            content: ireq.data.message
+          });
+        }
+        global.mwin.webContents.send(&quot;updateNotification&quot;, ireq.data)
+        break;
+      default:
+        //Do nothing
+    }
+  }
+}
+
+function dataExecuter(data) {
+  var index = currentBuf.indexOf(&quot;\0&quot;);
+  if (index != -1) {
+    var tmp = currentBuf.substring(0, index).toString(&quot;utf8&quot;);
+    currentBuf = currentBuf.slice(index + 1);
+    currentCb(null, tmp);
+    clientServer(tmp);
+    if (currentBuf.length &gt; 0)
+      dataExecuter(currentBuf);
+  }
+}
+
+function incomingDataHandling(data) {
+  currentBuf += data;
+  dataExecuter(currentBuf);
+}
+
+function connect(cb) {
+  clientconn = new net.Socket();
+  clientconn.once(&quot;error&quot;, (err) =&gt; {
+    if (global.currentPage != request.PAGES.LOGIN)
+      global.mwin.loadURL(url.format({
+        pathname: path.join(__dirname, &#x27;web_frontend/pages/login.html&#x27;),
+        protocol: &#x27;file:&#x27;,
+        slashes: true
+      }));
+    global.clientconn = null;
+    cb(err);
+  });
+  clientconn.once(&quot;close&quot;, () =&gt; {
+    if (global.currentPage != request.PAGES.LOGIN)
+      global.mwin.loadURL(url.format({
+        pathname: path.join(__dirname, &#x27;web_frontend/pages/login.html&#x27;),
+        protocol: &#x27;file:&#x27;,
+        slashes: true
+      }));
+
+    global.clientconn = null;
+  });
+  clientconn.on(&quot;data&quot;, incomingDataHandling);
+  clientconn.connect({
+    host: global.config.server,
+    port: 703
+  }, () =&gt; {
+    global.clientconn = clientconn;
+    cb(null);
+
+  });
+}
+
+function disconnect() {
+  try {
+    global.clientconn.destroy();
+    global.clientconn = null;
+  } catch (err) {
+    log.error(err);
+  }
+}
+
+function send(data, cb) {
+  currentCb = cb;
+  global.clientconn.removeAllListeners(&quot;error&quot;);
+  global.clientconn.on(&quot;error&quot;, (err) =&gt; {
+    currentCb(err);
+  });
+  global.clientconn.write(data + &quot;\0&quot;);
+}
 /**
  * Create a windows for the client
  * @method createWindow
  *
  **/
-function createWindow()
-{
-    global.mwin = new BrowserWindow({
-      width: 800,
-        height: 600
+function createWindow() {
+  global.mwin = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntergrationInWorker: true
+    }
 
-    });
-    global.mwin.loadURL(url.format({
-        pathname: path.join(__dirname, &#x27;client.html&#x27;),
-        protocol: &#x27;file:&#x27;,
-        slashes: true
-    }));
+  });
+  global.mwin.loadURL(url.format({
+    pathname: path.join(__dirname, &#x27;web_frontend/pages/login.html&#x27;),
+    protocol: &#x27;file:&#x27;,
+    slashes: true
+  }));
+  if (global.DEBUG)
     global.mwin.webContents.openDevTools();
-    global.mwin.on(&#x27;closed&#x27;, function() {
-        mainWindow = null;
-    });
-    global.mwin.on(&quot;ready-to-show&quot;, () =&gt; {
-      global.mwin.show();
-    });
+  global.mwin.on(&#x27;closed&#x27;, function() {
+    mainWindow = null;
+  });
+  global.mwin.on(&quot;ready-to-show&quot;, () =&gt; {
+    global.mwin.show();
+  });
+  var iconPath = path.join(__dirname, &quot;..&quot;, &quot;graphics&quot;, &quot;ico.png&quot;);
+  global.tray = new electron.Tray(iconPath);
+  var showVisible = () =&gt; {
+    global.mwin.isVisible() ? global.mwin.hide() : global.mwin.show();
+  };
+  global.tray.on(&#x27;click&#x27;, showVisible);
+  global.tray.on(&#x27;double-click&#x27;, showVisible);
+  global.tray.on(&#x27;balloon-click&#x27;, showVisible);
+  global.mwin.on(&#x27;show&#x27;, () =&gt; {
+    global.tray.setHighlightMode(&#x27;always&#x27;)
+  });
+  global.mwin.on(&#x27;hide&#x27;, () =&gt; {
+    global.tray.setHighlightMode(&#x27;never&#x27;)
+  });
+
 }
 /**
  * Load the client interface
  * @method load
  **/
-function load()
-{
-    app.on(&#x27;ready&#x27;, createWindow);
-    app.on(&#x27;window-all-closed&#x27;, function() {
-        if (process.platform !== &#x27;darwin&#x27;) {
-            app.quit();
-        }
-    });
-    app.on(&#x27;activate&#x27;, function() {
-        if (global.mwin === null) {
-            createWindow();
-        }
-    });
+function load() {
+  global.clientconn = null;
+
+
+  app.on(&#x27;ready&#x27;, createWindow);
+  app.on(&#x27;window-all-closed&#x27;, function() {
+    if (process.platform !== &#x27;darwin&#x27;) {
+      app.quit();
+    }
+  });
+  app.on(&#x27;activate&#x27;, function() {
+    if (global.mwin === null) {
+      createWindow();
+    }
+  });
 }
+
+
 module.exports = {
-    load
+  load,
+  connect,
+  disconnect,
+  send
 };
 
     </pre>

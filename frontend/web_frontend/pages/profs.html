@@ -506,8 +506,8 @@
         document.getElementById("groupActionSubmit").setAttribute("onclick", "blockedGroupSubmit();");
       }
     }
-    function changeTimeGroup()
-    {
+
+    function changeTimeGroup() {
       stdToApply = $.map($("#stdTable").bootstrapTable('getSelections'), function(row) {
         return row.id;
       });
@@ -515,6 +515,7 @@
         $("#editStudentTimeModal").modal("toggle");
       }
     }
+
     function blockedGroupSubmit() {
       setFixed(stdToApply, document.getElementById("groupActionComment").value);
     }
@@ -542,6 +543,16 @@
               <input type="text" class="form-control" name="clname" id="clname">
               <span class="help-block" id="error"></span>
             </div>
+            <script type="text/javascript">
+              $('#cfname').on('input propertychange paste', function() {
+                var lname =document.getElementById("clname").value;
+                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? ".":"") + lname;
+              });
+              $('#clname').on('input propertychange paste', function() {
+                var lname =document.getElementById("clname").value;
+                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? ".":"") + lname;
+              });
+            </script>
             <div id="fgcusername" class="form-group">
               <label for="cusername" class="form-control-label">Username :</label>
               <input type="text" class="form-control" name="cusername" id="cusername">

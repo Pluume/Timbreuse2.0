@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -106,114 +121,211 @@
  * @class db
  */
 var knex = require(&#x27;knex&#x27;)({
-    client: &#x27;sqlite3&#x27;,
-    useNullAsDefault: true
+  client: &#x27;sqlite3&#x27;,
+  useNullAsDefault: true
 });
-var sqlite = require(&quot;sqlite3&quot;);
+var sqlite = require(&#x27;sqlite3&#x27;);
 var handle;
+const async = require(&quot;async&quot;);
+const path = require(&quot;path&quot;);
 RANK = {
-    STUDENT: 0,
-    PROF: 1,
-    ADMIN: 2
+  STUDENT: 0,
+  PROF: 1,
+  ADMIN: 2
 };
 STATUS = {
-    IN: 1,
-    OUT: 2,
-    ABS: 3
+  IN: 1,
+  OUT: 2,
+  ABS: 3
 };
+REASON = {
+  MILITARY: 0,
+  DEAD: 1,
+  OFFICIAL: 2,
+  DRIVER: 3,
+  SICKW: 4,
+  SICKWO: 5,
+  TREATEMENT: 6,
+  OTHER: 7
+};
+PROOF = {
+  NONE: 0,
+  MEDICAL: 1,
+  CERTIFICATE: 2,
+  CONVOCATION: 3
+};
+LOGS = {
+  IN: 1,
+  OUT: 2,
+  ABSENT: 3,
+  SETTIME: 4,
+  MODTIME: 5,
+  RESETTIME: 6,
+  MINIMUMPAUSE: 7,
+  NOPAUSE: 8,
+  NOLUNCH: 9,
+  TIMEERROR: 10,
+  BLOCKED: 11,
+  UNBLOCKED: 12,
+  ENDOFDAY: 13,
+  LEAVEREQ: 14
+}
+NOTIF = {
+  MINIMUMPAUSE: LOGS.MINIMUMPAUSE,
+  NOPAUSE: LOGS.NOPAUSE,
+  MOLUNCH: LOGS.NOLUNCH,
+  TIMEERROR: LOGS.TIMEERROR
+}
 global.RANK = RANK;
 global.STATUS = STATUS;
-module.exports = {
-    handle: handle,
-    RANK: RANK,
-    /**
-     * Init the database
-     * @method init
-     **/
-    init: function() {
-        handle = new sqlite.Database(&quot;Data.db&quot;);
-        global.db = handle;
-        global.db.prototype = {};
-        global.db.prototype.all = function(sql, stdCallback) {
-            var res = this.prepare(sql, function(err) {
-                return stdCallback(err, rows);
-            });
-        };
+global.LOGS = LOGS;
+global.NOTIF = NOTIF;
 
-        handle.serialize(function() {
-            handle.run(knex.schema.createTableIfNotExists(&quot;users&quot;, function(table) { //Users table
-                table.increments(&quot;id&quot;).primary();
-                table.string(&quot;username&quot;);
-                table.string(&quot;password&quot;);
-                table.integer(&quot;rank&quot;);
-                table.string(&quot;fname&quot;);
-                table.string(&quot;lname&quot;);
-                table.string(&quot;dob&quot;);
-                table.string(&quot;email&quot;);
-                table.string(&quot;tag&quot;);
-            }).toString());
-
-            handle.run(knex.schema.createTableIfNotExists(&quot;students&quot;, function(table) { //Student table
-                table.increments(&quot;id&quot;).primary();
-                table.integer(&quot;userid&quot;);
-                table.integer(&quot;profid&quot;);
-                table.integer(&quot;timeDiff&quot;);
-                table.integer(&quot;timeDiffToday&quot;);
-                table.string(&quot;lastTagTime&quot;);
-                table.integer(&quot;status&quot;);
-                table.boolean(&quot;isBlocked&quot;);
-                table.string(&quot;firstClass&quot;);
-                table.string(&quot;project&quot;);
-            }).toString());
-
-
-            handle.run(knex.schema.createTableIfNotExists(&quot;timeoff&quot;, function(table) { //timeoff table
-                table.increments(&quot;id&quot;).primary();
-                table.string(&quot;date1&quot;);
-                table.string(&quot;date2&quot;);
-                table.string(&quot;desc&quot;);
-            }).toString());
-            //TODO Add timediff in the log table
-            handle.run(knex.schema.createTableIfNotExists(&quot;logs&quot;, function(table) { //logs table
-                table.increments(&quot;id&quot;).primary();
-                table.string(&quot;tag&quot;);
-                table.integer(&quot;studentid&quot;);
-                table.integer(&quot;nstatus&quot;);
-                table.string(&quot;date&quot;);
-                table.string(&quot;class&quot;);
-                table.string(&quot;description&quot;);
-            }).toString());
-
-            handle.run(knex.schema.createTableIfNotExists(&quot;notifications&quot;, function(table) { //notification table
-                table.increments(&quot;id&quot;).primary();
-                table.integer(&quot;userid&quot;);
-                table.integer(&quot;type&quot;);
-                table.string(&quot;date&quot;);
-                table.string(&quot;message&quot;);
-                table.boolean(&quot;read&quot;);
-            }).toString());
-
-            handle.run(knex.schema.createTableIfNotExists(&quot;class&quot;, function(table) { //class table
-                table.increments(&quot;id&quot;).primary();
-                table.integer(&quot;profid&quot;);
-                table.string(&quot;name&quot;);
-            }).toString());
-        });
-        handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;, (err, data) =&gt; {
-            if (data === undefined) {
-                handle.run(knex(&quot;users&quot;).insert({
-                    username: &quot;admin&quot;,
-                    password: &quot;4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9&quot;,
-                    rank: RANK.ADMIN,
-                    fname: &quot;Administrator&quot;,
-                    lname: &quot;&quot;,
-                    dob: &quot;&quot;,
-                    email: &quot;&quot;
-                }).toString()); //password: administrator
-            }
-        });
-
+function wipeStudents(id, cb) {
+  async.waterfall([
+    function(callback) {
+      global.db.all(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).select(&quot;userid&quot;).toString(), callback);
+    },
+    function(row, callback) {
+      var idList = [];
+      for (var i = 0; i &lt; row.length; i++)
+        idList.push(row[i].userid);
+      global.db.run(knex(&quot;users&quot;).where(&quot;id&quot;, &quot;in&quot;, idList).del().toString(), (err) =&gt; {
+        callback(err, idList);
+      });
+    },
+    function(row, callback) {
+      global.db.run(knex(&quot;notifications&quot;).where(&quot;userid&quot;, &quot;in&quot;, row).del().toString(), callback);
+    },
+    function(callback) {
+      global.db.run(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).del().toString(), callback);
+    },
+    function(callback) {
+      global.db.run(knex(&quot;leavereq&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);
+    },
+    function(callback) {
+      global.db.run(knex(&quot;logs&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);
     }
+  ], function(err) {
+    cb(err);
+  });
+}
+module.exports = {
+  handle: handle,
+  wipeStudents: wipeStudents,
+  RANK: RANK,
+  REASON: REASON,
+  PROOF: PROOF,
+  STATUS: STATUS,
+  LOGS: LOGS,
+  NOTIF: NOTIF,
+  /**
+   * Init the database
+   * @method init
+   **/
+  init: function() {
+    handle = new sqlite.Database(path.join(__dirname,&quot;..&quot;,&quot;Data.db&quot;));
+    global.db = handle;
+    global.db.prototype = {};
+    global.db.prototype.all = function(sql, stdCallback) {
+      var res = this.prepare(sql, function(err) {
+        return stdCallback(err, rows);
+      });
+    };
+
+    handle.serialize(function() {
+      handle.run(knex.schema.createTableIfNotExists(&quot;users&quot;, function(table) { //Users table
+        table.increments(&quot;id&quot;).primary();
+        table.string(&quot;username&quot;);
+        table.string(&quot;password&quot;);
+        table.integer(&quot;rank&quot;);
+        table.string(&quot;fname&quot;);
+        table.string(&quot;lname&quot;);
+        table.string(&quot;dob&quot;);
+        table.string(&quot;email&quot;);
+        table.string(&quot;tag&quot;);
+        table.blob(&quot;pp&quot;);
+      }).toString());
+
+      handle.run(knex.schema.createTableIfNotExists(&quot;students&quot;, function(table) { //Student table
+        table.increments(&quot;id&quot;).primary();
+        table.integer(&quot;userid&quot;);
+        table.integer(&quot;profid&quot;);
+        table.integer(&quot;timeDiff&quot;);
+        table.integer(&quot;timeDiffToday&quot;);
+        table.string(&quot;lastTagTime&quot;);
+        table.integer(&quot;missedPause&quot;);
+        table.boolean(&quot;hadLunch&quot;);
+        table.string(&quot;details&quot;);
+        table.integer(&quot;status&quot;);
+        table.boolean(&quot;isBlocked&quot;);
+        table.string(&quot;project&quot;);
+        table.string(&quot;firstClass&quot;);
+      }).toString());
+
+
+      handle.run(knex.schema.createTableIfNotExists(&quot;timeoff&quot;, function(table) { //timeoff table
+        table.increments(&quot;id&quot;).primary();
+        table.string(&quot;date1&quot;);
+        table.string(&quot;date2&quot;);
+        table.string(&quot;desc&quot;);
+      }).toString());
+      //TODO Add timediff in the log table
+      handle.run(knex.schema.createTableIfNotExists(&quot;logs&quot;, function(table) { //logs table
+        table.increments(&quot;id&quot;).primary();
+        table.integer(&quot;studentid&quot;);
+        table.integer(&quot;type&quot;);
+        table.string(&quot;date&quot;);
+        table.string(&quot;class&quot;);
+        table.string(&quot;description&quot;);
+        table.integer(&quot;timeDiff&quot;);
+        table.integer(&quot;timeDiffToday&quot;);
+      }).toString());
+
+      handle.run(knex.schema.createTableIfNotExists(&quot;notifications&quot;, function(table) { //notification table
+        table.increments(&quot;id&quot;).primary();
+        table.integer(&quot;userid&quot;);
+        table.integer(&quot;type&quot;);
+        table.string(&quot;date&quot;);
+        table.string(&quot;message&quot;);
+        table.boolean(&quot;read&quot;);
+      }).toString());
+
+      handle.run(knex.schema.createTableIfNotExists(&quot;class&quot;, function(table) { //class table
+        table.increments(&quot;id&quot;).primary();
+        table.integer(&quot;profid&quot;);
+        table.string(&quot;name&quot;);
+      }).toString());
+
+      handle.run(knex.schema.createTableIfNotExists(&quot;leavereq&quot;, function(table) { //leavereq table
+        table.increments(&quot;id&quot;).primary();
+        table.integer(&quot;studentid&quot;);
+        table.string(&quot;dateFrom&quot;);
+        table.string(&quot;dateTo&quot;);
+        table.boolean(&quot;missedTest&quot;);
+        table.integer(&quot;reason&quot;);
+        table.string(&quot;reasonDesc&quot;);
+        table.integer(&quot;proof&quot;);
+        table.string(&quot;where&quot;);
+        table.string(&quot;date&quot;);
+        table.boolean(&quot;acpt&quot;);
+      }).toString());
+    });
+    handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;, (err, data) =&gt; {
+      if (data === undefined) {
+        handle.run(knex(&quot;users&quot;).insert({
+          username: &quot;admin&quot;,
+          password: &quot;4194d1706ed1f408d5e02d672777019f4d5385c766a8c6ca8acba3167d36a7b9&quot;,//password: administrator
+          rank: RANK.ADMIN,
+          fname: &quot;Administrator&quot;,
+          lname: &quot;&quot;,
+          dob: &quot;&quot;,
+          email: &quot;&quot;
+        }).toString());
+      }
+    });
+
+  }
 };
 
     </pre>

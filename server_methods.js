@@ -1256,46 +1256,6 @@ function getHolidays(conn, ireq) {
 }
 
 /**
- * Change the read status of a notifications
- * @method toggleNotification
- * @param {Object} conn a JSON object containing a socket connection and an userid variable.
- * @param {Object} ireq a JSON object containing the request.
- **/
-function toggleNotification(conn, ireq) {
-  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
-
-    log.error("Not logged in");
-    return;
-  }
-  if (ireq.id === undefined) {
-
-    log.error("Unkown error");
-    return;
-  }
-  global.db.get(knex("notifications").select().where({
-    id: ireq.id
-  }).toString(), (err, row) => {
-    if (err) {
-      log.error("Error when querrying the database : " + err);
-      return;
-    }
-    if (row.read)
-      global.db.run(knex("notifications").update({
-        read: 0
-      }).where({
-        id: ireq.id
-      }).toString());
-    else
-      global.db.run(knex("notifications").update({
-        read: 1
-      }).where({
-        id: ireq.id
-      }).toString());
-    updateNotification(conn.user.id, ireq.id);
-  });
-
-}
-/**
  * Create a new holidays
  * @method addHolidays
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -1901,7 +1861,7 @@ function toggleLeaveRequest(conn, ireq) {
  * @param {Object} data raw data from the client.
  **/
 function sortRequest(connection, data) {
-  var oreq = getBaseReq(request.REQUEST.PING);
+  var oreq = getBaseReq(request.REQUEST.OK);
   var ireq;
   try {
     if (global.DEBUG) {
@@ -1922,6 +1882,7 @@ function sortRequest(connection, data) {
         connection: connection,
         ireq: ireq[i]
       });
+      console.log(tagReqList.length);
       toRm.push(i);
     }
   }

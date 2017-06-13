@@ -1,5 +1,5 @@
 % $ biblatex auxiliary file $
-% $ biblatex version 2.6 $
+% $ biblatex bbl format version 2.8 $
 % Do not modify the above lines!
 %
 % This is an auxiliary file used by the 'biblatex' package.
@@ -16,26 +16,26 @@
   {}
 \endgroup
 
-\entry{thisdavej}{misc}{}
-  \name{author}{1}{}{%
-    {{}%
-     {Johnson}{J.}%
-     {Dave}{D.}%
-     {}{}%
-     {}{}}%
-  }
-  \strng{namehash}{JD1}
-  \strng{fullhash}{JD1}
-  \field{sortinit}{J}
-  \field{title}{Beginner’s Guide to Installing Node.js on a Raspberry Pi}
-  \verb{url}
-  \verb http://thisdavej.com/beginners-guide-to-installing-node-js-on-a-raspber
-  \verb ry-pi/
-  \endverb
-  \field{year}{2016}
-\endentry
-
-\lossort
-\endlossort
-
+\sortlist[entry]{nty/global/}
+  \entry{thisdavej}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=JD}{%
+         family={Johnson},
+         familyi={J\bibinitperiod},
+         given={Dave},
+         giveni={D\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{JD1}
+    \strng{fullhash}{JD1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{Beginner’s Guide to Installing Node.js on a Raspberry Pi}
+    \verb{url}
+    \verb http://thisdavej.com/beginners-guide-to-installing-node-js-on-a-raspb
+    \verb erry-pi/
+    \endverb
+    \field{year}{2016}
+  \endentry
+\endsortlist
 \endinput

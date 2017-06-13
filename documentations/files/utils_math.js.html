@@ -41,9 +41,17 @@
                                 <li><a href="../classes/client.html">client</a></li>
                                 <li><a href="../classes/config.html">config</a></li>
                                 <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
                                 <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
                                 <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
                                 <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
                                 <li><a href="../classes/server.html">server</a></li>
                                 <li><a href="../classes/server_methods.html">server_methods</a></li>
                                 <li><a href="../classes/slave.html">slave</a></li>
@@ -55,9 +63,16 @@
                                 <li><a href="../modules/config.html">config</a></li>
                                 <li><a href="../modules/csv.html">csv</a></li>
                                 <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
                                 <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
                                 <li><a href="../modules/main.html">main</a></li>
                                 <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
                                 <li><a href="../modules/request.html">request</a></li>
                                 <li><a href="../modules/server.html">server</a></li>
                                 <li><a href="../modules/server_methods.html">server_methods</a></li>
@@ -99,6 +114,7 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
+const moment = require(&quot;moment&quot;);
 /**
  * Handle mathematics functions needed by the server.
  *
@@ -113,8 +129,40 @@ module.exports = {
    * @param {Date} date2 the end date.
    * @return {Integer} the difference in seconds between the date1 and the date2
    **/
-  getTimeDelta: (date1,date2) =&gt; {
-    return (Math.abs(date1 - date2)/1000);
+  getTimeDelta: (date1, date2) =&gt; {
+    return (Math.abs(date1 - date2) / 1000);
+  },
+  secondsToDate: (sec) =&gt; {
+    return moment().startOf(&quot;day&quot;).add(sec, &quot;seconds&quot;).format().toString()
+  },
+  /**
+   * Convert seconds to H:M:S format
+   * @method secondsToHms
+   **/
+  secondsToHms: function(nb) {
+    if (nb == null)
+      return &quot;+ 00:00:00&quot;
+
+    function addZero(nb) {
+      if (Math.abs(nb &lt; 10)) {
+        return &quot;0&quot; + nb.toString();
+      } else {
+        return nb.toString();
+      }
+    }
+    var neg;
+    (nb &lt; 0) ? neg = true: neg = false;
+    nb = Math.abs(Number(nb));
+    var h = Math.floor(nb / 3600);
+    if (Number.isNaN(h))
+      h = 0;
+    var m = Math.floor(Math.floor(nb % 3600) / 60);
+    if (Number.isNaN(m))
+      m = 0;
+    var s = Math.floor(nb % 60);
+    if (Number.isNaN(s))
+      s = 0;
+    return ((neg) ? &quot;-&quot; : &quot;+&quot;) + &quot; &quot; + addZero(h) + &quot;:&quot; + addZero(m) + &quot;:&quot; + addZero(s);
   }
 };
 

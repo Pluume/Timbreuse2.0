@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>test.js - Timbreuse</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="Timbreuse" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 2.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/client.html">client</a></li>
+                                <li><a href="../classes/config.html">config</a></li>
+                                <li><a href="../classes/csv.html">csv</a></li>
+                                <li><a href="../classes/DataTable.Api.html">DataTable.Api</a></li>
+                                <li><a href="../classes/db.html">db</a></li>
+                                <li><a href="../classes/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../classes/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../classes/holidays.html">holidays</a></li>
+                                <li><a href="../classes/informations.html">informations</a></li>
+                                <li><a href="../classes/leavereq.html">leavereq</a></li>
+                                <li><a href="../classes/log.html">log</a></li>
+                                <li><a href="../classes/login.html">login</a></li>
+                                <li><a href="../classes/math.html">math</a></li>
+                                <li><a href="../classes/pages.html">pages</a></li>
+                                <li><a href="../classes/server.html">server</a></li>
+                                <li><a href="../classes/server_methods.html">server_methods</a></li>
+                                <li><a href="../classes/slave.html">slave</a></li>
+                            </ul>
+                
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/client.html">client</a></li>
+                                <li><a href="../modules/config.html">config</a></li>
+                                <li><a href="../modules/csv.html">csv</a></li>
+                                <li><a href="../modules/db.html">db</a></li>
+                                <li><a href="../modules/frontendHandle.html">frontendHandle</a></li>
+                                <li><a href="../modules/frontendUtil.html">frontendUtil</a></li>
+                                <li><a href="../modules/holidays.html">holidays</a></li>
+                                <li><a href="../modules/informations.html">informations</a></li>
+                                <li><a href="../modules/leavereq.html">leavereq</a></li>
+                                <li><a href="../modules/log.html">log</a></li>
+                                <li><a href="../modules/login.html">login</a></li>
+                                <li><a href="../modules/main.html">main</a></li>
+                                <li><a href="../modules/math.html">math</a></li>
+                                <li><a href="../modules/pages.html">pages</a></li>
+                                <li><a href="../modules/request.html">request</a></li>
+                                <li><a href="../modules/server.html">server</a></li>
+                                <li><a href="../modules/server_methods.html">server_methods</a></li>
+                                <li><a href="../modules/slave.html">slave</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: test.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Main module. Makes all the other modules start by parsing the command line argument.
+ *
+ * @module main
+ */
+const log = require(&quot;./utils/log.js&quot;);
+log.info(&quot;Loading configuration...&quot;);
+const config = require(&quot;./utils/config.js&quot;);
+const leavereq = require(&quot;./utils/leaveReq.js&quot;);
+var knex = require(&#x27;knex&#x27;)({
+    client: &#x27;sqlite3&#x27;,
+    useNullAsDefault: true
+});
+config.read();
+config.getType();
+global.mwin = null;
+const slaveHandle = require(&quot;./frontend/slave.js&quot;);
+log.info(&quot;Starting as a &quot; + global.TYPE.string);
+
+if (global.TYPE.int === config.TYPE.SERVER.int || global.TYPE.int === config.TYPE.SLAVE.int) { //Check if the app is starting as server or slave
+    log.info(&quot;Initializing database...&quot;);
+    const db = require(&quot;./db/db.js&quot;);
+    db.init();//Init the database
+    log.info(&quot;Starting server...&quot;);
+    var tserver = require(&quot;./server.js&quot;);
+    tserver.start();//Start the server
+    if (global.TYPE.int === config.TYPE.SLAVE.int) {
+        slaveHandle.load(); //Load the slave frontend
+    } else {
+      const scheduler = require(&quot;./utils/scheduler.js&quot;);
+      scheduler.start();
+    }
+    //console.log(leavereq.isToday(1));
+
+    global.db.get(knex.select().from(&quot;leavereq&quot;).where({
+        studentid: 1
+    }).toString(), (err, row) =&gt; {
+        if (err) {
+            log.error(&quot;Error : &quot; + err);
+            return;
+        }
+        console.log(leavereq.isToday(row));
+    });
+} else {
+        const clientHandle = require(&quot;./frontend/client.js&quot;);
+        clientHandle.load(); //Load the client frontend
+}
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
