@@ -27,7 +27,7 @@
 
 
 
-\title{Étude \\ Choix de format de date \\ utilisé par la timbreuse}
+\title{Étude \\ Choix de formats de dates \\ utilisés par la timbreuse}
 
 \author{Francis \textsc{Le Roy}}
 
@@ -47,17 +47,17 @@ Protocole parent : & Aucun
 \end{center}
 
 \section{Introduction}
-Les formats de dates en informatique sont aussi décisif que variés. Trois possibilité était envisageable, utilisé le système de date EPOCH, utilisé le format normalisée de date ISO8601 \cite{isodate} sous l'heure UTC, ou bien finalement le format ISO8601 sous l'heure local avec le décalage horaire inclut dans la date. Les trois ont leurs avantages et inconvenients. \\
-En revanche, nativement, le Javascript utilise le format ISO8601 sous l'heure UTC lors de la création d'un objet \texttt{Date}. J'ai décidé d'utilisé ce format. \\
-Pour formater l'heure correctement et faire diverse opération sur la date et l'heure j'utilise la bibliothèque Javascript MomentJs \cite{momentjs}
-\section{Résultat attendu}
-Si le format de date adopté est bon, alors les heures affiché sur les différents panel et affichage graphique devrait être correcte, c'est-à-dire correspondant à l'heure local actuelle.
+Les formats de dates en informatique sont aussi décisifs que variés. Trois possibilités étaient envisageables :  utiliser le système de date EPOCH, utiliser le format normalisé de date ISO8601 \cite{isodate} sous l'heure UTC, ou bien finalement le format ISO8601 sous l'heure locale avec le décalage horaire inclus dans la date. Les trois ont leurs avantages et inconvenients. \\
+En revanche, nativement, le Javascript utilise le format ISO8601 sous l'heure UTC lors de la création d'un objet \texttt{Date}. J'ai décidé d'utiliser ce format. \\
+Pour formater l'heure correctement et faire diverses opérations sur la date et l'heure, j'utilise la bibliothèque Javascript MomentJs \cite{momentjs}
+\section{Résultats attendus}
+Si le format de dates adopté est bon, alors les heures affichées sur les différents panels et affichages graphiques devraient être corrects, c'est-à-dire correspondants à l'heure locale actuelle.
 \section{Procédure de test}
-Pour tester cette fonctionnalité il faut par exemple timbrer à l'aide d'une carte correspondant à un élèves puis aller observer depuis le panel des enseignants si l'évènement à été enregistré dans les logs de l'élèves.
+Pour tester cette fonctionnalité, il faut par exemple timbrer à l'aide d'une carte correspondant à un élève, puis aller observer, depuis le panel des enseignants, si l'évènement a été enregistré dans les logs de l'élève.
 \section{Résultats obtenus}
-Lors de l'utilisation du format ISO8601 sous l'heure UTC, toute les heures était décalé de deux heures (La différence entre l'heure locale et l'heure UTC). Pour la suite toutes les heures ont été remplacée par des dates formattés sous le format ISO8601 avec le décalage horaire inclut.
+Lors de l'utilisation du format ISO8601 sous l'heure UTC, toutes les heures étaient décalées de deux heures (La différence entre l'heure locale et l'heure UTC). Pour la suite, toutes les heures ont été remplacées par des dates formatées sous le format ISO8601 avec le décalage horaire inclus.
 \section{Conclusion}
-En conclusion la conversion entre la bibliotéque \texttt{MomentJs} et l'objet \texttt{Date} natif au Javascript ne reconvertissait pas en heure locale. Le format ISO8601 avec le décalage horaire est donc la meilleurs solutions.
+La conversion entre la bibliothèque \texttt{MomentJs} et l'objet \texttt{Date} natif au Javascript ne reconvertissait pas en heure locale. Le format ISO8601 avec le décalage horaire est donc la meilleures solutions.
 
 \printbibliography
 

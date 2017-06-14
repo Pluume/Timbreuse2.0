@@ -46,12 +46,12 @@ Projet : & P1699 \\
 \end{center}
 
 \section{Introduction}
-Lorsqu'un élève timbre sur une des timbreuses esclaves, les timbreuses sont censées s'envoyer les informations de timbrage entre elles. Le but de ce test est de vérifier si lorsque l'on timbre sur une timbreuse, les informations sont répliquer sur l'autre timbreuse.
+Lorsqu'un élève timbre sur une des timbreuses esclaves, les timbreuses sont censées s'envoyer les informations de timbrage entre elles. Le but de ce test est de vérifier si, lorsque l'on timbre sur une timbreuse, les informations sont répliquées sur l'autre timbreuse.
 \section{Mise en place}
-Tout d'abord, en utilisant un des lecteurs RFID (ACR1281U-C2) à disposition il faut noter l'identifiant unique du badge que nous allons utiliser par la suite. En utilisant les deux timbreuses du centre St Roch installées le 4 Avril 2017, on timbre sur l'une des timbreuses. Puis en se connectant en SSH sur la timbreuse sur laquelle nous n'avons \textbf{pas} timbré, nous vérifions que notre tag apparait à l'heure à laquelle nous avons timbré.
+Tout d'abord, en utilisant un des lecteurs RFID (ACR1281U-C2) à disposition, il faut noter l'identifiant unique du badge que nous allons utiliser par la suite. En utilisant les deux timbreuses du centre St Roch installées le 4 Avril 2017, on timbre sur l'une des timbreuses. Puis, en se connectant en SSH sur la timbreuse sur laquelle nous n'avons \textbf{pas} timbré, nous vérifions que notre tag apparaît à l'heure à laquelle nous avons timbré.
 
 \section{Résultats obtenus}
-La distribution des timbrage fonctionne correctement car on a pu voir une réplication des informations à travers le réseau.
+La distribution des timbrages fonctionne correctement car on a pu voir une réplication des informations à travers le réseau.
 \section{Conclusion}
 Cette fonctionnalité est donc opérationnelle.
 % \printbibliography

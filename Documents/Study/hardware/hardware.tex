@@ -46,34 +46,34 @@ Projet : & P1699 \\
 
 
 \section{Introduction}
-La Timbreuse à été dévelloppé à l'aide du framework Node JS. Celui ci permet de développer des applications bureau en utilisant du Javascript.
-Node JS va compiler puis interpreter le code : cette technique s'appelle le "Compile Just In Time". La premiere chose à vérifirer est la
+La Timbreuse a été développée à l'aide du framework Node JS. Celui-ci permet de développer des applications bureau en utilisant du Javascript.
+Node JS va compiler, puis interpréter le code : cette technique s'appelle le "Compile Just In Time". La premiere chose à vérifirer est la
 compatibilité du logiciel avec Node JS.
 \section{Installation}
 \subsection{Systéme d'exploitation}
-L'installation du système d'exploitation du Raspberry Pi s'effectue en inscrivant sur une puce Micro SD l'image télécharger deèuis le site officiel
+L'installation du système d'exploitation du Raspberry Pi s'effectue en inscrivant sur une puce Micro SD l'image téléchargée depuis le site officiel
 de Raspberry Pi.
 \subsection{Connexion à Internet}
-Pour ce connecter à internet à travers le réseau du CPNV deux méthodes s'offrent à nous. La prémière consiste à demandé un la création d'un mots de passe
-jetable à notre professeur référent puis à déverouiller l'IP que l'on souhaite à travers notre panel depuis l'intranet du CPNV. Ou bien de nous connecter
-avec le script \texttt{internet.sh} fournit par le service informatique du CPNV. La dernière solution fonctionne plus souvent.
+Pour se connecter à internet à travers le réseau du CPNV, deux méthodes s'offrent à nous. La première consiste à demander la création d'un mots de passe
+jetable à notre professeur référent, puis à déverrouiller l'IP que l'on souhaite à travers notre panel depuis l'intranet du CPNV, ou bien de nous connecter
+avec le script \texttt{internet.sh} fournis par le service informatique du CPNV. La dernière solution fonctionne plus souvent.
 
 \subsection{Installation des paquets de base}
-Il faut tout d'abord installer les dernières mise-à-jour du système pour nous protéger des dernière failles de sécurités découvertes.
-Pour ce faire il faut taper la commande \texttt{sudo apt\- get update \& \&  sudo apt-get upgrade \& \&  sudo apt-get dist-upgrade}. Après l'execution de cette commande
+Il faut tout d'abord installer les dernières mise à jours du système pour nous protéger des dernières failles de sécurité découvertes.
+Pour ce faire, il faut taper la commande \texttt{sudo apt\- get update \& \&  sudo apt-get upgrade \& \&  sudo apt-get dist-upgrade}. Après l'exécution de cette commande,
 il est recommandé de redémarrer le pi.
 
 \subsection{Installation de Node JS}
-Pour installer Node JS il faut tout d'abord executer cette commande : \texttt{curl -sL https://deb.nodesource.com/setup\_7.x | sudo -E bash -} puis celle-ci
-\texttt{sudo apt install nodejs}. Si tout c'est bien passé, vous devriez pouvoir voir la version de Node JS installé depuis un terminal en tapant la commande \texttt{node -v}.
+Pour installer Node JS, il faut tout d'abord exécuter cette commande : \texttt{curl -sL https://deb.nodesource.com/setup\_7.x | sudo -E bash -} puis celle-ci
+\texttt{sudo apt install nodejs}. Si tout s'est bien passé, vous devriez pouvoir voir la version de Node JS, installée depuis un terminal, en tapant la commande \texttt{node -v}.
 
-\subsection{Installation de électron}
-Pour insaller electron, l'un des framework sur lequel la Timbreuse à été développé, il faut taper la commande \texttt{sudo npm install -g electron}.
-Si tout ces biens passé, la commande \texttt{electron} doit afficher une fenêtre de test.
+\subsection{Installation de Electron}
+Pour installer Electron, l'un des framework sur lequel la Timbreuse a été développée, il faut taper la commande \texttt{sudo npm install -g electron}.
+Si tout c'est bien passé, la commande \texttt{Electron} doit afficher une fenêtre de test.
 
 \section{Conclusion}
-Le Raspberry Pi avec comme système d'exploitation Rapsbian
-est compatabible avec le logiciel de la Timbreuse. Pour plus d'information, voir le guide d'installation de Node JS sur Raspberry pi de Dave Johnson \cite{thisdavej}
+Le Raspberry Pi, avec comme système d'exploitation Raspbian,
+est compatabible avec le logiciel de la Timbreuse. Pour plus d'informations, voir le guide d'installation de Node JS sur Raspberry pi de Dave Johnson \cite{thisdavej}
 
 \printbibliography
 

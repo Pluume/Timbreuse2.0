@@ -46,15 +46,15 @@ Projet : & P1699 \\
 
 
 \section{Introduction}
-La Timbreuse serveur ainsi que les timbreuse esclave utilise un port TCP pour pour se connecter les unes aux autres. Il est nécessaire de choisir un port logicielle qui ne va pas rentrer en conflit avec d'autre logiciel précédemment installer ou qui seront succeptible d'être nécessaire dans le futur proche à venir.
+La Timbreuse serveur et les timbreuses esclaves utilisent un port TCP pour se connecter les unes aux autres. Il est nécessaire de choisir un port logiciel qui ne va pas rentrer en conflit avec d'autres logiciels précédemment installés, ou qui seront susceptibles d'être nécessaires dans le futur proche.
 \section{Recherche}
 \subsection{Depuis une liste de ports communs}
-Il est possible de trouver sur Wikipedia\cite{Wikipedia} une liste des ports les plus commun occuper par d'autre application. Au hasard, j'ai choisi le port 703 car il n'était pas occupé.
+Il est possible de trouver sur Wikipedia\cite{Wikipedia} une liste des ports les plus communs occupés par d'autres applications. Au hasard, j'ai choisi le port 703 car il n'était pas occupé.
 \subsection{Vérification locale}
-Bien que le port 703 ne soit habituellement pas pris par les application, il faut vérifier que le port n'est pas déjà utilisé par default sur les Raspberry Pi. Pour ce faire, on tape la commande \texttt{sudo netstat -tulpn | grep 704}. Si cette commande affiche une ligne sur l'interface de commande du Raspberry Pi, alors le port est utilisé. Après avoir tapé la commande, on se rend compte que le port 703 n'est pas utilisé par default sur les Raspberry Pi 3 model B avec comme système d'exploitation Raspbian version 4.4.50-v7+.
+Bien que le port 703 ne soit habituellement pas pris par les applications, il faut vérifier que le port n'est pas déjà utilisé par défaut sur les Raspberry Pi. Pour ce faire, on tape la commande \texttt{sudo netstat -tulpn | grep 704}. Si cette commande affiche une ligne sur l'interface de commande du Raspberry Pi, alors le port est utilisé. Après avoir tapé la commande, on se rend compte que le port 703 n'est pas utilisé par défaut sur les Raspberry Pi 3 model B avec comme système d'exploitation Raspbian version 4.4.50-v7+.
 
 \section{Conclusion}
-Le port 703 n'était globalement et localement pas utilisé on peut le définir comme le port utilisé par la timbreuse.
+Le port 703 n'était globalement et localement pas utilisé, on peut le définir comme le port utilisé par la timbreuse.
 
 \printbibliography
 

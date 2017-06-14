@@ -30,6 +30,8 @@
     \strng{fullhash}{JD1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
     \field{title}{Beginner’s Guide to Installing Node.js on a Raspberry Pi}
     \verb{url}
     \verb http://thisdavej.com/beginners-guide-to-installing-node-js-on-a-raspb

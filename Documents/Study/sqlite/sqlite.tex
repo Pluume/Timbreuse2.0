@@ -46,16 +46,16 @@ Projet : & P1699 \\
 
 
 \section{Introduction}
-La Timbreuse a besoin d'avoir accès à une base de données pour stocké ses informations. Il existe deux grandes écoles : les bases de données géré par des services externe au logiciel client (comme MySQL) ou les bases de données géré directement par le logiciel client (comme SQLite).
+La Timbreuse a besoin d'avoir accès à une base de données pour stocker ses informations. Il existe deux grandes écoles : les bases de données gérées par des services externes au logiciel client (comme MySQL), ou les bases de données géré directement par le logiciel client (comme SQLite).
 \section{Raison de simplicité}
-Tout d'abord, il est beaucoup plus facile de transporter, copier, sauvegarder une base de données comme SQLite. C'est base de données se présente sous la forme d'un seul fichier pouvant être géré comme n'importe quel autre fichier. 
+Tout d'abord, il est beaucoup plus facile de transporter, copier, sauvegarder une base de données comme SQLite. Ces bases de données se présentent sous la forme d'un seul fichier pouvant être géré comme n'importe quel autre fichier. 
 \subsection{Raison de sécurité}
-Par default les base de données comme MySQL ouvre des ports sur le système. C'est base de données ne sont pas à l'abris de failles de sécurités majeurs pouvant compromettre l'intégrité du serveur ainsi que les données qu'il contient.
+Par défaut les bases de données comme MySQL ouvrent des ports sur le système. Ces bases de données ne sont pas à l'abri de failles de sécurité majeures pouvant compromettre l'intégrité du serveur, ainsi que les données qu'il contient.
 \subsection{Un besoin limité}
-Les performances des bases de données type SQLite sont souvent inférieur comparé à celle d'une base de données SQLite. En revanche, les bases de données externes offrent beaucoup plus de fonctionnalités. Cependant, dans le cadre du projet de la timbreuse, le nombre de fonctionnalité nécessaire est faible et le nombre de requête est au maximum de 5 requête par seconde, ce qui est très en dessous de performance maximal de SQLite.
+Les performances des bases de données type SQLite sont souvent inférieures, comparées à celles d'une base de données SQLite. En revanche, les bases de données externes offrent beaucoup plus de fonctionnalités. Cependant, dans le cadre du projet de la timbreuse, le nombre de fonctionnalités nécessaires est faible et le nombre de requêtes est, au maximum, de 5 requêtes par seconde, ce qui est très en dessous des performances maximales de SQLite.
 
 \section{Conclusion}
-Un base de données de SQLite semble plus adapté au projet de la timbreuse étant donnée le nombre faible de fonctionnalité demandé ainsi que la portabilité nécessaire des données. Finalement SQLite est un projet ancien avec une solide documentation rendant le developpement avec cette outils plus aisé.
+Un base de données de SQLite semble plus adaptée au projet de la timbreuse, étant donné le nombre faible de fonctionnalités demandées, ainsi que la portabilité nécessaire des données. Finalement SQLite est un projet ancien avec une solide documentation rendant le developpement avec cet outil plus aisé.
 
 \printbibliography
 

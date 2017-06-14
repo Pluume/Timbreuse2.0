@@ -27,7 +27,7 @@
 
 
 
-\title{Rapport de test \\ Convertir des secondes \\ en heure formaté}
+\title{Rapport de test \\ Convertir des secondes \\ en heure formatée}
 
 \author{Francis \textsc{Le Roy}}
 
@@ -46,13 +46,13 @@ Projet : & P1699 \\
 \end{center}
 
 \section{Introduction}
-Toutes les dates utilisé dans le système de la timbreuse sont soient formaté en ISO8601 lorsque l'on exprime un point fixe dans le temps, soit en secondes lorsqu'on veut exprimer une durée. Il est plus parlant d'afficher du temps sous le format HH:MM:SS que sous la forme d'un nombre de secondes.
-\section{Résultat attendu}
-Lorsque l'on passe un nombre entier positif ou négatif, le script de test devrait affiché une durée formaté sous le format HH:MM:SS (p.ex -3650 donnerait -01:00:50).
+Toutes les dates utilisées dans le système de la timbreuse sont, soit formatées en ISO8601 lorsque l'on exprime un point fixe dans le temps, soit en secondes lorsqu'on veut exprimer une durée. Il est plus parlant d'afficher du temps sous le format HH:MM:SS que sous la forme d'un nombre de secondes.
+\section{Résultats attendus}
+Lorsque l'on passe un nombre entier positif ou négatif, le script de test devrait afficher une durée formatée sous le format HH:MM:SS (p.ex -3650 donnerait -01:00:50).
 \section{Procédure de test}
-Il faut utiliser le fichier \href{run:../../../test/secondsToDateConverter.js}{script} Node JS, qui va effectuer la fonction de conversion des secondes en durée formaté. Pour vérifié que le script fonctionne on compare avec le calcul réalisé à la main pour vérifié que le résultat obtenue est correcte.
+Il faut utiliser le fichier \href{run:../../../test/secondsToDateConverter.js}{script} Node JS, qui va effectuer la fonction de conversion des secondes en durée formatée. Pour vérifier que le script fonctionne, on compare avec le calcul réalisé à la main pour vérifier que le résultat obtenu est correcte.
 \section{Résultats obtenus}
-Le script affiche les durées en secondes correctement formaté sous le format HH:MM:SS.
+Le script affiche les durées en secondes, correctement formatées sous le format HH:MM:SS.
 \section{Conclusion}
 Cette fonctionnalité est donc opérationnelle.
 % \printbibliography
