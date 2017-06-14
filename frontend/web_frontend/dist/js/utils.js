@@ -23,7 +23,7 @@ function searchSubmit(event) //TODO Delete
   }
 }
 
-function emptyInput(arrId) //Delete
+function emptyInput(arrId) //TODO Delete
 {
   for(var i = 0; i< arrId.length; i++)
   {
@@ -47,12 +47,17 @@ function loadPage(page)
   document.getElementById("MainIFrame").src = page;
 }
 
-function resizeToClient() //TODO Delete
-{
-  document.getElementById("MainIFrame").style.height = document.body.clientHeight + "px";
-}
-
-function resizeIFrame() {//TODO Delete
+/**
+ * Resize the webview to windows height
+ * @method resizeIFrame
+ */
+function resizeIFrame() {
+  try {
     document.getElementById("MainIFrame").style.height = (document.body.clientHeight - document.getElementById("MainIFrame").offsetTop) + "px";
+  } catch(er)
+  {
+
+  }
+
 }
-window.onload = function () { resizeIFrame(); }//TODO Delete
+window.onload = function () { resizeIFrame(); }

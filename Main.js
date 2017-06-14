@@ -4,10 +4,10 @@
  * @module main
  */
 const inst = require("./utils/installRoutines.js");
-if (inst.handleSquirrelEvent())
+if (inst.handleSquirrelEvent()) //If installation, close to let squirrel do it's stuff
   return 0;
 var app = require("electron").app;
-var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) { //If app already launched, quit the new launched one and focus the old one
   if (global.mwin) {
     if (global.mwin.isMinimized()) global.mwin.restore();
     global.mwin.focus();

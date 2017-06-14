@@ -1,0 +1,61 @@
+\documentclass[10pt,a4paper,onecolumn]{article}
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry}
+\usepackage{a4wide}
+\usepackage{titling}
+\setlength{\droptitle}{-5em}
+\usepackage[version=3]{mhchem}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[english,francais]{babel}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage[pdftex]{hyperref}
+\setlength\parindent{0pt}
+\usepackage{xcolor}
+\hypersetup{colorlinks,urlcolor=blue}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\chead{Francis Le Roy}
+\lfoot{P1699/MCT}
+\cfoot{\today}
+\rfoot{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+\bibliography{bib}
+\renewcommand{\labelenumi}{\alph{enumi}.}
+
+
+\title{Étude \\ Choix du framework graphique \\ pour le logiciel de la timbreuse}
+
+\author{Francis \textsc{Le Roy}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{center}
+\begin{tabular}{l r}
+Date de réalisation : & 14 Juin, 2017 \\
+Projet : & P1699 \\
+\end{tabular}
+\end{center}
+
+
+\section{Introduction}
+La timbreuse dans sa déclinaison esclave et client à besoins d'afficher une interface graphique à l'utilisateur. Celle-ci va permettre à l'utilisateur de voir et d'interagir avec les différents éléments et informations à l'écran. Deux choix s'offraient à moi étant donné que la framework de développement était Node JS : Electron \cite{electron} ou NW.js \cite{NW}.
+\section{Séparation des processus}
+Sur Electron, le processus principale et le processus graphique sont séparé permettant d'avoir une meilleur gestion de l'affichage lorsque des tâches lourdes s'executent en arrière-plan.
+\section{Protection du code source}
+NW.js offre une protection du code source lors de la distribution du logiciel à l'utilisateur finale. C'est à dire que l'utilisateur ne pourra pas lire le code du logiciel car il sera compilé. En revanche, il est nécessaire de recompiler le code pour chacune des platformes sur lesquelles le logiciel va être installé. Electron n'offre pas une protection du code source, bien que dans le cadre de la timbreuse une telle fonctionnalité n'est pas mandataire.
+
+
+\section{Conclusion}
+Finalement, j'ai décidé d'utiliser Electron car j'ai déjà travaillé avec ce framework dans le passé.
+
+\printbibliography
+
+\end{document}

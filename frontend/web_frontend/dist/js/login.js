@@ -35,20 +35,20 @@ function login(user, pass) {
     switch (arg.error) {
       case window.ERROR.OK:
         switch (arg.rank) {
-          case window.RANK.PROF:
+          case window.RANK.PROF: //Prof logged in
             ipcRenderer.send("redirect", window.PAGES.PROFS);
             break;
-          case window.RANK.ADMIN:
+          case window.RANK.ADMIN: //Admin logged in
             ipcRenderer.send("redirect", window.PAGES.ADMIN);
             break;
-          case window.RANK.STUDENT:
+          case window.RANK.STUDENT: //Student logged in
             ipcRenderer.send("redirect", window.PAGES.STUDENT);
             break;
           default:
             redAlert("Ill formed request...");
         }
         break;
-      case window.ERROR.WRONGCREDS:
+      case window.ERROR.WRONGCREDS: //Wrong credentials
         redAlert("Wrong username/password combinaison");
         break;
       case window.ERROR.UNKNOWN:

@@ -27,17 +27,17 @@ module.exports = {
   writeBruteLoggingToCSV: (tag, time) => {
     var filename;
     var dirname = path.join(__dirname, "..", "CSV");
-    if (!fs.existsSync(dirname)) {
+    if (!fs.existsSync(dirname)) { //Create CSV folder if don't exists
       fs.mkdirSync(dirname);
     }
-    if (global.config.csvFreq) {
+    if (global.config.csvFreq) { //Open the CSV file
       filename = moment().format("DD_MM_YYYY") + ".csv";
     } else {
       filename = "week_" + moment().week() + ".csv";
     }
     var npath = path.join(path.join(dirname, global.config.class + "_" + filename).toString());
     var fd;
-    if (!fs.existsSync(npath)) {
+    if (!fs.existsSync(npath)) { //If file don't exists init CSV file with headers
       try {
         fd = fs.openSync(npath, "a");
         fs.writeSync(fd, "tag,time\n");
@@ -49,7 +49,7 @@ module.exports = {
         return;
       }
     }
-    try {
+    try { //Write data to CSV (tag + time)
       fd = fs.openSync(npath, "a");
       fs.writeSync(fd, tag + "," + time + "\n");
       fs.closeSync(fd);
@@ -72,10 +72,10 @@ module.exports = {
         log.error("Error while detecting USB drive. Aborting...");
         return;
       }
-      drives.forEach((drive) => {
-        if (!drive.system && drive.mountpoints[0].path != "/boot") {
+      drives.forEach((drive) => { //Iterate through each connected drives entity available
+        if (!drive.system && drive.mountpoints[0].path != "/boot") { //The raspberry pi has not a system drive but the system SD card is always mounted on /boot
           var remotefolder = path.join(drive.mountpoints[0].path, global.config.class + "_" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
-          log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
+          log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString()); //If external disk, copy CSV
           if (fs.existsSync(remotefolder)) {
             log.error("The folder already exists. Aborting");
             return;
@@ -101,11 +101,18 @@ module.exports = {
       });
     });
   },
+  /**
+   * Export all the database to CSV
+   * @method exportDBtoCSV
+   * @param  {Function}    cb Callback function
+   */
   exportDBtoCSV: (cb) => {
     var data = [];
     async.waterfall([
       function(callback) {
-        global.db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
+        log.info("Master key detected.");
+        log.info("Creating a database snapshot.");
+        global.db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => { //Get the database schema
           if (err)
             callback(err, null);
           for (var i = 0; i < rows.length; i++) {
@@ -116,7 +123,7 @@ module.exports = {
           callback(null, data);
         });
       },
-      function(data, callback) {
+      function(data, callback) { //Get the column for each table
         async.each(data, function(cur, callback2) {
           global.db.all("pragma table_info(" + cur.name + ");", (err, rows) => {
             data[cur.id].columns = [];
@@ -133,7 +140,7 @@ module.exports = {
           callback(null, data);
         });
       },
-      function(data, callback) {
+      function(data, callback) { //Get the data for each table
 
         async.each(data, function(cur, callback2) {
           global.db.all(knex.select().from(cur.name).toString(), (err, rows) => {
@@ -152,8 +159,7 @@ module.exports = {
       },
       function(data, callback) {
         var csv = [];
-        async.each(data, function(cur, callback2) {
-          //console.log(cur.rows);
+        async.each(data, function(cur, callback2) { //Push all data to CSV
           csv.push({
             data: json2csv({
               data: cur.rows,
@@ -164,16 +170,16 @@ module.exports = {
           callback2(null);
 
         }, function() {
-          log.info("Master key detected. Detecting USB drive...");
+
           drivelist.list((error, drives) => {
             if (error) {
               log.error("Error while detecting USB drive. Aborting...");
               callback(error);
               return;
             }
-            drives.forEach((drive) => {
+            drives.forEach((drive) => { //Iterate through each disks
               var remotefolder = "";
-              if (!drive.system && drive.mountpoints[0].path != "/boot") {
+              if (!drive.system && drive.mountpoints[0].path != "/boot") { //The raspberry pi has not a system drive but the system SD card is always mounted on /boot
                 remotefolder = path.join(drive.mountpoints[0].path, "DB_DUMP___" + moment().format('MMMM_Do_YYYY__HH_mm_ss'));
                 log.info("Copying CSV to " + drive.description + " in path " + remotefolder.toString());
                 if (fs.existsSync(remotefolder)) {
@@ -183,7 +189,7 @@ module.exports = {
                 } else {
                   fs.mkdirSync(remotefolder);
                 }
-                for (var i = 0; i < csv.length; i++) {
+                for (var i = 0; i < csv.length; i++) { //Write CSV to destination folder
                   var filename = csv[i].name + ".csv";
                   var fpath = path.join(remotefolder, filename);
                   log.info("Writing data in " + fpath);
@@ -206,6 +212,10 @@ module.exports = {
     });
 
   },
+  /**
+   * Delete all the CSV on the current machine
+   * @method deleteAllCSV
+   */
   deleteAllCSV: function() {
     var rmDir = function(dirPath) { //Thanks to guybedford (https://gist.github.com/liangzan/807712/8fb16263cb39e8472d17aea760b6b1492c465af2)
       try {
@@ -216,13 +226,13 @@ module.exports = {
       if (files.length > 0)
         for (var i = 0; i < files.length; i++) {
           var filePath = path.join(dirPath, files[i]);
-          if (fs.statSync(filePath).isFile())
+          if (fs.statSync(filePath).isFile()) //If file, delete it, if not recall the rmDir function on the function
             fs.unlinkSync(filePath);
           else
             rmDir(filePath);
         }
       fs.rmdirSync(dirPath);
     };
-    rmDir(path.join(__dirname, "..", "CSV"));
+    rmDir(path.join(__dirname, "..", "CSV")); //Recursively delete the CSV folder.
   }
 };

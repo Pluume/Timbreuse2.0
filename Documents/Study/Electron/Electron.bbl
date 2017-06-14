@@ -1,0 +1,62 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.8 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\sortlist[entry]{nty/global/}
+  \entry{NW}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=AC}{%
+         family={Aguilar},
+         familyi={A\bibinitperiod},
+         given={Camilo},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AC1}
+    \strng{fullhash}{AC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{Le framework Node Webkit}
+    \verb{url}
+    \verb https://nwjs.io
+    \endverb
+    \field{year}{2017}
+  \endentry
+
+  \entry{electron}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=G}{%
+         family={Github},
+         familyi={G\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{G1}
+    \strng{fullhash}{G1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{title}{Le framework Electron}
+    \verb{url}
+    \verb https://electron.atom.io
+    \endverb
+    \field{year}{2017}
+  \endentry
+\endsortlist
+\endinput

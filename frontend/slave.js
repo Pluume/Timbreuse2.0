@@ -37,12 +37,12 @@ function getNow() {
  * @method executePile
  **/
 function executePile() {
-  if (oreqPile.length && connected) {
+  if (oreqPile.length && connected) { //If connected to server, then send all the pile
     slaveconn.write(JSON.stringify(oreqPile) + "\0");
-    oreqPile = [];
+    oreqPile = []; //Empty the pile afterwards
   }
-  for (var i = 0; i < slaves.length; i++) {
-    if (slaves[i].pile.length && slaves[i].conn.connected) {
+  for (var i = 0; i < slaves.length; i++) { //Iterate through connected slave
+    if (slaves[i].pile.length && slaves[i].conn.connected) { //If connected to this slave, then send all the pile
       slaves[i].conn.write(JSON.stringify(slaves[i].pile) + "\0");
       slaves[i].pile = [];
     }
@@ -61,7 +61,7 @@ function tag(stag, ntime) {
   if (global.DEBUG) {
     log.info("Tag : " + stag + " Time : " + ntime);
   }
-  stag = stag.replace(/\W/g, '');
+  stag = stag.replace(/\W/g, ''); //Replace bad characters
   var oreq = {
     fnc: request.REQUEST.TAG,
     error: request.ERROR.OK,
@@ -69,21 +69,20 @@ function tag(stag, ntime) {
     time: ntime,
     class: global.config.class
   };
-  csv.writeBruteLoggingToCSV(stag, ntime);
-  if (connected) {
+  csv.writeBruteLoggingToCSV(stag, ntime); //Write tag to CSV
+  if (connected) { //If connected to server send it straight away. If not, store it for later
     slaveconn.write(JSON.stringify(request.toArray(oreq)) + "\0");
   } else {
     oreq.delayed = true;
     oreqPile.push(oreq);
   }
-  var soreq = clone(oreq);
+  var soreq = clone(oreq); //Clone the oreq to alter without altering the first element
   soreq.fnc = request.REQUEST.PROPAGATE_TAG;
-  for (var i = 0; i < slaves.length; i++) {
+  for (var i = 0; i < slaves.length; i++) { //Send to every other slave. If connected, directly, if not, at the next reconnexion
     if (slaves[i].conn.connected) {
       slaves[i].conn.write(JSON.stringify(request.toArray(soreq)) + "\0");
     } else {
       soreq.delayed = true;
-
       slaves[i].pile.push(soreq);
     }
 
@@ -97,7 +96,7 @@ function tag(stag, ntime) {
  **/
 function compileRequest(ireq) {
   slaveconn.currentBuf += ireq;
-  if (slaveconn.currentBuf[slaveconn.currentBuf.length - 1] == "\0") {
+  if (slaveconn.currentBuf[slaveconn.currentBuf.length - 1] == "\0") { //Compil request separated with a null byte
     onSocketData(slaveconn.currentBuf.substring(0, slaveconn.currentBuf.length - 1).toString("utf8"));
     slaveconn.currentBuf = "";
   }
@@ -111,8 +110,7 @@ function onSocketData(nireq) {
   var ireq;
   try {
     ireq = JSON.parse(nireq);
-  } catch(err)
-  {
+  } catch (err) {
     log.error("Error parsing : " + ireq);
   }
 
@@ -121,13 +119,13 @@ function onSocketData(nireq) {
 
   switch (ireq.fnc) {
     case request.REQUEST.MASTER:
-      global.mwin.webContents.send("CSV", false);
+      global.mwin.webContents.send("CSV", false); //Display that CSV is being copied to screen
       csv.exportCSV(() => {
-        global.mwin.webContents.send("CSV", true);
+        global.mwin.webContents.send("CSV", true); //Display that CSV have been copied to the USB drive
       });
       break;
     case request.REQUEST.TAG:
-      global.mwin.webContents.send("slaveStd", ireq.student);
+      global.mwin.webContents.send("slaveStd", ireq.student); //Display the tagged user's informations
       break;
     default:
       break;
@@ -141,24 +139,24 @@ function onSocketData(nireq) {
 function foreverConnect() {
   slaveconn = new net.Socket();
   slaveconn.currentBuf = "";
-  var connectedToServer = function() {
+  var connectedToServer = function() { //Connect to server
     if (connected)
       return;
     connected = true;
-    global.mwin.webContents.send("onlineServer", true);
+    global.mwin.webContents.send("onlineServer", true); //Send to renderer process that socket is connected
     log.info('Connected to server!');
     slaveconn.on("data", compileRequest);
-    executePile();
+    executePile(); //Flush pile
 
   };
-  var slavesConnect = function() {
+  var slavesConnect = function() { //Execute pile for newly connected slaves
     if (this.connected)
       return;
     this.connected = true;
     executePile();
     log.info("The Timbreuse " + this.class + " is online.");
   };
-  var slavesClose = function(err) {
+  var slavesClose = function(err) { //Handle when connection to a slave is lost
     this.connected = false;
     var tsock = this;
     tsock.removeAllListeners("connect");
@@ -171,7 +169,7 @@ function foreverConnect() {
             host: tsock.ip,
             port: 703
           });
-        }, 5000);
+        }, 5000); //Wait for 5 seconds
       } else {
         log.warning("The connection to the Timbreuse " + this.class + " was closed without an error. Connecting back in 5 seconds");
         setTimeout(() => {
@@ -185,7 +183,7 @@ function foreverConnect() {
       log.info("Connection closed. (" + this.class + ")");
     }
   };
-  for (var i = 0; i < slaves.length; i++) {
+  for (var i = 0; i < slaves.length; i++) { //Iterate through slaves and connect to them
     slaves[i].conn = new net.Socket();
     slaves[i].conn.class = slaves[i].class;
     slaves[i].conn.connected = false;
@@ -203,12 +201,12 @@ function foreverConnect() {
     }, slavesConnect);
 
   }
-  slaveconn.on("timeout", () => {
+  slaveconn.on("timeout", () => { //On timeout, destroy socket
     log.error("Connection to server timed out");
     connected = false;
     slaveconn.destroy();
   });
-  slaveconn.on("close", (err) => {
+  slaveconn.on("close", (err) => { //On close, destroy socket and try to reconnect
     slaveconn.destroy();
     connected = false;
     global.mwin.webContents.send("onlineServer", false);
@@ -236,7 +234,7 @@ function foreverConnect() {
 
   });
   log.info("Connecting to server : " + global.config.server + ":703");
-  slaveconn.connect({
+  slaveconn.connect({ //Connect to server
     host: global.config.server,
     port: 703
   }, connectedToServer);
@@ -302,7 +300,10 @@ function load() {
   });
 
 }
-
+/**
+ * Delete all the CSV of the slave
+ * @method delCSV
+ */
 function delCSV() {
   csv.deleteAllCSV();
 }

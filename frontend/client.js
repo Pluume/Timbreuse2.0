@@ -14,7 +14,12 @@ const request = require("../request.js");
 const log = require("./../utils/log.js");
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = "";
-
+/**
+ * Handle incoming request and treat them when the Timbreuse type is a client
+ * @method clientServer
+ * @param  {[type]}     data [description]
+ * @return {[type]}          [description]
+ */
 function clientServer(data) {
   try {
     var ireq = JSON.parse(data);
@@ -24,13 +29,13 @@ function clientServer(data) {
   if (ireq.fnc != undefined) {
     switch (ireq.fnc) {
       case request.REQUEST.UPDATESTD:
-        global.mwin.webContents.send("update", ireq.data);
+        global.mwin.webContents.send("update", ireq.data); //Update data about a student
         break;
       case request.REQUEST.TOGGLENOTIFICATION:
-        global.mwin.webContents.send("toggleNotification", ireq.data)
+        global.mwin.webContents.send("toggleNotification", ireq.data) //Change the status of a notification
         break;
       case request.REQUEST.UPDATENOTIF:
-        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) {
+        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) { //Incomming notification
           var title;
           switch (ireq.data.type) {
             case global.LOGS.MINIMUMPAUSE:
@@ -63,7 +68,11 @@ function clientServer(data) {
     }
   }
 }
-
+/**
+ * Check if packet is complet. If so, send it to clientServer function
+ * @method dataExecuter
+ * @param  {String}     data The current buffer
+ */
 function dataExecuter(data) {
   var index = currentBuf.indexOf("\0");
   if (index != -1) {
@@ -75,15 +84,23 @@ function dataExecuter(data) {
       dataExecuter(currentBuf);
   }
 }
-
+/**
+ * Handle incomming data appending new data to current data buffer
+ * @method incomingDataHandling
+ * @param  {String}             data The incomming data
+  */
 function incomingDataHandling(data) {
   currentBuf += data;
   dataExecuter(currentBuf);
 }
-
+/**
+ * Connect to the server
+ * @method connect
+ * @param  {Function} cb the callback function
+ */
 function connect(cb) {
   clientconn = new net.Socket();
-  clientconn.once("error", (err) => {
+  clientconn.once("error", (err) => { //On error display login
     if (global.currentPage != request.PAGES.LOGIN)
       global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
@@ -93,7 +110,7 @@ function connect(cb) {
     global.clientconn = null;
     cb(err);
   });
-  clientconn.once("close", () => {
+  clientconn.once("close", () => { //On close, go to login
     if (global.currentPage != request.PAGES.LOGIN)
       global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, 'web_frontend/pages/login.html'),
@@ -103,8 +120,8 @@ function connect(cb) {
 
     global.clientconn = null;
   });
-  clientconn.on("data", incomingDataHandling);
-  clientconn.connect({
+  clientconn.on("data", incomingDataHandling); //On data, send it to data compilation function
+  clientconn.connect({ //Connect to server
     host: global.config.server,
     port: 703
   }, () => {
@@ -113,7 +130,10 @@ function connect(cb) {
 
   });
 }
-
+/**
+ * End current connection to the server
+ * @method disconnect
+ */
 function disconnect() {
   try {
     global.clientconn.destroy();
@@ -122,7 +142,12 @@ function disconnect() {
     log.error(err);
   }
 }
-
+/**
+ * Send data to server
+ * @method send
+ * @param  {String}   data outgoing data
+ * @param  {Function} cb   The callback to callback
+ */
 function send(data, cb) {
   currentCb = cb;
   global.clientconn.removeAllListeners("error");
@@ -152,10 +177,10 @@ function createWindow() {
   }));
   if (global.DEBUG)
     global.mwin.webContents.openDevTools();
-  global.mwin.on('closed', function() {
+  global.mwin.on('closed', function() { //On closed, quit
     mainWindow = null;
   });
-  global.mwin.on("ready-to-show", () => {
+  global.mwin.on("ready-to-show", () => { //Wait for html before showing
     global.mwin.show();
   });
   var iconPath = path.join(__dirname, "..", "graphics", "ico.png");

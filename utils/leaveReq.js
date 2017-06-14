@@ -27,7 +27,7 @@ var knex = require('knex')({
  * @param {String} where the place it has been made.
  **/
 function create(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) {
-  global.db.handle.run(knex("leavereq").insert({
+  global.db.handle.run(knex("leavereq").insert({ //Insert in db
     studentid: studentid,
     dateFrom: dateFrom,
     dateTo: dateTo,
@@ -48,7 +48,7 @@ function create(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, pro
 function compareDate(dateTimeA, dateTimeB) {
   var momentA = moment(dateTimeA, "DD/MM/YYYY");
   var momentB = moment(dateTimeB, "DD/MM/YYYY");
-  if (momentA > momentB) return 1;
+  if (momentA > momentB) return 1; //See the momentjs lib for documentation about date comparaison
   else if (momentA < momentB) return -1;
   else return 0;
 }
@@ -61,11 +61,11 @@ function compareDate(dateTimeA, dateTimeB) {
 function routine(res) {
   var sync = true;
   var diff = 0;
-  var smmt = moment(res.dateFrom);
-  var smmtMidnight = smmt.clone().startOf('day');
-  var ssecs = smmt.diff(smmtMidnight, 'seconds');
-  var emmt = moment(res.dateTo);
-  var esecs = emmt.diff(smmtMidnight, 'seconds');
+  var smmt = moment(res.dateFrom); //Start date
+  var smmtMidnight = smmt.clone().startOf('day'); //Start date's midnights
+  var ssecs = smmt.diff(smmtMidnight, 'seconds'); //Start date : number of second since midnight
+  var emmt = moment(res.dateTo); //End date
+  var esecs = emmt.diff(smmtMidnight, 'seconds'); //End date : number of seconds sinces start date's midnight
   if (esecs > 86400) //If the end time of the leavereq is more than a day
     esecs -= emmt.diff(smmtMidnight, 'days') * 86400;
   var today = config.loadDay(new Date().getDay());
@@ -127,7 +127,7 @@ function routine(res) {
  * @param {String} where the place it has been made.
  **/
 function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) {
-  global.db.handle.run(knex("leavereq").where({
+  global.db.handle.run(knex("leavereq").where({ //Update in db
     id: id
   }).update({
     studentid: studentid,
@@ -148,10 +148,10 @@ function update(id, studentid, dateFrom, dateTo, missedTest, reason, reasonDesc,
 function erase(id) {
   global.db.handle.run(knex("leavereq").where({
     id: id
-  }).del().toString());
+  }).del().toString()); //Del leavereq
 }
 
-function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) //FIXME
+function createPDF(studentid, dateFrom, dateTo, missedTest, reason, reasonDesc, proof, where) //TODO
 {
 
 }
@@ -174,7 +174,7 @@ function checkIfInLeaveReq(stdid, time) {
     for (var i = 0; i < rows.length; i++) {
       var momentA = moment(rows[i].dateFrom);
       var momentB = moment(rows[i].dateTo);
-      if (compareDate(momentA, time) <= 0 && compareDate(momentB, time) >= 0)
+      if (compareDate(momentA, time) <= 0 && compareDate(momentB, time) >= 0) //Check if time in leaveReq
         return true;
       else
         return false;
@@ -190,7 +190,7 @@ function checkIfInLeaveReq(stdid, time) {
 function getTimeToRefund(stdid, cb) {
   var res = 0;
   var today = config.loadDay(new Date().getDay());
-  global.db.all(knex("leavereq").select().where({
+  global.db.all(knex("leavereq").select().where({ //Get all leavereq for student
     studentid: stdid,
     acpt: 1
   }).toString(), (err, rows) => {
@@ -200,13 +200,13 @@ function getTimeToRefund(stdid, cb) {
     }
     if (rows == undefined)
       cb(0);
-    for (var i = 0; i < rows.length; i++)
+    for (var i = 0; i < rows.length; i++) //Iterate through leavereq
     {
-      res += routine(rows[i]);
+      res += routine(rows[i]); //Add "to be refunded" time to result
     }
 
-    if (res > today.timeToDo + global.config.lunch.time)
-      res = today.timeToDo + global.config.lunch.time;
+    if (res > today.timeToDo) // Do give more than the time to do for this day
+      res = today.timeToDo;
     cb(res);
   });
 }

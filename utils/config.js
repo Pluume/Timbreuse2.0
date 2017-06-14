@@ -52,16 +52,16 @@ module.exports = {
         console.log(helpstring);
         process.exit(0);
       }
-      if(process.argv.indexOf("--debug")>-1)
+      if(process.argv.indexOf("--debug")>-1) //Is debug argument present
       {
         global.DEBUG = true;
       }
-      if(process.argv.indexOf("--server")>-1)
+      if(process.argv.indexOf("--server")>-1)//Is server argument present
       {
         global.TYPE = TYPE.SERVER;
         return;
       }
-      if(process.argv.indexOf("--slave")>-1)
+      if(process.argv.indexOf("--slave")>-1)//Is slave argument present
       {
         global.TYPE = TYPE.SLAVE;
         return;

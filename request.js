@@ -21,7 +21,7 @@ function toArray(singleItem) {
     somearray.push(singleItem);
     return somearray;
 }
-ERROR = {
+ERROR = { //Define errors
     OK: 0,
     UNKNOWN: 1,
     WRONGTAG: 2,
@@ -31,7 +31,7 @@ ERROR = {
     USEREXISTS: 6,
     TAGEXISTS: 7
 };
-REQUEST ={
+REQUEST ={ //Define requests
     EXIT: -1,
     OK: 0,
     TAG: 1,
@@ -67,7 +67,7 @@ REQUEST ={
     GETLR: 31,
     TOGGLELR: 32
 };
-PAGES ={
+PAGES ={ //Define pages
     LOGIN: 0,
     PROFS: 1,
     SLAVE: 2,
@@ -79,7 +79,7 @@ PAGES ={
     LEAVEREQ_STUDENT: 8,
     LEAVEREQ_PROF: 9
 };
-SCOPE ={
+SCOPE ={ //Define scopes
     UNIQUE: -1,
     ALL: "*"
 };

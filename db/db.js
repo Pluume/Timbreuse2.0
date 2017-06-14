@@ -12,17 +12,17 @@ var sqlite = require('sqlite3');
 var handle;
 const async = require("async");
 const path = require("path");
-RANK = {
+RANK = { //DEFINE Rank
   STUDENT: 0,
   PROF: 1,
   ADMIN: 2
 };
-STATUS = {
+STATUS = { //Define status
   IN: 1,
   OUT: 2,
   ABS: 3
 };
-REASON = {
+REASON = { //Define reasons
   MILITARY: 0,
   DEAD: 1,
   OFFICIAL: 2,
@@ -32,13 +32,13 @@ REASON = {
   TREATEMENT: 6,
   OTHER: 7
 };
-PROOF = {
+PROOF = { //Define leavereq proof
   NONE: 0,
   MEDICAL: 1,
   CERTIFICATE: 2,
   CONVOCATION: 3
 };
-LOGS = {
+LOGS = { //Define logs
   IN: 1,
   OUT: 2,
   ABSENT: 3,
@@ -54,7 +54,7 @@ LOGS = {
   ENDOFDAY: 13,
   LEAVEREQ: 14
 }
-NOTIF = {
+NOTIF = { //Define Notifications
   MINIMUMPAUSE: LOGS.MINIMUMPAUSE,
   NOPAUSE: LOGS.NOPAUSE,
   MOLUNCH: LOGS.NOLUNCH,
@@ -65,30 +65,36 @@ global.STATUS = STATUS;
 global.LOGS = LOGS;
 global.NOTIF = NOTIF;
 
+/**
+ * Complety erase all the data begeted by a student
+ * @method wipeStudents
+ * @param  {integer}     id The userid of the student
+ * @param  {Function}   cb The callback function
+ */
 function wipeStudents(id, cb) {
   async.waterfall([
     function(callback) {
-      global.db.all(knex("students").where("id", "in", id).select("userid").toString(), callback);
+      global.db.all(knex("students").where("id", "in", id).select("userid").toString(), callback); //Get students account
     },
     function(row, callback) {
       var idList = [];
       for (var i = 0; i < row.length; i++)
         idList.push(row[i].userid);
-      global.db.run(knex("users").where("id", "in", idList).del().toString(), (err) => {
+      global.db.run(knex("users").where("id", "in", idList).del().toString(), (err) => { //Del the students' users accounts
         callback(err, idList);
       });
     },
     function(row, callback) {
-      global.db.run(knex("notifications").where("userid", "in", row).del().toString(), callback);
+      global.db.run(knex("notifications").where("userid", "in", row).del().toString(), callback);//Del the students' notifications
     },
     function(callback) {
-      global.db.run(knex("students").where("id", "in", id).del().toString(), callback);
+      global.db.run(knex("students").where("id", "in", id).del().toString(), callback);//Del the students' account
     },
     function(callback) {
-      global.db.run(knex("leavereq").where("studentid", "in", id).del().toString(), callback);
+      global.db.run(knex("leavereq").where("studentid", "in", id).del().toString(), callback);//Del the students' leavereq
     },
     function(callback) {
-      global.db.run(knex("logs").where("studentid", "in", id).del().toString(), callback);
+      global.db.run(knex("logs").where("studentid", "in", id).del().toString(), callback);//Del the students' logs
     }
   ], function(err) {
     cb(err);
@@ -195,7 +201,7 @@ module.exports = {
         table.boolean("acpt");
       }).toString());
     });
-    handle.get("SELECT * FROM users WHERE rank=2", (err, data) => {
+    handle.get("SELECT * FROM users WHERE rank=2", (err, data) => { //Create the default users
       if (data === undefined) {
         handle.run(knex("users").insert({
           username: "admin",

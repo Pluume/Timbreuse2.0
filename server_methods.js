@@ -168,7 +168,7 @@ function tagRoutine(conn, user, ireq, done) {
       if (missedPause) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
-        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't take a pause in a " + Math.floor(math.secondsToHms(delta)) + " session.");
+        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't taken a pause in a " + Math.floor(math.secondsToHms(delta)) + " session.");
       }
       global.db.serialize(() => {
         global.db.run(knex("students").update({

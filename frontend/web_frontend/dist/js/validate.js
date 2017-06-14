@@ -1,18 +1,25 @@
 // JavaScript Validation For Registration Page
 window.$ = window.jQuery = require('../vendor/jquery/jquery.min.js');
-
+/**
+ * Cancel a formName
+ * @method cancelForm
+ * @param  {String}   formName The form's name
+ */
 function cancelForm(formName) {
   $(formName).validate().resetForm();
   $(formName + ' span[id="error"]').html("");
 }
-
+/**
+ * Validator for the add student modal
+ * @method validateCreateStd
+ */
 function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation/
   $("#addStudentForm").validate({
 
     rules: {
-      cfname: {
-        required: true,
-        validName: true
+      cfname: { //Field name
+        required: true, //Is it required ?
+        validName: true //Type of checking ? See below for the list of checking function defined
       },
       clname: {
         required: true,
@@ -36,8 +43,8 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
     },
     messages: {
       cfname: {
-        required: "Please enter a first name",
-        validName: "Name must contain only alphabets, space and dash"
+        required: "Please enter a first name", //Message on empty input
+        validName: "Name must contain only alphabets, space and dash" //Message on invalid input
       },
       clname: {
         required: "Please enter a last name",
@@ -70,12 +77,15 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
     },
 
     submitHandler: function(form) {
-      submitCreateModal();
+      submitCreateModal();//Function to call on validated and submited form
     }
   });
 
 }
-
+/**
+ * Validator for the create prof modal
+ * @method validateCreateProf
+ */
 function validateCreateProf() { // http://demos.codingcage.com/bs-form-validation/
   $("#addProfModalForm").validate({
 
@@ -154,7 +164,10 @@ function validateCreateProf() { // http://demos.codingcage.com/bs-form-validatio
   });
 
 }
-
+/**
+ * Validate edit student modal
+ * @method validateEditStd
+ */
 function validateEditStd() {
   $("#editStudentForm").validate({
 
@@ -210,7 +223,10 @@ function validateEditStd() {
   });
 
 }
-
+/**
+ * Validate edit prof modal
+ * @method validateEditProf
+ */
 function validateEditProf() {
   $("#editProfModalForm").validate({
 
@@ -269,7 +285,10 @@ function validateEditProf() {
   });
 
 }
-
+/**
+ * Validate "create leave application" for student
+ * @method validateStudentCreateLeaveRequest
+ */
 function validateStudentCreateLeaveRequest() {
   $("#addLeaveRequestForm").validate({
 
@@ -321,7 +340,10 @@ function validateStudentCreateLeaveRequest() {
   });
 
 }
-
+/**
+ * Validate "create leave application" for prof
+ * @method validateProfCreateLeaveRequest
+ */
 function validateProfCreateLeaveRequest() {
   $("#addLeaveRequestForm").validate({
 
@@ -374,7 +396,10 @@ function validateProfCreateLeaveRequest() {
   });
 
 }
-
+/**
+ * Define all the validator function and activate the plugin
+ * @method activateValidator
+ */
 function activateValidator() {
   // name validation
   var nameregex = /^[a-zA-Z \-]+$/;

@@ -24,10 +24,10 @@ module.exports = {
    * @method secondsToHms
    **/
   secondsToHms: function(nb) {
-    if (nb == null)
+    if (nb == null) //If no date, return default
       return "+ 00:00:00"
 
-    function addZero(nb) {
+    function addZero(nb) { //Add a zero if the interger is smaller than 10
       if (Math.abs(nb < 10)) {
         return "0" + nb.toString();
       } else {
@@ -35,7 +35,7 @@ module.exports = {
       }
     }
     var neg;
-    (nb < 0) ? neg = true: neg = false;
+    (nb < 0) ? neg = true: neg = false; //Check if under 0
     nb = Math.abs(Number(nb));
     var h = Math.floor(nb / 3600);
     if (Number.isNaN(h))
@@ -46,6 +46,6 @@ module.exports = {
     var s = Math.floor(nb % 60);
     if (Number.isNaN(s))
       s = 0;
-    return ((neg) ? "-" : "+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s);
+    return ((neg) ? "-" : "+") + " " + addZero(h) + ":" + addZero(m) + ":" + addZero(s); //Return formatted date
   }
 };

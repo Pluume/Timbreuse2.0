@@ -34,25 +34,25 @@ module.exports = {
     global.server = net.createServer(function(socket) {
       var connection = {socket: socket, userid: -1};
       connection.currentBuf = "";
-      addClient(connection);
+      addClient(connection); //Add client to client list
       socket.setKeepAlive(true,60000);
       if(global.DEBUG)
       log.info(socket.remoteAddress + " just connected");
-        socket.on('error', function() {
+        socket.on('error', function() { //On error remove the connection from the connection list
             removeClient(connection);
         });
-        socket.on('timeout', function() {
+        socket.on('timeout', function() {//On timeout remove the connection from the connection list and end the connection
           log.warning(socket.remoteAddress +" timed out")
             removeClient(connection);
             socket.end();
         });
-        socket.on('data', function(data) {
+        socket.on('data', function(data) {//On data, compile the request
           method.compileRequest(connection,data.toString("utf8"));
         });
-        socket.on('end', function() {
+        socket.on('end', function() {//On end remove the connection from the connection list
             removeClient(connection);
         });
-        socket.on('close', function(hadError) {
+        socket.on('close', function(hadError) {//On close remove the connection from the connection list
             removeClient(connection);
             if(global.DEBUG)
             log.info(socket.remoteAddress + " just disconnected");

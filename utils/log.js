@@ -14,15 +14,15 @@ const math = require("./math.js");
  * @method createNewLogFile
  */
 function createNewLogFile() {
-  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? "./" : path.join(__dirname, ".."));
-  if (fs.existsSync(path.join(basePath, "Timbreuse.10.log")))
+  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? "./" : path.join(__dirname, "..")); //Get base path
+  if (fs.existsSync(path.join(basePath, "Timbreuse.10.log"))) //If log 10 exists, delete
     fs.unlinkSync(path.join(basePath, "Timbreuse.10.log"));
   for (var i = 9; i > 0; i--)
-    if (fs.existsSync(path.join(basePath, "Timbreuse." + i + ".log")))
+    if (fs.existsSync(path.join(basePath, "Timbreuse." + i + ".log"))) //Then move log n to log n+1
       fs.renameSync(path.join(basePath, "Timbreuse." + i + ".log"), path.join(basePath, "Timbreuse." + (i + 1) + ".log"));
-  if (fs.existsSync(path.join(basePath, "Timbreuse.log")))
+  if (fs.existsSync(path.join(basePath, "Timbreuse.log"))) //If log exists, move it to log 1
     fs.renameSync(path.join(basePath, "Timbreuse.log"), path.join(basePath, "Timbreuse.1.log"));
-  global.logFile = fs.createWriteStream(path.join(basePath, "Timbreuse.log"), {
+  global.logFile = fs.createWriteStream(path.join(basePath, "Timbreuse.log"), { //Then create write stream to log file
     flags: 'w'
   });
 }
@@ -37,7 +37,7 @@ const knex = require('knex')({
  **/
 var info = (msg) => {
   var stack = at(1);
-  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[INFO] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg; //Print formated info message
   console.log(cmsg);
   global.logFile.write(cmsg + "\n");
 };
@@ -55,7 +55,7 @@ var printStack = function() {
  **/
 var error = (msg) => {
   var stack = at(1);
-  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[ERROR] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg; //Print formated error message
   console.log(cmsg);
   printStack();
   global.logFile.write(cmsg + "\n");
@@ -68,7 +68,7 @@ var error = (msg) => {
  **/
 var warning = (msg) => {
   var stack = at(1);
-  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg;
+  var cmsg = "[" + moment().format("DD/MM/YYYY HH:mm:ss.SSS") + "] " + "[WARNING] " + "(" + path.relative(".", stack.file) + ":" + stack.line + ") > " + msg; //Print formated warning message
   console.log(cmsg);
   global.logFile.write(cmsg + "\n");
 };
@@ -79,9 +79,19 @@ process.on("exit", (code) => {
   info("Exiting with code " + code);
   global.logFile.end();
 });
-
+/**
+ * Save new log into the database
+ * @method save
+ * @param  {Interger} type     The log type
+ * @param  {Interger} stdid    The student's id
+ * @param  {Interger} tclass   The class where the log took place
+ * @param  {Date} time     The log's date
+ * @param  {String} comments Some description
+ * @param  {Interger} td       timeDiff in seconds
+ * @param  {Interger} tdT      timeDiffToday in seconds
+ */
 var save = function(type, stdid, tclass, time, comments, td, tdT) {
-  global.db.run(knex("logs").insert({
+  global.db.run(knex("logs").insert({ //Insert into db
     type: type,
     studentid: stdid,
     date: time,
@@ -91,9 +101,15 @@ var save = function(type, stdid, tclass, time, comments, td, tdT) {
     timeDiffToday: tdT
   }).toString());
 };
+/**
+ * Get the logs for a student
+ * @method
+ * @param  {Interger}   stdid The student's id
+ * @param  {Function} cb    The callback function
+ */
 var get = function(stdid, cb) {
   var obj = {};
-  global.db.all(knex("logs").select().where({
+  global.db.all(knex("logs").select().where({ //Select logs
     studentid: stdid
   }).toString(), (err, rows) => {
     if (err || rows == undefined || rows == []) {
@@ -102,7 +118,7 @@ var get = function(stdid, cb) {
       return;
     }
     obj.logs = rows;
-    global.db.get(knex("students").select().where({
+    global.db.get(knex("students").select().where({ //Select students account
       id: stdid
     }).toString(), (err, row0) => {
       if (err) {
@@ -111,7 +127,7 @@ var get = function(stdid, cb) {
         return;
       }
       obj.student = row0;
-      global.db.get(knex("users").select().where({
+      global.db.get(knex("users").select().where({ //Select user account
         id: row0.userid
       }).toString(), (err, row) => {
         if (err) {
@@ -120,13 +136,18 @@ var get = function(stdid, cb) {
           return;
         }
         obj.user = row;
-        cb(null, obj);
+        cb(null, obj); //return callback
       })
     });
 
   });
 };
-
+/**
+ * Format data for fullcalendar events
+ * @method format
+ * @param  {Array} data Array of logs
+ * @return {Array}      Array of Fullcalendar events
+ */
 function format(data) {
   var obj = [];
   for (var i = 0; i < data.logs.length; i++) {
@@ -234,12 +255,12 @@ function format(data) {
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
-        curr.color = "rgb(223, 222, 179)"
+        curr.color = "rgb(52, 73, 94)"
         curr.textColor = "rgb(0, 0, 0)";
         break;
       case global.LOGS.LEAVEREQ:
         curr.title = "LEAVE APPLICATION > " + data.logs[i].description;
-        curr.color = "rgb(223, 222, 179)"
+        curr.color = "rgb(52, 73, 94)"
         curr.textColor = "rgb(0, 0, 0)";
         curr.start = data.logs[i].date;
         break;
@@ -279,11 +300,11 @@ if (process.platform === "win32") {
     output: process.stdout
   });
 
-  rl.on("SIGINT", function() {
+  rl.on("SIGINT", function() { //On control+C call interruption
     interruption();
   });
 }
 
-process.on("SIGINT", function() {
+process.on("SIGINT", function() { //On control+C call interruption
   interruption();
 });
