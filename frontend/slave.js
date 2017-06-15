@@ -188,7 +188,7 @@ function foreverConnect() {
     slaves[i].conn.class = slaves[i].class;
     slaves[i].conn.connected = false;
     slaves[i].conn.on("close", slavesClose);
-    slaves[i].on("timeout", () => {
+    slaves[i].conn.on("timeout", () => {
       log.error("Connection to the slave " + slaves[i].class + " timed out");
       slaves[i].conn.connected = false;
       slaves[i].conn.destroy();

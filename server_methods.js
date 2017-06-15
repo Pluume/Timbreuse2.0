@@ -165,7 +165,7 @@ function tagRoutine(conn, user, ireq, done) {
       var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
       nTimeDiffToday = row2.timeDiffToday + delta;
       var missedPause = delta / global.config.pause.interval; //Calculate the number of missedPause
-      if (missedPause) {
+      if (Math.floor(missedPause)) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
         pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't taken a pause in a " + Math.floor(math.secondsToHms(delta)) + " session.");
@@ -229,7 +229,7 @@ function tagRoutine(conn, user, ireq, done) {
           hadLunch = 1;
       }
       var awayTime = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
-      if (awayTime >= global.config.pause.time && row2.missedPause > 0) {
+      if (awayTime >= global.config.pause.time) {
         missedPause -= Math.floor(awayTime / global.config.pause.time);
         missedPause = (missedPause < 0) ? 0 : missedPause;
       }
@@ -238,7 +238,8 @@ function tagRoutine(conn, user, ireq, done) {
           status: nstatus,
           lastTagTime: (ireq.time) ? ireq.time : moment().format().toString(),
           hadLunch: hadLunch,
-          timeDiffToday: nTimeDiffToday
+          timeDiffToday: nTimeDiffToday,
+          missedPause: (missedPause < 0) ? 0 : missedPause
         }).where("userid", user.id).toString());
         global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err3, row3) => {
           if (err3) {
@@ -1882,7 +1883,6 @@ function sortRequest(connection, data) {
         connection: connection,
         ireq: ireq[i]
       });
-      console.log(tagReqList.length);
       toRm.push(i);
     }
   }
