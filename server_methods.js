@@ -21,7 +21,7 @@ const moment = require("moment");
 const config = require("./utils/config.js");
 const db = require("./db/db.js");
 const async = require("async");
-var tagReqQueue = async.queue(tagRequest,1);
+var tagReqQueue = async.queue(tagRequest, 1);
 var clone = require('clone');
 /**
  * Generate the a base for an outgoing request
@@ -1998,8 +1998,7 @@ function sortRequest(connection, data) {
 function serializedTagRequest() {
   tagReqList.sort('ireq.time', 'ascending');
   var tmp = tagReqList.pop();
-  while(tmp)
-  {
+  while (tmp) {
     tagReqQueue.push(tmp);
     tmp = tagReqList.pop();
   }
