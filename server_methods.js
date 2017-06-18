@@ -41,7 +41,7 @@ function getBaseReq(fnc) {
  * @param {Object} ireq a JSON object containing the incoming request.
  **/
 function propagate_tag(ireq) {
-  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, ''), ireq.time);
+  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, ''), ireq.time); //Write tag to CSV
 }
 /**
  * Send a ping to server
@@ -49,9 +49,14 @@ function propagate_tag(ireq) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function okRequest(conn) {
-
+//TODO Develop this function in the future
 }
-
+/**
+ * Send a notitification to all connected user with corresponding to the profid
+ * @param  {Interger} profid  The prof id
+ * @param  {Interger} type    The notifications type
+ * @param  {String} message The notification message
+ */
 function pushNotifications(profid, type, message) {
   var now = moment().format();
   global.db.run(knex("notifications").insert({
@@ -61,7 +66,7 @@ function pushNotifications(profid, type, message) {
     date: now,
     read: 0
   }).toString(), function() {
-    var arr = _.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) { //Get all the connected user with id corresponding to profid
       try {
         return o.user.id == profid
       } catch (err) {
@@ -82,7 +87,11 @@ function pushNotifications(profid, type, message) {
   });
 
 }
-
+/**
+ * Send a update about notification to a connected profid
+ * @param  {Interger} profid  The profid
+ * @param  {Interger} notifid The notification type
+ */
 function updateNotification(profid, notifid) {
   global.db.get(knex("notifications").select().where({
     id: notifid
@@ -91,7 +100,7 @@ function updateNotification(profid, notifid) {
       log.error("Error querrying the database : " + err);
       return;
     }
-    var arr = _.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) { //Filter the connected user corresponding to profid
       try {
         return o.user.id == profid;
       } catch (err) {
@@ -106,7 +115,11 @@ function updateNotification(profid, notifid) {
   });
 
 }
-
+/**
+ * Send update about a student to the connected profid
+ * @param  {Interger} id  The id to send the notification to
+ * @param  {Object} arg The object with the new data
+ */
 function sendUpdate(id, arg) {
   var arr = _.filter(global.clients, function(o) {
     try {
@@ -122,7 +135,13 @@ function sendUpdate(id, arg) {
     arr[i].socket.write(JSON.stringify(oreq) + "\0");
   }
 }
-
+/**
+ * Function called for each tag request
+ * @param  {Socket}   conn The socket
+ * @param  {Object}   user The user object to treat
+ * @param  {Object}   ireq The incoming request
+ * @param  {Function} done The callback function
+ */
 function tagRoutine(conn, user, ireq, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
 
@@ -136,7 +155,7 @@ function tagRoutine(conn, user, ireq, done) {
     done();
     return;
   }
-  global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err2, row2) => {
+  global.db.get(knex.select().from("students").where("userid", user.id).toString(), (err2, row2) => { // Get the student
     if (err2) {
       log.error("Error while accessing the database...\n" + err);
       oreq.fnc = request.REQUEST.TAG;
@@ -162,7 +181,7 @@ function tagRoutine(conn, user, ireq, done) {
     if (row2.status == global.STATUS.IN) //Departure
     {
       nstatus = global.STATUS.OUT;
-      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
+      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime()); //Check if date is correct
       nTimeDiffToday = row2.timeDiffToday + delta;
       var missedPause = delta / global.config.pause.interval; //Calculate the number of missedPause
       if (Math.floor(missedPause)) {
@@ -200,9 +219,6 @@ function tagRoutine(conn, user, ireq, done) {
           done();
         });
       });
-
-
-
     } else { //Arrival
       nstatus = global.STATUS.IN;
       var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
