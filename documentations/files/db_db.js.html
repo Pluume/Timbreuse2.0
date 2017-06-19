@@ -128,17 +128,17 @@ var sqlite = require(&#x27;sqlite3&#x27;);
 var handle;
 const async = require(&quot;async&quot;);
 const path = require(&quot;path&quot;);
-RANK = {
+RANK = { //DEFINE Rank
   STUDENT: 0,
   PROF: 1,
   ADMIN: 2
 };
-STATUS = {
+STATUS = { //Define status
   IN: 1,
   OUT: 2,
   ABS: 3
 };
-REASON = {
+REASON = { //Define reasons
   MILITARY: 0,
   DEAD: 1,
   OFFICIAL: 2,
@@ -148,13 +148,13 @@ REASON = {
   TREATEMENT: 6,
   OTHER: 7
 };
-PROOF = {
+PROOF = { //Define leavereq proof
   NONE: 0,
   MEDICAL: 1,
   CERTIFICATE: 2,
   CONVOCATION: 3
 };
-LOGS = {
+LOGS = { //Define logs
   IN: 1,
   OUT: 2,
   ABSENT: 3,
@@ -170,7 +170,7 @@ LOGS = {
   ENDOFDAY: 13,
   LEAVEREQ: 14
 }
-NOTIF = {
+NOTIF = { //Define Notifications
   MINIMUMPAUSE: LOGS.MINIMUMPAUSE,
   NOPAUSE: LOGS.NOPAUSE,
   MOLUNCH: LOGS.NOLUNCH,
@@ -181,30 +181,36 @@ global.STATUS = STATUS;
 global.LOGS = LOGS;
 global.NOTIF = NOTIF;
 
+/**
+ * Complety erase all the data begeted by a student
+ * @method wipeStudents
+ * @param  {integer}     id The userid of the student
+ * @param  {Function}   cb The callback function
+ */
 function wipeStudents(id, cb) {
   async.waterfall([
     function(callback) {
-      global.db.all(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).select(&quot;userid&quot;).toString(), callback);
+      global.db.all(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).select(&quot;userid&quot;).toString(), callback); //Get students account
     },
     function(row, callback) {
       var idList = [];
       for (var i = 0; i &lt; row.length; i++)
         idList.push(row[i].userid);
-      global.db.run(knex(&quot;users&quot;).where(&quot;id&quot;, &quot;in&quot;, idList).del().toString(), (err) =&gt; {
+      global.db.run(knex(&quot;users&quot;).where(&quot;id&quot;, &quot;in&quot;, idList).del().toString(), (err) =&gt; { //Del the students&#x27; users accounts
         callback(err, idList);
       });
     },
     function(row, callback) {
-      global.db.run(knex(&quot;notifications&quot;).where(&quot;userid&quot;, &quot;in&quot;, row).del().toString(), callback);
+      global.db.run(knex(&quot;notifications&quot;).where(&quot;userid&quot;, &quot;in&quot;, row).del().toString(), callback);//Del the students&#x27; notifications
     },
     function(callback) {
-      global.db.run(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).del().toString(), callback);
+      global.db.run(knex(&quot;students&quot;).where(&quot;id&quot;, &quot;in&quot;, id).del().toString(), callback);//Del the students&#x27; account
     },
     function(callback) {
-      global.db.run(knex(&quot;leavereq&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);
+      global.db.run(knex(&quot;leavereq&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);//Del the students&#x27; leavereq
     },
     function(callback) {
-      global.db.run(knex(&quot;logs&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);
+      global.db.run(knex(&quot;logs&quot;).where(&quot;studentid&quot;, &quot;in&quot;, id).del().toString(), callback);//Del the students&#x27; logs
     }
   ], function(err) {
     cb(err);
@@ -311,7 +317,7 @@ module.exports = {
         table.boolean(&quot;acpt&quot;);
       }).toString());
     });
-    handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;, (err, data) =&gt; {
+    handle.get(&quot;SELECT * FROM users WHERE rank=2&quot;, (err, data) =&gt; { //Create the default users
       if (data === undefined) {
         handle.run(knex(&quot;users&quot;).insert({
           username: &quot;admin&quot;,

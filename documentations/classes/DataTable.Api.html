@@ -174,11 +174,19 @@ api.row.add( {...} ).draw();</code></pre>
                                     <span class="flag deprecated">deprecated</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_"></a>
+                                <a href="#method_activateValidator">activateValidator</a>
 
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_"></a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_"></a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_cancelForm">cancelForm</a>
 
                             </li>
                             <li class="index-item method">
@@ -204,6 +212,30 @@ api.row.add( {...} ).draw();</code></pre>
                             </li>
                             <li class="index-item method">
                                 <a href="#method_DataTable.defaults.stateSaveCallback">DataTable.defaults.stateSaveCallback</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateCreateProf">validateCreateProf</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateCreateStd">validateCreateStd</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateEditProf">validateEditProf</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateEditStd">validateEditStd</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateProfCreateLeaveRequest">validateProfCreateLeaveRequest</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_validateStudentCreateLeaveRequest">validateStudentCreateLeaveRequest</a>
 
                             </li>
                     </ul>
@@ -360,8 +392,8 @@ alert( oTable.fnVersionCheck( '1.9.0' ) );
             </div>
         </div>
 </div>
-<div id="method_" class="method item">
-    <h3 class="name"><code></code></h3>
+<div id="method_activateValidator" class="method item">
+    <h3 class="name"><code>activateValidator</code></h3>
 
         <span class="paren">()</span>
 
@@ -375,7 +407,7 @@ alert( oTable.fnVersionCheck( '1.9.0' ) );
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/frontend_web_frontend_vendor_datatables_js_jquery.dataTables.js.html#l9362"><code>frontend\web_frontend\vendor\datatables\js\jquery.dataTables.js:9362</code></a>
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l399"><code>frontend\web_frontend\dist\js\validate.js:399</code></a>
         </p>
 
 
@@ -383,9 +415,7 @@ alert( oTable.fnVersionCheck( '1.9.0' ) );
     </div>
 
     <div class="description">
-        <p>Version string for plug-ins to check compatibility. Allowed format is
-<code>a.b.c-d</code> where: a:int, b:int, c:int, d:string(dev|beta|alpha). <code>d</code> is used
-only for non-release builds. See <a href="http://semver.org/">http://semver.org/</a> for more information.</p>
+        <p>Define all the validator function and activate the plugin</p>
 
     </div>
 
@@ -425,6 +455,93 @@ manipulated, or <code>jQuery.fn.dataTable.settings</code>.</p>
 
     </div>
 
+
+
+
+</div>
+<div id="method_" class="method item">
+    <h3 class="name"><code></code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_vendor_datatables_js_jquery.dataTables.js.html#l9362"><code>frontend\web_frontend\vendor\datatables\js\jquery.dataTables.js:9362</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Version string for plug-ins to check compatibility. Allowed format is
+<code>a.b.c-d</code> where: a:int, b:int, c:int, d:string(dev|beta|alpha). <code>d</code> is used
+only for non-release builds. See <a href="http://semver.org/">http://semver.org/</a> for more information.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_cancelForm" class="method item">
+    <h3 class="name"><code>cancelForm</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>formName</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l3"><code>frontend\web_frontend\dist\js\validate.js:3</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Cancel a formName</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">formName</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The form's name</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
 
 
@@ -889,6 +1006,192 @@ $.ajax( {
 
             </div>
         </div>
+</div>
+<div id="method_validateCreateProf" class="method item">
+    <h3 class="name"><code>validateCreateProf</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l85"><code>frontend\web_frontend\dist\js\validate.js:85</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validator for the create prof modal</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_validateCreateStd" class="method item">
+    <h3 class="name"><code>validateCreateStd</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l12"><code>frontend\web_frontend\dist\js\validate.js:12</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validator for the add student modal</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_validateEditProf" class="method item">
+    <h3 class="name"><code>validateEditProf</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l226"><code>frontend\web_frontend\dist\js\validate.js:226</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validate edit prof modal</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_validateEditStd" class="method item">
+    <h3 class="name"><code>validateEditStd</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l167"><code>frontend\web_frontend\dist\js\validate.js:167</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validate edit student modal</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_validateProfCreateLeaveRequest" class="method item">
+    <h3 class="name"><code>validateProfCreateLeaveRequest</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l343"><code>frontend\web_frontend\dist\js\validate.js:343</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validate &quot;create leave application&quot; for prof</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_validateStudentCreateLeaveRequest" class="method item">
+    <h3 class="name"><code>validateStudentCreateLeaveRequest</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/frontend_web_frontend_dist_js_validate.js.html#l288"><code>frontend\web_frontend\dist\js\validate.js:288</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Validate &quot;create leave application&quot; for student</p>
+
+    </div>
+
+
+
+
 </div>
             </div>
 

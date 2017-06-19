@@ -193,6 +193,35 @@ function getStudentsAll(cb) {
   });
 }
 /**
+ * Get all the students
+ * @method getStudentsAllForProf
+ * @param {Function} cb Callback function
+ **/
+function getStudentsAllForProf(tableId, cb) {
+  ipcRenderer.send("students", window.SCOPE.ALL);
+  ipcRenderer.once("students", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        var data = formatForStdTable(arg);
+        $('#' + tableId).bootstrapTable('load', data);
+        cb();
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
+
+  });
+}
+/**
  * Get a student
  * @method getStudent
  * @param {Integer} id The student id
@@ -584,9 +613,7 @@ function onUpdate(event, arg) {
 
   if (require('electron').remote.getGlobal('currentPage') == window.PAGES.PROFS && arg != undefined && arg.id != undefined) //FIXME
   {
-    console.log(arg.id);
     var oldData = $("#stdTable").bootstrapTable('getRowByUniqueId', arg.id);
-    console.log(JSON.stringify(arg, null, 1));
     var formatData = { //FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!! Todo : verifie arg.user a part + faire en sorte que l'on puisse donne autant d'info qu'on le souhaite
       id: (arg.id ? arg.id : oldData.id),
       lname: ((arg.user !== undefined && arg.user.lname !== undefined) ? arg.user.lname : oldData.lname),
@@ -1143,7 +1170,6 @@ function getLR(tableId, cb) {
             fname: arg.data[i].student.user.fname,
             username: arg.data[i].student.user.username
           });
-          console.log(data);
         }
         $('#' + tableId).bootstrapTable('load', data);
 
@@ -1192,6 +1218,36 @@ function changeLRStatus(id, status, cb) {
         redAlert("Ill formed request...");
     }
     cb(false);
+  });
+}
+/**
+ * Delete a Leave application
+ * @method deleteLR
+ * @param  {Interger} id The leave application id
+ */
+function deleteLR(id) {
+  ipcRenderer.send("deleteLR", {
+    id: id,
+    status: status
+  });
+  ipcRenderer.once("deleteLR", (event, arg) => {
+    if (arg === window.ERROR.UNKNOWN) {
+      redAlert("Unable to contact the server...");
+    }
+    switch (arg.error) {
+      case window.ERROR.OK:
+        $("#LRTable").bootstrapTable('removeByUniqueId', id);
+        return;
+        break;
+      case window.ERROR.NOTLOGEDIN:
+        redAlert("Not logged in !");
+        break;
+      case window.ERROR.UNKNOWN:
+        redAlert("Unkown error...");
+        break;
+      default:
+        redAlert("Ill formed request...");
+    }
   });
 }
 ipcRenderer.on("update", onUpdate);

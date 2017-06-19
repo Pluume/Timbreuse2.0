@@ -134,13 +134,13 @@ function endOfDay() {
   var d = new Date();
 
   var dayConfig = config.loadDay(d.getDay());
-  hd.isTodayOff((isTodayOff) =&gt; {
-    global.db.each(knex.select().from(&#x27;students&#x27;).toString(), (err, row) =&gt; {
+  hd.isTodayOff((isTodayOff) =&gt; { //Check if today is holidays
+    global.db.each(knex.select().from(&#x27;students&#x27;).toString(), (err, row) =&gt; { //Iterate through students
       if (err) {
         log.error(&quot;Error while iterating through students in the database : &quot; + err);
         return;
       }
-      var updateStdForTheDay = function(id, status, ntimeDiff, details) {
+      var updateStdForTheDay = function(id, status, ntimeDiff, details) { //Function that update the students informations passed in parameter in the database
 
         if (isNaN(ntimeDiff)) {
           log.error(&quot;New time diff is NaN&quot;);
@@ -155,19 +155,19 @@ function endOfDay() {
           missedPause: -1
         }).toString());
       };
-      var updateDetails = function(ndetails, ntimeDiff) {
-        ndetails.day.push({
+      var updateDetails = function(ndetails, ntimeDiff) { //Function that update student&#x27;s details in the database
+        ndetails.day.push({ //Days points
           time: moment().format(),
           timeDiff: ntimeDiff
         });
-        if (moment(moment().format()).isSame(moment().endOf(&quot;week&quot;), &#x27;day&#x27;)) {
+        if (moment(moment().format()).isSame(moment().endOf(&quot;week&quot;), &#x27;day&#x27;)) { //Week points
 
           ndetails.week.push({
             time: moment().format(),
             timeDiff: ntimeDiff
           });
         }
-        if (moment(moment().format()).isSame(moment().endOf(&quot;month&quot;), &#x27;day&#x27;)) {
+        if (moment(moment().format()).isSame(moment().endOf(&quot;month&quot;), &#x27;day&#x27;)) { //Month points
           ndetails.month.push({
             time: moment().format(),
             timeDiff: ntimeDiff
@@ -175,29 +175,29 @@ function endOfDay() {
         }
       };
       var ntimeDiff;
-      if (row.status == global.STATUS.IN) {
-        ntimeDiff = row.timeDiff - dayConfig.timeToDo;
+      if (row.status == global.STATUS.IN) { //Student&#x27;s last status, is IN.
+        ntimeDiff = row.timeDiff - dayConfig.timeToDo; //Substract the time to do
         log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Last status of the day was IN&quot;, row.timeDiff, row.timeDiffToday);
-      } else if (row.status == global.STATUS.ABS) {
+      } else if (row.status == global.STATUS.ABS) {//ABSENT : Do nothing
         ntimeDiff = row.timeDiff
-      } else if (!isTodayOff) {
+      } else if (!isTodayOff) { //Is not holidays
         ntimeDiff = row.timeDiff + (row.timeDiffToday - dayConfig.timeToDo);
-        if (row.isBlocked) {
-          if (dayConfig.scheduleFix.length &gt; 0)
-            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end))) {
+        if (row.isBlocked) { //Check if student is blocked
+          if (dayConfig.scheduleFix.length &gt; 0) //Is today a work day ?
+            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end))) { //Last tag was before last schedule end time
               log.warning(&quot;USRID &quot; + row.id + &quot; : Left early. The accepted leaving time is &quot; + math.secondsToHms(dayConfig.scheduleFix[dayConfig.scheduleFix.length - 1].end));
               log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Left early (at &quot; + moment(row.lastTagTime).format(&quot;H:mm:ss&quot;) + &quot;)&quot;, row.timeDiff, row.timeDiffToday);
             }
         } else {
-          if (dayConfig.schedule.length &gt; 0)
-            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].end))) {
+          if (dayConfig.schedule.length &gt; 0)//Is today a work day ?
+            if (new Date(row.lastTagTime) &lt; new Date(math.secondsToDate(dayConfig.schedule[dayConfig.schedule.length - 1].end))) {//Last tag was before last schedule end time
               log.warning(&quot;USRID &quot; + row.id + &quot; : Left early. The accepted leaving time is &quot; + math.secondsToHms(dayConfig.schedule[dayConfig.schedule.length - 1].end));
               log.save(global.LOGS.TIMEERROR, row.id, &quot;&quot;, row.lastTagTime, &quot;Left early (at &quot; + moment(row.lastTagTime).format(&quot;H:mm:ss&quot;) + &quot;)&quot;, row.timeDiff, row.timeDiffToday);
             }
         }
 
       }
-      if (!row.hadLunch &amp;&amp; row.status != global.STATUS.ABS &amp;&amp; dayConfig.lunch &amp;&amp; !isTodayOff)
+      if (!row.hadLunch &amp;&amp; row.status != global.STATUS.ABS &amp;&amp; dayConfig.lunch &amp;&amp; !isTodayOff) //Has he lunched ? is today a lunch day ?
       {
         log.info(&quot;USRID &quot; + row.id + &quot; : Missed lunch&quot;);
         log.save(global.LOGS.NOLUNCH, row.id, &quot;SERVER&quot;, null, &quot;&quot;, row.timeDiff, row.timeDiffToday);
@@ -205,7 +205,7 @@ function endOfDay() {
 
       var ndetails;
       try {
-        ndetails = JSON.parse(row.details);
+        ndetails = JSON.parse(row.details); //Parse details
         if (ndetails == null) {
           ndetails.day = [];
           ndetails.week = [];
@@ -219,15 +219,15 @@ function endOfDay() {
           month: []
         };
       }
-      if (isTodayOff) {
+      if (isTodayOff) { //Is Holidays
         ntimeDiff = row.timeDiff + row.timeDiffToday;
-        ntimeDiff += (row.missedPause &lt;= 0) ? 0 : (row.missedPause * (-20 * 60));
+        ntimeDiff += (row.missedPause &lt;= 0) ? 0 : (Math.floor(row.missedPause) * (-20 * 60));
         log.save(global.LOGS.ENDOFDAY, row.id, &quot;&quot;, moment().format(), &quot;Function executed (Holidays) &quot;, ntimeDiff, 0);
       } else {
-        if (row.status != global.STATUS.ABS) {
+        if (row.status != global.STATUS.ABS) { //Check for leave req
 
-          ntimeDiff -= (row.missedPause &lt;= 0) ? 0 : (row.missedPause * (20 * 60));
-          lr.getTimeToRefund(row.id, (res) =&gt; {
+          ntimeDiff -= (row.missedPause &lt;= 0) ? 0 : (Math.floor(row.missedPause) * (20 * 60));
+          lr.getTimeToRefund(row.id, (res) =&gt; { //Get time to be refunded
             ntimeDiff += res;
             if (dayConfig.lunch &amp;&amp; !res)
               ntimeDiff -= (row.hadLunch) ? 0 : global.config.lunch.time; //Substract time in case of missed lunch
@@ -264,7 +264,7 @@ module.exports = {
    * @method start
    **/
   start: function() {
-    job = new CronJob(&#x27;00 00 23 * * 1-7&#x27;, function() {
+    job = new CronJob(&#x27;00 00 23 * * 1-7&#x27;, function() { //Execute the endOfDay function every day at 23:00
         endOfDay();
       }, function() {
         log.info(&quot;Scheduler stopped !&quot;);

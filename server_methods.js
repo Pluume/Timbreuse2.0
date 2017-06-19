@@ -53,6 +53,7 @@ function okRequest(conn) {
 }
 /**
  * Send a notitification to all connected user with corresponding to the profid
+ * @method pushNotifications
  * @param  {Interger} profid  The prof id
  * @param  {Interger} type    The notifications type
  * @param  {String} message The notification message
@@ -89,6 +90,7 @@ function pushNotifications(profid, type, message) {
 }
 /**
  * Send a update about notification to a connected profid
+ * @method updateNotification
  * @param  {Interger} profid  The profid
  * @param  {Interger} notifid The notification type
  */
@@ -117,6 +119,7 @@ function updateNotification(profid, notifid) {
 }
 /**
  * Send update about a student to the connected profid
+ * @method sendUpdate
  * @param  {Interger} id  The id to send the notification to
  * @param  {Object} arg The object with the new data
  */
@@ -137,6 +140,7 @@ function sendUpdate(id, arg) {
 }
 /**
  * Function called for each tag request
+ * @method tagRoutine
  * @param  {Socket}   conn The socket
  * @param  {Object}   user The user object to treat
  * @param  {Object}   ireq The incoming request
@@ -187,7 +191,7 @@ function tagRoutine(conn, user, ireq, done) {
       if (Math.floor(missedPause)) {
         log.warning("USRID : " + user.id + " : regular break rule not respected " + missedPause + " time(s) !");
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), "", row2.timeDiff, row2.timeDiffToday);
-        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't taken a pause in a " + Math.floor(math.secondsToHms(delta)) + " session.");
+        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + " " + user.lname + " hasn't taken a pause in a " + math.secondsToHms(Math.floor(delta)) + " session.");
       }
       global.db.serialize(() => {
         global.db.run(knex("students").update({
@@ -1872,6 +1876,38 @@ function toggleLeaveRequest(conn, ireq) {
   });
 }
 /**
+ * Delete leavereq from the database
+ * @method deleteLR
+ * @param  {socket} conn The socket object
+ * @param  {object} ireq The incoming request
+ */
+function deleteLR(conn, ireq) {
+  var oreq = getBaseReq(ireq.fnc);
+  if (conn.user === undefined || conn.user.rank != global.RANK.PROF) {
+
+    oreq.error = request.ERROR.NOTLOGEDIN;
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+    return;
+  }
+
+  if (ireq.id === undefined) {
+    log.error("Ill formed request");
+    return;
+  }
+  global.db.run(knex("leavereq").del().where({
+    id: ireq.id
+  }).toString(), (err) => {
+    if (err) {
+      log.error("Error : " + err);
+
+      oreq.error = request.ERROR.SQLITE;
+      conn.socket.write(JSON.stringify(oreq) + "\0");
+      return;
+    }
+    conn.socket.write(JSON.stringify(oreq) + "\0");
+  });
+}
+/**
  * Sort the incoming request. Redirect the request to the correct function.
  * @method sortRequest
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
@@ -2005,6 +2041,9 @@ function sortRequest(connection, data) {
         break;
       case request.REQUEST.TOGGLELR:
         toggleLeaveRequest(connection, ireq[i]);
+        break;
+        case request.REQUEST.DELETELR:
+        deleteLR(connection, ireq[i]);
         break;
     }
   }

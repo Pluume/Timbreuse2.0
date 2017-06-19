@@ -139,7 +139,7 @@ function searchSubmit(event) //TODO Delete
   }
 }
 
-function emptyInput(arrId) //Delete
+function emptyInput(arrId) //TODO Delete
 {
   for(var i = 0; i&lt; arrId.length; i++)
   {
@@ -163,15 +163,20 @@ function loadPage(page)
   document.getElementById(&quot;MainIFrame&quot;).src = page;
 }
 
-function resizeToClient() //TODO Delete
-{
-  document.getElementById(&quot;MainIFrame&quot;).style.height = document.body.clientHeight + &quot;px&quot;;
-}
-
-function resizeIFrame() {//TODO Delete
+/**
+ * Resize the webview to windows height
+ * @method resizeIFrame
+ */
+function resizeIFrame() {
+  try {
     document.getElementById(&quot;MainIFrame&quot;).style.height = (document.body.clientHeight - document.getElementById(&quot;MainIFrame&quot;).offsetTop) + &quot;px&quot;;
+  } catch(er)
+  {
+
+  }
+
 }
-window.onload = function () { resizeIFrame(); }//TODO Delete
+window.onload = function () { resizeIFrame(); }
 
     </pre>
 </div>

@@ -19,6 +19,7 @@
   <!-- Custom Fonts -->
   <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
   <link href="../vendor/fullcalendar/css/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+
   <title>Timbreuse - Prof panel</title>
   <script src="../dist/js/pages.js"></script>
 </head>
@@ -64,8 +65,8 @@
             <button href="#" onclick="changeTimeGroup();" data-toggle='tooltip' data-placement='bottom' title="Change student's time" href='#' class='btn btn-outline btn-primary btn-circle'><i class='fa fa-clock-o'></i></button>
             <button href="#" onclick="tagGroup();" data-toggle='tooltip' data-placement='bottom' title='Tag for selected students' href='#' class='btn btn-outline btn-warning btn-circle'><i class='fa fa-tag'></i></button>
             <button href="#" onclick="blockedGroup();" data-toggle='tooltip' data-placement='bottom' title="Set blocked" href='#' class='btn btn-outline btn-primary btn-circle'><i class='fa fa-lock'></i></button>
+            <button href="#" onclick="toggleFull();" data-toggle='tooltip' data-placement='bottom' title="Show all the students" href='#' class='btn btn-outline btn-primary btn-circle'><i class='glyphicon glyphicon-list'></i></button>
             <span data-toggle='modal' data-target="#addStudentModal"><button data-toggle="tooltip" data-placement='bottom' title='Add' href='#' onclick="emptyInput(['cfname', 'clname', 'cusername', 'ctag','cemail','cdob','cproject']);" class='btn btn-outline btn-success btn-circle'><i class='fa fa-plus'></i></button></span>
-
           </th>
           <th data-field="userid" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
           <th data-field="dob" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false"></th>
@@ -302,7 +303,27 @@
       card.appendChild(cardBlock);
       return card.outerHTML;
     }
+    var isFull = false;
+    function toggleFull()
+    {
+      $("#loadingGif").css("display", "");
+      $("#pageContainer").css("display", "none");
+      if(!isFull)
+      {
 
+        getStudentsAllForProf("stdTable",() => {
+          $("#loadingGif").css("display", "none");
+          $("#pageContainer").css("display", "");
+        });
+        isFull = true;
+      } else {
+        getStudents("stdTable",() => {
+          $("#loadingGif").css("display", "none");
+          $("#pageContainer").css("display", "");
+        });
+        isFull = false;
+      }
+    }
     function editCb(std) {
       document.getElementById("elname").setAttribute("placeholder", std.students.user.lname == null ? "" : std.students.user.lname);
       document.getElementById("efname").setAttribute("placeholder", std.students.user.fname == null ? "" : std.students.user.fname);
@@ -437,6 +458,7 @@
           }
           $("#loadingGif").css("display", "none");
           $("#pageContainer").css("display", "");
+
         });
       });
       activateValidator();
@@ -545,12 +567,12 @@
             </div>
             <script type="text/javascript">
               $('#cfname').on('input propertychange paste', function() {
-                var lname =document.getElementById("clname").value;
-                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? ".":"") + lname;
+                var lname = document.getElementById("clname").value;
+                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? "." : "") + lname;
               });
               $('#clname').on('input propertychange paste', function() {
-                var lname =document.getElementById("clname").value;
-                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? ".":"") + lname;
+                var lname = document.getElementById("clname").value;
+                document.getElementById("cusername").value = document.getElementById("cfname").value[0].toLowerCase() + (lname ? "." : "") + lname;
               });
             </script>
             <div id="fgcusername" class="form-group">
@@ -845,8 +867,6 @@
       </div>
     </div>
   </div>
-  <script>
-  </script>
   <!-- Bootstrap Core JavaScript -->
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -868,6 +888,7 @@
   <script src="../vendor/fullcalendar/js/fullcalendar.min.js"></script>
   <script src="../vendor/validator/jquery.validate.min.js"></script>
   <script src="../dist/js/validate.js"></script>
+
 </body>
 
 </html>

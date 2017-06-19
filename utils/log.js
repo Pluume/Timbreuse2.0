@@ -256,12 +256,12 @@ function format(data) {
         if (data.logs[i].description)
           curr.title += " - " + data.logs[i].description
         curr.color = "rgb(52, 73, 94)"
-        curr.textColor = "rgb(0, 0, 0)";
+        curr.textColor = "rgb(255, 255, 255)";
         break;
       case global.LOGS.LEAVEREQ:
         curr.title = "LEAVE APPLICATION > " + data.logs[i].description;
         curr.color = "rgb(52, 73, 94)"
-        curr.textColor = "rgb(0, 0, 0)";
+        curr.textColor = "rgb(255, 255, 255)";
         curr.start = data.logs[i].date;
         break;
       default:

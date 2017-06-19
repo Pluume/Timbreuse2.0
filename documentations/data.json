@@ -79,6 +79,13 @@
             "fors": {},
             "namespaces": {}
         },
+        "frontend\\web_frontend\\dist\\js\\validate.js": {
+            "name": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "frontend\\web_frontend\\vendor\\datatables\\js\\dataTables.bootstrap.js": {
             "name": "frontend\\web_frontend\\vendor\\datatables\\js\\dataTables.bootstrap.js",
             "modules": {},
@@ -256,6 +263,13 @@
             "classes": {
                 "holidays": 1
             },
+            "fors": {},
+            "namespaces": {}
+        },
+        "utils\\installRoutines.js": {
+            "name": "utils\\installRoutines.js",
+            "modules": {},
+            "classes": {},
             "fors": {},
             "namespaces": {}
         },
@@ -866,7 +880,28 @@
     "classitems": [
         {
             "file": "db\\db.js",
-            "line": 106,
+            "line": 68,
+            "description": "Complety erase all the data begeted by a student",
+            "itemtype": "method",
+            "name": "wipeStudents",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The userid of the student",
+                    "type": "Integer"
+                },
+                {
+                    "name": "cb",
+                    "description": "The callback function",
+                    "type": "Function"
+                }
+            ],
+            "class": "db",
+            "module": "db"
+        },
+        {
+            "file": "db\\db.js",
+            "line": 112,
             "description": "Init the database",
             "itemtype": "method",
             "name": "init",
@@ -1839,7 +1874,7 @@
         },
         {
             "file": "frontend\\web_frontend\\dist\\js\\slave.js",
-            "line": 83,
+            "line": 77,
             "description": "Display the status of the CSV Copying",
             "itemtype": "method",
             "name": "displayCSV",
@@ -1860,7 +1895,7 @@
         },
         {
             "file": "frontend\\web_frontend\\dist\\js\\slave.js",
-            "line": 137,
+            "line": 131,
             "description": "Display the offline statusGroup",
             "itemtype": "method",
             "name": "showOnline",
@@ -1902,6 +1937,94 @@
                 }
             ],
             "class": "frontendUtil",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\utils.js",
+            "line": 50,
+            "description": "Resize the webview to windows height",
+            "itemtype": "method",
+            "name": "resizeIFrame",
+            "class": "frontendUtil",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 3,
+            "description": "Cancel a formName",
+            "itemtype": "method",
+            "name": "cancelForm",
+            "params": [
+                {
+                    "name": "formName",
+                    "description": "The form's name",
+                    "type": "String"
+                }
+            ],
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 12,
+            "description": "Validator for the add student modal",
+            "itemtype": "method",
+            "name": "validateCreateStd",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 85,
+            "description": "Validator for the create prof modal",
+            "itemtype": "method",
+            "name": "validateCreateProf",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 167,
+            "description": "Validate edit student modal",
+            "itemtype": "method",
+            "name": "validateEditStd",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 226,
+            "description": "Validate edit prof modal",
+            "itemtype": "method",
+            "name": "validateEditProf",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 288,
+            "description": "Validate \"create leave application\" for student",
+            "itemtype": "method",
+            "name": "validateStudentCreateLeaveRequest",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 343,
+            "description": "Validate \"create leave application\" for prof",
+            "itemtype": "method",
+            "name": "validateProfCreateLeaveRequest",
+            "class": "DataTable.Api",
+            "module": "frontendUtil"
+        },
+        {
+            "file": "frontend\\web_frontend\\dist\\js\\validate.js",
+            "line": 399,
+            "description": "Define all the validator function and activate the plugin",
+            "itemtype": "method",
+            "name": "activateValidator",
+            "class": "DataTable.Api",
             "module": "frontendUtil"
         },
         {
@@ -9478,7 +9601,105 @@
         },
         {
             "file": "frontend\\client.js",
-            "line": 134,
+            "line": 17,
+            "description": "Handle incoming request and treat them when the Timbreuse type is a client",
+            "itemtype": "method",
+            "name": "clientServer",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "[description]",
+                    "type": "[type]"
+                }
+            ],
+            "return": {
+                "description": "[description]",
+                "type": "[type]"
+            },
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 71,
+            "description": "Check if packet is complet. If so, send it to clientServer function",
+            "itemtype": "method",
+            "name": "dataExecuter",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The current buffer",
+                    "type": "String"
+                }
+            ],
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 87,
+            "description": "Handle incomming data appending new data to current data buffer",
+            "itemtype": "method",
+            "name": "incomingDataHandling",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The incomming data",
+                    "type": "String"
+                }
+            ],
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 96,
+            "description": "Connect to the server",
+            "itemtype": "method",
+            "name": "connect",
+            "params": [
+                {
+                    "name": "cb",
+                    "description": "the callback function",
+                    "type": "Function"
+                }
+            ],
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 133,
+            "description": "End current connection to the server",
+            "itemtype": "method",
+            "name": "disconnect",
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 145,
+            "description": "Send data to server",
+            "itemtype": "method",
+            "name": "send",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "outgoing data",
+                    "type": "String"
+                },
+                {
+                    "name": "cb",
+                    "description": "The callback to callback",
+                    "type": "Function"
+                }
+            ],
+            "class": "client",
+            "module": "client"
+        },
+        {
+            "file": "frontend\\client.js",
+            "line": 159,
             "description": "Create a windows for the client",
             "itemtype": "method",
             "name": "createWindow",
@@ -9487,7 +9708,7 @@
         },
         {
             "file": "frontend\\client.js",
-            "line": 177,
+            "line": 202,
             "description": "Load the client interface",
             "itemtype": "method",
             "name": "load",
@@ -10190,7 +10411,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 93,
+            "line": 92,
             "description": "Compile the complete request before using it",
             "itemtype": "method",
             "name": "compileRequest",
@@ -10206,13 +10427,13 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 105,
+            "line": 104,
             "description": "Handle the incoming data from the outgoing socket",
             "itemtype": "method",
             "name": "onSocketData",
             "params": [
                 {
-                    "name": "ireq",
+                    "name": "nireq",
                     "description": "The json request",
                     "type": "Object"
                 }
@@ -10222,7 +10443,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 130,
+            "line": 135,
             "description": "Make the slave always try to maintain a connection with the server",
             "itemtype": "method",
             "name": "foreverConnect",
@@ -10231,7 +10452,7 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 231,
+            "line": 243,
             "description": "Create the slave frontend",
             "itemtype": "method",
             "name": "createWindow",
@@ -10240,10 +10461,19 @@
         },
         {
             "file": "frontend\\slave.js",
-            "line": 273,
+            "line": 285,
             "description": "Load the slave frontend",
             "itemtype": "method",
             "name": "load",
+            "class": "slave",
+            "module": "slave"
+        },
+        {
+            "file": "frontend\\slave.js",
+            "line": 303,
+            "description": "Delete all the CSV of the slave",
+            "itemtype": "method",
+            "name": "delCSV",
             "class": "slave",
             "module": "slave"
         },
@@ -10332,6 +10562,56 @@
             ],
             "class": "csv",
             "module": "csv"
+        },
+        {
+            "file": "utils\\csv.js",
+            "line": 104,
+            "description": "Export all the database to CSV",
+            "itemtype": "method",
+            "name": "exportDBtoCSV",
+            "params": [
+                {
+                    "name": "cb",
+                    "description": "Callback function",
+                    "type": "Function"
+                }
+            ],
+            "class": "csv",
+            "module": "csv"
+        },
+        {
+            "file": "utils\\csv.js",
+            "line": 215,
+            "description": "Delete all the CSV on the current machine",
+            "itemtype": "method",
+            "name": "deleteAllCSV",
+            "class": "csv",
+            "module": "csv"
+        },
+        {
+            "file": "utils\\holidays.js",
+            "line": 12,
+            "description": "Check if today is holidays",
+            "itemtype": "method",
+            "name": "isTodayOff",
+            "params": [
+                {
+                    "name": "cb",
+                    "description": "Callback with boolean result",
+                    "type": "Function"
+                }
+            ],
+            "class": "holidays",
+            "module": "holidays"
+        },
+        {
+            "file": "utils\\installRoutines.js",
+            "line": 3,
+            "description": "Function that handle when application is launched to install",
+            "itemtype": "method",
+            "name": "handleSquirrelEvent",
+            "class": "leavereq",
+            "module": "holidays"
         },
         {
             "file": "utils\\leaveReq.js",
@@ -10609,7 +10889,94 @@
         },
         {
             "file": "utils\\log.js",
-            "line": 263,
+            "line": 82,
+            "description": "Save new log into the database",
+            "itemtype": "method",
+            "name": "save",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The log type",
+                    "type": "Interger"
+                },
+                {
+                    "name": "stdid",
+                    "description": "The student's id",
+                    "type": "Interger"
+                },
+                {
+                    "name": "tclass",
+                    "description": "The class where the log took place",
+                    "type": "Interger"
+                },
+                {
+                    "name": "time",
+                    "description": "The log's date",
+                    "type": "Date"
+                },
+                {
+                    "name": "comments",
+                    "description": "Some description",
+                    "type": "String"
+                },
+                {
+                    "name": "td",
+                    "description": "timeDiff in seconds",
+                    "type": "Interger"
+                },
+                {
+                    "name": "tdT",
+                    "description": "timeDiffToday in seconds",
+                    "type": "Interger"
+                }
+            ],
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 104,
+            "description": "Get the logs for a student",
+            "itemtype": "method",
+            "name": "",
+            "params": [
+                {
+                    "name": "stdid",
+                    "description": "The student's id",
+                    "type": "Interger"
+                },
+                {
+                    "name": "cb",
+                    "description": "The callback function",
+                    "type": "Function"
+                }
+            ],
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 145,
+            "description": "Format data for fullcalendar events",
+            "itemtype": "method",
+            "name": "format",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "Array of logs",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "Array of Fullcalendar events",
+                "type": "Array"
+            },
+            "class": "log",
+            "module": "log"
+        },
+        {
+            "file": "utils\\log.js",
+            "line": 284,
             "description": "On SIGINT (Ctrl + C), quit the app nicely",
             "itemtype": "method",
             "name": "interruption",
@@ -10745,7 +11112,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 25,
+            "line": 26,
             "description": "Generate the a base for an outgoing request",
             "itemtype": "method",
             "name": "getBaseReq",
@@ -10759,7 +11126,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 37,
+            "line": 38,
             "description": "Save the propagated tag request into this Timbreuse's CSV",
             "itemtype": "method",
             "name": "propagate_tag",
@@ -10776,7 +11143,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 45,
+            "line": 46,
             "description": "Send a ping to server",
             "itemtype": "method",
             "name": "okRequest",
@@ -10793,7 +11160,110 @@
         },
         {
             "file": "server_methods.js",
-            "line": 293,
+            "line": 54,
+            "description": "Send a notitification to all connected user with corresponding to the profid",
+            "itemtype": "method",
+            "name": "pushNotifications",
+            "params": [
+                {
+                    "name": "profid",
+                    "description": "The prof id",
+                    "type": "Interger"
+                },
+                {
+                    "name": "type",
+                    "description": "The notifications type",
+                    "type": "Interger"
+                },
+                {
+                    "name": "message",
+                    "description": "The notification message",
+                    "type": "String"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 91,
+            "description": "Send a update about notification to a connected profid",
+            "itemtype": "method",
+            "name": "updateNotification",
+            "params": [
+                {
+                    "name": "profid",
+                    "description": "The profid",
+                    "type": "Interger"
+                },
+                {
+                    "name": "notifid",
+                    "description": "The notification type",
+                    "type": "Interger"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 120,
+            "description": "Send update about a student to the connected profid",
+            "itemtype": "method",
+            "name": "sendUpdate",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "The id to send the notification to",
+                    "type": "Interger"
+                },
+                {
+                    "name": "arg",
+                    "description": "The object with the new data",
+                    "type": "Object"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 141,
+            "description": "Function called for each tag request",
+            "itemtype": "method",
+            "name": "tagRoutine",
+            "params": [
+                {
+                    "name": "conn",
+                    "description": "The socket",
+                    "type": "Socket"
+                },
+                {
+                    "name": "user",
+                    "description": "The user object to treat",
+                    "type": "Object"
+                },
+                {
+                    "name": "ireq",
+                    "description": "The incoming request",
+                    "type": "Object"
+                },
+                {
+                    "name": "done",
+                    "description": "The callback function",
+                    "type": "Function"
+                }
+            ],
+            "class": "server_methods",
+            "module": "server",
+            "submodule": "server_methods"
+        },
+        {
+            "file": "server_methods.js",
+            "line": 315,
             "description": "Handle a tag request (When a student arrive or leave)",
             "itemtype": "method",
             "name": "tagRequest",
@@ -10803,7 +11273,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 399,
+            "line": 420,
             "description": "Handle a login request",
             "itemtype": "method",
             "name": "authenticate",
@@ -10825,7 +11295,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 463,
+            "line": 484,
             "description": "End the provided socket",
             "itemtype": "method",
             "name": "socketExit",
@@ -10842,7 +11312,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 474,
+            "line": 495,
             "description": "Get one or multiple students",
             "itemtype": "method",
             "name": "getStudent",
@@ -10864,7 +11334,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 597,
+            "line": 618,
             "description": "Get the class associated with the profs",
             "itemtype": "method",
             "name": "getClass",
@@ -10886,7 +11356,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 643,
+            "line": 664,
             "description": "Create a new students",
             "itemtype": "method",
             "name": "createStudent",
@@ -10908,7 +11378,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 732,
+            "line": 753,
             "description": "Delete a student",
             "itemtype": "method",
             "name": "deleteStudent",
@@ -10930,7 +11400,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 756,
+            "line": 777,
             "description": "Edit a students",
             "itemtype": "method",
             "name": "editStudent",
@@ -10952,7 +11422,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 829,
+            "line": 850,
             "description": "Clean an user's account",
             "itemtype": "method",
             "name": "resetTime",
@@ -10974,7 +11444,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 894,
+            "line": 915,
             "description": "Modify the time of students",
             "itemtype": "method",
             "name": "modTime",
@@ -10996,7 +11466,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 937,
+            "line": 958,
             "description": "Set the time of students",
             "itemtype": "method",
             "name": "setTime",
@@ -11018,7 +11488,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 981,
+            "line": 1002,
             "description": "Get the logs of the students",
             "itemtype": "method",
             "name": "getLogs",
@@ -11040,7 +11510,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1041,
+            "line": 1062,
             "description": "Set a students as absent",
             "itemtype": "method",
             "name": "setAbsent",
@@ -11062,7 +11532,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1085,
+            "line": 1106,
             "description": "Toggle a student isBlocked value.",
             "itemtype": "method",
             "name": "setFixed",
@@ -11084,7 +11554,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1159,
+            "line": 1180,
             "description": "Get all the notification for a logged user",
             "itemtype": "method",
             "name": "getNotifications",
@@ -11106,7 +11576,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1188,
+            "line": 1209,
             "description": "Change the read status of a notifications",
             "itemtype": "method",
             "name": "toggleNotification",
@@ -11128,7 +11598,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1228,
+            "line": 1249,
             "description": "Return the holidays to the connected user",
             "itemtype": "method",
             "name": "getHolidays",
@@ -11150,7 +11620,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1258,
+            "line": 1279,
             "description": "Create a new holidays",
             "itemtype": "method",
             "name": "addHolidays",
@@ -11172,7 +11642,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1311,
+            "line": 1332,
             "description": "Delete an holidays",
             "itemtype": "method",
             "name": "delHolidays",
@@ -11194,7 +11664,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1343,
+            "line": 1364,
             "description": "Return all the teachers' info the connected administrator",
             "itemtype": "method",
             "name": "getProf",
@@ -11216,7 +11686,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1393,
+            "line": 1414,
             "description": "Create a new teacher",
             "itemtype": "method",
             "name": "createProf",
@@ -11238,7 +11708,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1447,
+            "line": 1468,
             "description": "Delete a teacher and all his students at once",
             "itemtype": "method",
             "name": "delProf",
@@ -11260,7 +11730,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1500,
+            "line": 1521,
             "description": "Edit a teacher",
             "itemtype": "method",
             "name": "editProf",
@@ -11282,7 +11752,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1558,
+            "line": 1579,
             "description": "Change the user's password",
             "itemtype": "method",
             "name": "changePassword",
@@ -11304,7 +11774,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1585,
+            "line": 1606,
             "description": "Return a list of the existing class to the professor",
             "itemtype": "method",
             "name": "getClassList",
@@ -11326,7 +11796,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1641,
+            "line": 1662,
             "description": "Change the class of a student",
             "itemtype": "method",
             "name": "changeStudentClass",
@@ -11348,7 +11818,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1672,
+            "line": 1693,
             "description": "Create a new leave application",
             "itemtype": "method",
             "name": "createLeaveRequest",
@@ -11370,7 +11840,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1752,
+            "line": 1773,
             "description": "Get the leave req for the connected user",
             "itemtype": "method",
             "name": "getLeaveRequest",
@@ -11392,7 +11862,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1826,
+            "line": 1847,
             "description": "Toggle the accepted status of a leave application",
             "itemtype": "method",
             "name": "toggleLeaveRequest",
@@ -11414,7 +11884,7 @@
         },
         {
             "file": "server_methods.js",
-            "line": 1857,
+            "line": 1878,
             "description": "Sort the incoming request. Redirect the request to the correct function.",
             "itemtype": "method",
             "name": "sortRequest",

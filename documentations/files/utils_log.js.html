@@ -130,15 +130,15 @@ const math = require(&quot;./math.js&quot;);
  * @method createNewLogFile
  */
 function createNewLogFile() {
-  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? &quot;./&quot; : path.join(__dirname, &quot;..&quot;));
-  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.10.log&quot;)))
+  var basePath = (global.TYPE.int === global.TYPE_LIST.CLIENT.int ? &quot;./&quot; : path.join(__dirname, &quot;..&quot;)); //Get base path
+  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.10.log&quot;))) //If log 10 exists, delete
     fs.unlinkSync(path.join(basePath, &quot;Timbreuse.10.log&quot;));
   for (var i = 9; i &gt; 0; i--)
-    if (fs.existsSync(path.join(basePath, &quot;Timbreuse.&quot; + i + &quot;.log&quot;)))
+    if (fs.existsSync(path.join(basePath, &quot;Timbreuse.&quot; + i + &quot;.log&quot;))) //Then move log n to log n+1
       fs.renameSync(path.join(basePath, &quot;Timbreuse.&quot; + i + &quot;.log&quot;), path.join(basePath, &quot;Timbreuse.&quot; + (i + 1) + &quot;.log&quot;));
-  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.log&quot;)))
+  if (fs.existsSync(path.join(basePath, &quot;Timbreuse.log&quot;))) //If log exists, move it to log 1
     fs.renameSync(path.join(basePath, &quot;Timbreuse.log&quot;), path.join(basePath, &quot;Timbreuse.1.log&quot;));
-  global.logFile = fs.createWriteStream(path.join(basePath, &quot;Timbreuse.log&quot;), {
+  global.logFile = fs.createWriteStream(path.join(basePath, &quot;Timbreuse.log&quot;), { //Then create write stream to log file
     flags: &#x27;w&#x27;
   });
 }
@@ -153,7 +153,7 @@ const knex = require(&#x27;knex&#x27;)({
  **/
 var info = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[INFO] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[INFO] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg; //Print formated info message
   console.log(cmsg);
   global.logFile.write(cmsg + &quot;\n&quot;);
 };
@@ -171,7 +171,7 @@ var printStack = function() {
  **/
 var error = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[ERROR] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[ERROR] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg; //Print formated error message
   console.log(cmsg);
   printStack();
   global.logFile.write(cmsg + &quot;\n&quot;);
@@ -184,7 +184,7 @@ var error = (msg) =&gt; {
  **/
 var warning = (msg) =&gt; {
   var stack = at(1);
-  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[WARNING] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg;
+  var cmsg = &quot;[&quot; + moment().format(&quot;DD/MM/YYYY HH:mm:ss.SSS&quot;) + &quot;] &quot; + &quot;[WARNING] &quot; + &quot;(&quot; + path.relative(&quot;.&quot;, stack.file) + &quot;:&quot; + stack.line + &quot;) &gt; &quot; + msg; //Print formated warning message
   console.log(cmsg);
   global.logFile.write(cmsg + &quot;\n&quot;);
 };
@@ -195,9 +195,19 @@ process.on(&quot;exit&quot;, (code) =&gt; {
   info(&quot;Exiting with code &quot; + code);
   global.logFile.end();
 });
-
+/**
+ * Save new log into the database
+ * @method save
+ * @param  {Interger} type     The log type
+ * @param  {Interger} stdid    The student&#x27;s id
+ * @param  {Interger} tclass   The class where the log took place
+ * @param  {Date} time     The log&#x27;s date
+ * @param  {String} comments Some description
+ * @param  {Interger} td       timeDiff in seconds
+ * @param  {Interger} tdT      timeDiffToday in seconds
+ */
 var save = function(type, stdid, tclass, time, comments, td, tdT) {
-  global.db.run(knex(&quot;logs&quot;).insert({
+  global.db.run(knex(&quot;logs&quot;).insert({ //Insert into db
     type: type,
     studentid: stdid,
     date: time,
@@ -207,9 +217,15 @@ var save = function(type, stdid, tclass, time, comments, td, tdT) {
     timeDiffToday: tdT
   }).toString());
 };
+/**
+ * Get the logs for a student
+ * @method
+ * @param  {Interger}   stdid The student&#x27;s id
+ * @param  {Function} cb    The callback function
+ */
 var get = function(stdid, cb) {
   var obj = {};
-  global.db.all(knex(&quot;logs&quot;).select().where({
+  global.db.all(knex(&quot;logs&quot;).select().where({ //Select logs
     studentid: stdid
   }).toString(), (err, rows) =&gt; {
     if (err || rows == undefined || rows == []) {
@@ -218,7 +234,7 @@ var get = function(stdid, cb) {
       return;
     }
     obj.logs = rows;
-    global.db.get(knex(&quot;students&quot;).select().where({
+    global.db.get(knex(&quot;students&quot;).select().where({ //Select students account
       id: stdid
     }).toString(), (err, row0) =&gt; {
       if (err) {
@@ -227,7 +243,7 @@ var get = function(stdid, cb) {
         return;
       }
       obj.student = row0;
-      global.db.get(knex(&quot;users&quot;).select().where({
+      global.db.get(knex(&quot;users&quot;).select().where({ //Select user account
         id: row0.userid
       }).toString(), (err, row) =&gt; {
         if (err) {
@@ -236,13 +252,18 @@ var get = function(stdid, cb) {
           return;
         }
         obj.user = row;
-        cb(null, obj);
+        cb(null, obj); //return callback
       })
     });
 
   });
 };
-
+/**
+ * Format data for fullcalendar events
+ * @method format
+ * @param  {Array} data Array of logs
+ * @return {Array}      Array of Fullcalendar events
+ */
 function format(data) {
   var obj = [];
   for (var i = 0; i &lt; data.logs.length; i++) {
@@ -350,12 +371,12 @@ function format(data) {
         curr.start = data.logs[i].date;
         if (data.logs[i].description)
           curr.title += &quot; - &quot; + data.logs[i].description
-        curr.color = &quot;rgb(223, 222, 179)&quot;
+        curr.color = &quot;rgb(52, 73, 94)&quot;
         curr.textColor = &quot;rgb(0, 0, 0)&quot;;
         break;
       case global.LOGS.LEAVEREQ:
         curr.title = &quot;LEAVE APPLICATION &gt; &quot; + data.logs[i].description;
-        curr.color = &quot;rgb(223, 222, 179)&quot;
+        curr.color = &quot;rgb(52, 73, 94)&quot;
         curr.textColor = &quot;rgb(0, 0, 0)&quot;;
         curr.start = data.logs[i].date;
         break;
@@ -395,12 +416,12 @@ if (process.platform === &quot;win32&quot;) {
     output: process.stdout
   });
 
-  rl.on(&quot;SIGINT&quot;, function() {
+  rl.on(&quot;SIGINT&quot;, function() { //On control+C call interruption
     interruption();
   });
 }
 
-process.on(&quot;SIGINT&quot;, function() {
+process.on(&quot;SIGINT&quot;, function() { //On control+C call interruption
   interruption();
 });
 

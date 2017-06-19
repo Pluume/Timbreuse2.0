@@ -168,16 +168,16 @@ module.exports = {
         console.log(helpstring);
         process.exit(0);
       }
-      if(process.argv.indexOf(&quot;--debug&quot;)&gt;-1)
+      if(process.argv.indexOf(&quot;--debug&quot;)&gt;-1) //Is debug argument present
       {
         global.DEBUG = true;
       }
-      if(process.argv.indexOf(&quot;--server&quot;)&gt;-1)
+      if(process.argv.indexOf(&quot;--server&quot;)&gt;-1)//Is server argument present
       {
         global.TYPE = TYPE.SERVER;
         return;
       }
-      if(process.argv.indexOf(&quot;--slave&quot;)&gt;-1)
+      if(process.argv.indexOf(&quot;--slave&quot;)&gt;-1)//Is slave argument present
       {
         global.TYPE = TYPE.SLAVE;
         return;

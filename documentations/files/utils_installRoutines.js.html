@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>server.js - Timbreuse</title>
+    <title>utils\installRoutines.js - Timbreuse</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -110,80 +110,65 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1 class="file-heading">File: server.js</h1>
+<h1 class="file-heading">File: utils\installRoutines.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
+
+const app = require(&#x27;electron&#x27;).app;
 /**
- * Declare the Timbreuse&#x27;s server and handle the client connection management. Redirect any request to the module server_methods
- *
- * @module server
- * @class server
+ * Function that handle when application is launched to install
+ * @method handleSquirrelEvent
  */
-const log = require(&quot;./utils/log.js&quot;);
-net = require(&#x27;net&#x27;);
-const method = require(&quot;./server_methods&quot;);
-/**
- * Remove a client from the client list
- * @method removeClient
- * @param {Object} conn a JSON object containing a socket connection and an userid variable.
- **/
-function removeClient(conn) {
-    global.clients.splice(clients.indexOf(conn), 1);
-}
-/**
- * Add a client to the client list
- * @method addClient
- * @param {Object} conn a JSON object containing a socket connection and an userid variable.
- **/
-function addClient(conn) {
-    global.clients.push(conn);
-}
-module.exports = {
-  /**
-   * Start the server routine and link all the event listener of the server.
-   * @method start
-   **/
-  start: () =&gt; {
-    global.clients = [];
-    method.initialize();
-    global.server = net.createServer(function(socket) {
-      var connection = {socket: socket, userid: -1};
-      connection.currentBuf = &quot;&quot;;
-      addClient(connection); //Add client to client list
-      socket.setKeepAlive(true,60000);
-      if(global.DEBUG)
-      log.info(socket.remoteAddress + &quot; just connected&quot;);
-        socket.on(&#x27;error&#x27;, function() { //On error remove the connection from the connection list
-            removeClient(connection);
-        });
-        socket.on(&#x27;timeout&#x27;, function() {//On timeout remove the connection from the connection list and end the connection
-          log.warning(socket.remoteAddress +&quot; timed out&quot;)
-            removeClient(connection);
-            socket.end();
-        });
-        socket.on(&#x27;data&#x27;, function(data) {//On data, compile the request
-          method.compileRequest(connection,data.toString(&quot;utf8&quot;));
-        });
-        socket.on(&#x27;end&#x27;, function() {//On end remove the connection from the connection list
-            removeClient(connection);
-        });
-        socket.on(&#x27;close&#x27;, function(hadError) {//On close remove the connection from the connection list
-            removeClient(connection);
-            if(global.DEBUG)
-            log.info(socket.remoteAddress + &quot; just disconnected&quot;);
-        });
-    }).listen(703).on(&#x27;listening&#x27;, function() {
-      log.info(&quot;The server up on the port 703&quot;);
-    });
-  },
-  /**
-   * Stop the server.
-   * @method stop
-   **/
-  stop: () =&gt; {
-    //TODO
+function handleSquirrelEvent() {
+  if (process.argv.length === 1) {
+    return false;
   }
+
+  const ChildProcess = require(&#x27;child_process&#x27;);
+  const path = require(&#x27;path&#x27;);
+
+  const appFolder = path.resolve(process.execPath, &#x27;..&#x27;);
+  const rootAtomFolder = path.resolve(appFolder, &#x27;..&#x27;);
+  const updateDotExe = path.resolve(path.join(rootAtomFolder, &#x27;Update.exe&#x27;)); //Get update.exe service
+  const exeName = path.basename(process.execPath);
+
+  const spawn = function(command, args) {
+    let spawnedProcess, error;
+
+    try {
+      spawnedProcess = ChildProcess.spawn(command, args, {detached: true}); //Launch update.exe
+    } catch (error) {}
+
+    return spawnedProcess;
+  };
+
+  const spawnUpdate = function(args) {
+    return spawn(updateDotExe, args);
+  };
+
+  const squirrelEvent = process.argv[1];
+  switch (squirrelEvent) {
+    case &#x27;--squirrel-install&#x27;:
+    case &#x27;--squirrel-updated&#x27;:
+      spawnUpdate([&#x27;--createShortcut&#x27;, exeName]); //Installing, updating
+
+      setTimeout(app.quit, 1000); //Quit to let squirell install
+      return true;
+
+    case &#x27;--squirrel-uninstall&#x27;:
+      spawnUpdate([&#x27;--removeShortcut&#x27;, exeName]); //Uninstalling
+
+      setTimeout(app.quit, 1000);//Quit to let squirell uninstall
+      return true;
+
+    case &#x27;--squirrel-obsolete&#x27;: //If app is obsolete, then quit
+      app.quit();
+      return true;
+  }
+};
+module.exports = {
+  handleSquirrelEvent
 };
 
     </pre>

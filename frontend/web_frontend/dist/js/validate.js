@@ -77,7 +77,7 @@ function validateCreateStd() { // http://demos.codingcage.com/bs-form-validation
     },
 
     submitHandler: function(form) {
-      submitCreateModal();//Function to call on validated and submited form
+      submitCreateModal(); //Function to call on validated and submited form
     }
   });
 
@@ -297,7 +297,8 @@ function validateStudentCreateLeaveRequest() {
         validDateTime: true
       },
       cedate: {
-        validDateTime: true
+        validDateTime: true,
+        validAfterBeforeDate: true
       }
     },
     messages: {
@@ -307,7 +308,8 @@ function validateStudentCreateLeaveRequest() {
       },
       cedate: {
         validDateTime: "Date format DD-MM-YYYY hh:mm",
-        required: "This field is required"
+        required: "This field is required",
+        validAfterBeforeDate: "The end date must be after the start date"
       }
     },
     errorPlacement: function(error, element) {
@@ -322,7 +324,7 @@ function validateStudentCreateLeaveRequest() {
     },
 
     submitHandler: function(form) {
-      var date1, date2,missedTest,reason,reasonDesc,proof,where;
+      var date1, date2, missedTest, reason, reasonDesc, proof, where;
       date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
       date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
       missedTest = document.getElementById("cmissedTest").checked;
@@ -352,7 +354,8 @@ function validateProfCreateLeaveRequest() {
         validDateTime: true
       },
       cedate: {
-        validDateTime: true
+        validDateTime: true,
+        validAfterBeforeDate: true
       }
     },
     messages: {
@@ -362,7 +365,8 @@ function validateProfCreateLeaveRequest() {
       },
       cedate: {
         validDateTime: "Date format DD-MM-YYYY hh:mm",
-        required: "This field is required"
+        required: "This field is required",
+        validAfterBeforeDate: "The end date must be after the start date"
       }
     },
     errorPlacement: function(error, element) {
@@ -377,7 +381,7 @@ function validateProfCreateLeaveRequest() {
     },
 
     submitHandler: function(form) {
-      var date1, date2,missedTest,reason,reasonDesc,proof,where;
+      var date1, date2, missedTest, reason, reasonDesc, proof, where;
       date1 = moment(document.getElementById("csdate").value, "DD-MM-YYYY H:mm").format();
       date2 = moment(document.getElementById("cedate").value, "DD-MM-YYYY H:mm").format();
       var studentID = $("#stdListSelect").val();
@@ -421,13 +425,17 @@ function activateValidator() {
   $.validator.addMethod("validDateTime", function(value, element) {
     return this.optional(element) || moment(value, "DD-MM-YYYY H:mm", true).isValid();
   });
-
+  $.validator.addMethod("validAfterBeforeDate", function(value, element) {
+    if (moment(value, "DD-MM-YYYY H:mm", true).isValid() && moment($('#csdate').val(), "DD-MM-YYYY H:mm", true).isValid())
+      return this.optional(element) || moment(value, "DD-MM-YYYY H:mm", true).isAfter(moment($('#csdate').val(), "DD-MM-YYYY H:mm", true), "minute");
+    return this.optional(element) || moment(value, "DD-MM-YYYY H:mm", true).isValid();
+  });
   $.validator.addMethod("validTime", function(value, element) {
     return this.optional(element) || moment(value, "HH:MM").isValid();
   });
   var classregex = /^[a-zA-Z1-9 \-]+$/;
   $.validator.addMethod("validClass", function(value, element) {
-  return this.optional(element) || classregex.test(value);
+    return this.optional(element) || classregex.test(value);
   });
   var usernameregex = /^[a-zA-Z1-9\-\.\_]+$/;
   $.validator.addMethod("validUsername", function(value, element) {

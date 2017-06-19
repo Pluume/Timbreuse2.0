@@ -137,6 +137,7 @@ const moment = require(&quot;moment&quot;);
 const config = require(&quot;./utils/config.js&quot;);
 const db = require(&quot;./db/db.js&quot;);
 const async = require(&quot;async&quot;);
+var tagReqQueue = async.queue(tagRequest, 1);
 var clone = require(&#x27;clone&#x27;);
 /**
  * Generate the a base for an outgoing request
@@ -156,7 +157,7 @@ function getBaseReq(fnc) {
  * @param {Object} ireq a JSON object containing the incoming request.
  **/
 function propagate_tag(ireq) {
-  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, &#x27;&#x27;), ireq.time);
+  csv.writeBruteLoggingToCSV(ireq.tag.replace(/\W/g, &#x27;&#x27;), ireq.time); //Write tag to CSV
 }
 /**
  * Send a ping to server
@@ -164,9 +165,15 @@ function propagate_tag(ireq) {
  * @param {Object} conn a JSON object containing a socket connection and an userid variable.
  **/
 function okRequest(conn) {
-
+//TODO Develop this function in the future
 }
-
+/**
+ * Send a notitification to all connected user with corresponding to the profid
+ * @method pushNotifications
+ * @param  {Interger} profid  The prof id
+ * @param  {Interger} type    The notifications type
+ * @param  {String} message The notification message
+ */
 function pushNotifications(profid, type, message) {
   var now = moment().format();
   global.db.run(knex(&quot;notifications&quot;).insert({
@@ -176,7 +183,7 @@ function pushNotifications(profid, type, message) {
     date: now,
     read: 0
   }).toString(), function() {
-    var arr = _.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) { //Get all the connected user with id corresponding to profid
       try {
         return o.user.id == profid
       } catch (err) {
@@ -197,7 +204,12 @@ function pushNotifications(profid, type, message) {
   });
 
 }
-
+/**
+ * Send a update about notification to a connected profid
+ * @method updateNotification
+ * @param  {Interger} profid  The profid
+ * @param  {Interger} notifid The notification type
+ */
 function updateNotification(profid, notifid) {
   global.db.get(knex(&quot;notifications&quot;).select().where({
     id: notifid
@@ -206,7 +218,7 @@ function updateNotification(profid, notifid) {
       log.error(&quot;Error querrying the database : &quot; + err);
       return;
     }
-    var arr = _.filter(global.clients, function(o) {
+    var arr = _.filter(global.clients, function(o) { //Filter the connected user corresponding to profid
       try {
         return o.user.id == profid;
       } catch (err) {
@@ -221,7 +233,12 @@ function updateNotification(profid, notifid) {
   });
 
 }
-
+/**
+ * Send update about a student to the connected profid
+ * @method sendUpdate
+ * @param  {Interger} id  The id to send the notification to
+ * @param  {Object} arg The object with the new data
+ */
 function sendUpdate(id, arg) {
   var arr = _.filter(global.clients, function(o) {
     try {
@@ -237,7 +254,14 @@ function sendUpdate(id, arg) {
     arr[i].socket.write(JSON.stringify(oreq) + &quot;\0&quot;);
   }
 }
-
+/**
+ * Function called for each tag request
+ * @method tagRoutine
+ * @param  {Socket}   conn The socket
+ * @param  {Object}   user The user object to treat
+ * @param  {Object}   ireq The incoming request
+ * @param  {Function} done The callback function
+ */
 function tagRoutine(conn, user, ireq, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
 
@@ -251,7 +275,7 @@ function tagRoutine(conn, user, ireq, done) {
     done();
     return;
   }
-  global.db.get(knex.select().from(&quot;students&quot;).where(&quot;userid&quot;, user.id).toString(), (err2, row2) =&gt; {
+  global.db.get(knex.select().from(&quot;students&quot;).where(&quot;userid&quot;, user.id).toString(), (err2, row2) =&gt; { // Get the student
     if (err2) {
       log.error(&quot;Error while accessing the database...\n&quot; + err);
       oreq.fnc = request.REQUEST.TAG;
@@ -277,13 +301,13 @@ function tagRoutine(conn, user, ireq, done) {
     if (row2.status == global.STATUS.IN) //Departure
     {
       nstatus = global.STATUS.OUT;
-      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
+      var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime()); //Check if date is correct
       nTimeDiffToday = row2.timeDiffToday + delta;
       var missedPause = delta / global.config.pause.interval; //Calculate the number of missedPause
-      if (missedPause) {
+      if (Math.floor(missedPause)) {
         log.warning(&quot;USRID : &quot; + user.id + &quot; : regular break rule not respected &quot; + missedPause + &quot; time(s) !&quot;);
         log.save(global.LOGS.NOPAUSE, row2.id, ireq.class, (ireq.time) ? ireq.time : moment().format().toString(), &quot;&quot;, row2.timeDiff, row2.timeDiffToday);
-        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + &quot; &quot; + user.lname + &quot; hasn&#x27;t take a pause in a &quot; + Math.floor(math.secondsToHms(delta)) + &quot; session.&quot;);
+        pushNotifications(row2.profid, global.LOGS.NOPAUSE, user.fname + &quot; &quot; + user.lname + &quot; hasn&#x27;t taken a pause in a &quot; + Math.floor(math.secondsToHms(delta)) + &quot; session.&quot;);
       }
       global.db.serialize(() =&gt; {
         global.db.run(knex(&quot;students&quot;).update({
@@ -315,9 +339,6 @@ function tagRoutine(conn, user, ireq, done) {
           done();
         });
       });
-
-
-
     } else { //Arrival
       nstatus = global.STATUS.IN;
       var delta = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
@@ -344,7 +365,7 @@ function tagRoutine(conn, user, ireq, done) {
           hadLunch = 1;
       }
       var awayTime = math.getTimeDelta(new Date((ireq.time) ? ireq.time : moment().format().toString()).getTime(), new Date(row2.lastTagTime).getTime());
-      if (awayTime &gt;= global.config.pause.time &amp;&amp; row2.missedPause &gt; 0) {
+      if (awayTime &gt;= global.config.pause.time) {
         missedPause -= Math.floor(awayTime / global.config.pause.time);
         missedPause = (missedPause &lt; 0) ? 0 : missedPause;
       }
@@ -353,7 +374,8 @@ function tagRoutine(conn, user, ireq, done) {
           status: nstatus,
           lastTagTime: (ireq.time) ? ireq.time : moment().format().toString(),
           hadLunch: hadLunch,
-          timeDiffToday: nTimeDiffToday
+          timeDiffToday: nTimeDiffToday,
+          missedPause: (missedPause &lt; 0) ? 0 : missedPause
         }).where(&quot;userid&quot;, user.id).toString());
         global.db.get(knex.select().from(&quot;students&quot;).where(&quot;userid&quot;, user.id).toString(), (err3, row3) =&gt; {
           if (err3) {
@@ -410,11 +432,10 @@ function tagRoutine(conn, user, ireq, done) {
  * Handle a tag request (When a student arrive or leave)
  * @method tagRequest
  **/
-function tagRequest(item, index, done) {
+function tagRequest(item, done) {
   var oreq = getBaseReq(request.REQUEST.TAG);
   var ireq = item.ireq;
   var conn = item.connection;
-  tagReqList.splice(index, 1); // Remove current item
   if (ireq.time != undefined &amp;&amp; !ireq.delayed &amp;&amp; !(moment(ireq.time).isBetween(moment().subtract(20, &quot;seconds&quot;), moment().add(20, &quot;seconds&quot;))))
     ireq.time = moment().format().toString();
   if (ireq.tag != undefined &amp;&amp; ireq.time != undefined)
@@ -1977,7 +1998,7 @@ function toggleLeaveRequest(conn, ireq) {
  * @param {Object} data raw data from the client.
  **/
 function sortRequest(connection, data) {
-  var oreq = getBaseReq(request.REQUEST.PING);
+  var oreq = getBaseReq(request.REQUEST.OK);
   var ireq;
   try {
     if (global.DEBUG) {
@@ -2112,7 +2133,12 @@ function sortRequest(connection, data) {
 
 function serializedTagRequest() {
   tagReqList.sort(&#x27;ireq.time&#x27;, &#x27;ascending&#x27;);
-  new EventedArray(tagReqList.toArray()).forEachEmission(tagRequest);
+  var tmp = tagReqList.pop();
+  while (tmp) {
+    tagReqQueue.push(tmp);
+    tmp = tagReqList.pop();
+  }
+
 }
 module.exports = {
 

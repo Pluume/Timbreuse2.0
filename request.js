@@ -65,7 +65,8 @@ REQUEST ={ //Define requests
     CHANGECLASS: 29,
     CREATELR: 30,
     GETLR: 31,
-    TOGGLELR: 32
+    TOGGLELR: 32,
+    DELETELR: 33
 };
 PAGES ={ //Define pages
     LOGIN: 0,

@@ -675,8 +675,8 @@ function createLeaveRequest(event, arg) {
     proof: arg.proof,
     where: arg.where
   }];
-  if(arg.id!=undefined)
-  oreq[0].id = arg.id;
+  if (arg.id != undefined)
+    oreq[0].id = arg.id;
   client.send(JSON.stringify(oreq), (err, data) => {
     try {
       var ireq = JSON.parse(data);
@@ -741,7 +741,28 @@ function toggleLR(event, arg) {
     }
   });
 }
-ipcMain.on("toggleLR",toggleLR);
+
+function deleteLR(event, arg) {
+  var oreq = [{
+    fnc: request.REQUEST.DELETELR,
+    error: request.ERROR.OK,
+    id: arg.id
+  }];
+  if (arg != undefined)
+    oreq[0].scope = arg;
+  client.send(JSON.stringify(oreq), (err, data) => {
+    try {
+      var ireq = JSON.parse(data);
+      if (ireq.fnc != oreq[0].fnc)
+        return;
+      event.sender.send("deleteLR", ireq);
+    } catch (err1) {
+      log.error("Error parsing request : " + err1);
+      log.error("Error details : " + err);
+    }
+  });
+}
+ipcMain.on("toggleLR", toggleLR);
 ipcMain.on("editStudent", editStudent);
 ipcMain.on("deleteStudent", deleteStudent);
 ipcMain.on("createStudent", createStudent);
@@ -772,3 +793,4 @@ ipcMain.on("getclasslist", getClassList);
 ipcMain.on("changestdclass", changeStudentClass);
 ipcMain.on("createLR", createLeaveRequest);
 ipcMain.on("getLR", getLeaveRequest);
+ipcMain.on("deleteLR", deleteLR);

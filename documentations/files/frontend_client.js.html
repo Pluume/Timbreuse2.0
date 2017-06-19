@@ -130,7 +130,12 @@ const request = require(&quot;../request.js&quot;);
 const log = require(&quot;./../utils/log.js&quot;);
 var currentCb = function(err, data) {}; //Proto
 var currentBuf = &quot;&quot;;
-
+/**
+ * Handle incoming request and treat them when the Timbreuse type is a client
+ * @method clientServer
+ * @param  {[type]}     data [description]
+ * @return {[type]}          [description]
+ */
 function clientServer(data) {
   try {
     var ireq = JSON.parse(data);
@@ -140,13 +145,13 @@ function clientServer(data) {
   if (ireq.fnc != undefined) {
     switch (ireq.fnc) {
       case request.REQUEST.UPDATESTD:
-        global.mwin.webContents.send(&quot;update&quot;, ireq.data);
+        global.mwin.webContents.send(&quot;update&quot;, ireq.data); //Update data about a student
         break;
       case request.REQUEST.TOGGLENOTIFICATION:
-        global.mwin.webContents.send(&quot;toggleNotification&quot;, ireq.data)
+        global.mwin.webContents.send(&quot;toggleNotification&quot;, ireq.data) //Change the status of a notification
         break;
       case request.REQUEST.UPDATENOTIF:
-        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) {
+        if (!global.mwin.isFocused() || global.currentPage != global.PAGES.NOTIFICATIONS) { //Incomming notification
           var title;
           switch (ireq.data.type) {
             case global.LOGS.MINIMUMPAUSE:
@@ -179,7 +184,11 @@ function clientServer(data) {
     }
   }
 }
-
+/**
+ * Check if packet is complet. If so, send it to clientServer function
+ * @method dataExecuter
+ * @param  {String}     data The current buffer
+ */
 function dataExecuter(data) {
   var index = currentBuf.indexOf(&quot;\0&quot;);
   if (index != -1) {
@@ -191,15 +200,23 @@ function dataExecuter(data) {
       dataExecuter(currentBuf);
   }
 }
-
+/**
+ * Handle incomming data appending new data to current data buffer
+ * @method incomingDataHandling
+ * @param  {String}             data The incomming data
+  */
 function incomingDataHandling(data) {
   currentBuf += data;
   dataExecuter(currentBuf);
 }
-
+/**
+ * Connect to the server
+ * @method connect
+ * @param  {Function} cb the callback function
+ */
 function connect(cb) {
   clientconn = new net.Socket();
-  clientconn.once(&quot;error&quot;, (err) =&gt; {
+  clientconn.once(&quot;error&quot;, (err) =&gt; { //On error display login
     if (global.currentPage != request.PAGES.LOGIN)
       global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, &#x27;web_frontend/pages/login.html&#x27;),
@@ -209,7 +226,7 @@ function connect(cb) {
     global.clientconn = null;
     cb(err);
   });
-  clientconn.once(&quot;close&quot;, () =&gt; {
+  clientconn.once(&quot;close&quot;, () =&gt; { //On close, go to login
     if (global.currentPage != request.PAGES.LOGIN)
       global.mwin.loadURL(url.format({
         pathname: path.join(__dirname, &#x27;web_frontend/pages/login.html&#x27;),
@@ -219,8 +236,8 @@ function connect(cb) {
 
     global.clientconn = null;
   });
-  clientconn.on(&quot;data&quot;, incomingDataHandling);
-  clientconn.connect({
+  clientconn.on(&quot;data&quot;, incomingDataHandling); //On data, send it to data compilation function
+  clientconn.connect({ //Connect to server
     host: global.config.server,
     port: 703
   }, () =&gt; {
@@ -229,7 +246,10 @@ function connect(cb) {
 
   });
 }
-
+/**
+ * End current connection to the server
+ * @method disconnect
+ */
 function disconnect() {
   try {
     global.clientconn.destroy();
@@ -238,7 +258,12 @@ function disconnect() {
     log.error(err);
   }
 }
-
+/**
+ * Send data to server
+ * @method send
+ * @param  {String}   data outgoing data
+ * @param  {Function} cb   The callback to callback
+ */
 function send(data, cb) {
   currentCb = cb;
   global.clientconn.removeAllListeners(&quot;error&quot;);
@@ -268,10 +293,10 @@ function createWindow() {
   }));
   if (global.DEBUG)
     global.mwin.webContents.openDevTools();
-  global.mwin.on(&#x27;closed&#x27;, function() {
+  global.mwin.on(&#x27;closed&#x27;, function() { //On closed, quit
     mainWindow = null;
   });
-  global.mwin.on(&quot;ready-to-show&quot;, () =&gt; {
+  global.mwin.on(&quot;ready-to-show&quot;, () =&gt; { //Wait for html before showing
     global.mwin.show();
   });
   var iconPath = path.join(__dirname, &quot;..&quot;, &quot;graphics&quot;, &quot;ico.png&quot;);

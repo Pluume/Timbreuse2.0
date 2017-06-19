@@ -183,12 +183,6 @@ function displayTaggedStudent(event, std) {
   }
   var dissmissGroup = document.createElement(&quot;div&quot;);
   dissmissGroup.setAttribute(&quot;class&quot;, &quot;btn-group pull-right&quot;);
-  var dissmissButton = document.createElement(&quot;a&quot;);
-  dissmissButton.setAttribute(&quot;href&quot;, &quot;#&quot;);
-  dissmissButton.setAttribute(&quot;class&quot;, &quot;btn btn-default btn-sm bigText&quot;);
-  dissmissButton.setAttribute(&quot;onclick&quot;, &quot;dissmissInfoPane();&quot;);
-  dissmissButton.innerHTML = &quot;Close&quot;;
-  dissmissGroup.appendChild(dissmissButton);
   footer.appendChild(statusGroup);
   footer.appendChild(dissmissGroup);
   panel.appendChild(heading);

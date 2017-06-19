@@ -27,7 +27,8 @@
 
 <body>
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="LRTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
+    <table id="LRTable" data-unique-id="id" data-detail-view="true" data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false"
+      data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="state" data-checkbox="true"></th>
@@ -35,7 +36,7 @@
           <th data-field="lname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Last name</th>
           <th data-field="fname" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">First name</th>
           <th data-field="username" style="text-align: center; vertical-align: middle; width: 36px; " data-sortable="true">Username</th>
-          <th data-field="dateFrom" style="text-align: center; vertical-align: middle; width: 36px; "  data-formatter="timeFormatter" data-sortable="true">Start date</th>
+          <th data-field="dateFrom" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">Start date</th>
           <th data-field="dateTo" style="text-align: center; vertical-align: middle; width: 36px; " data-formatter="timeFormatter" data-sortable="true">End date</th>
           <th data-field="missedTest" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Missed Test</th>
           <th data-field="reason" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true">Reason</th>
@@ -58,6 +59,7 @@
     window.RANK = require('../../../db/db.js').RANK;
     window.STATUS = require('../../../db/db.js').STATUS;
     window.LOGS = require('../../../db/db.js').LOGS;
+    window.REASON = require('../../../db/db.js').REASON;
     setPage(window.PAGES.LEAVEREQ_PROF);
 
     function toggleAcpt(id, val) {
@@ -72,16 +74,107 @@
       });
 
     }
-    function detailsFormatter(index,row)
-    {
-      //TODO
+
+    function detailsFormatter(index, row) {
+      var container = document.createElement("div");
+      container.setAttribute("style", "text-align: center;");
+      var title = document.createElement("h1");
+      title.innerHTML += row.fname;
+      title.innerHTML += " ";
+      title.innerHTML += row.lname;
+      title.innerHTML += " issued a leave application";
+      title.innerHTML += (moment(row.date, moment.ISO_8601, true).isValid() ? " the " + moment(row.date).format("DD-MM-YYYY") : "");
+      var missedTest = document.createElement("span");
+      var missedTestText = document.createElement("h3");
+      missedTestText.innerHTML = "Missed test ? ";
+      if (row.missedTest) {
+        missedTest.setAttribute("style", "color:red");
+        missedTest.setAttribute("class", "glyphicon glyphicon-ok");
+      } else {
+        missedTest.setAttribute("style", "color:green");
+        missedTest.setAttribute("class", "glyphicon glyphicon-remove");
+      }
+      var reason = document.createElement("h3");
+      var reasonStrong = document.createElement("strong");
+      reason.innerHTML = "Reason : ";
+      switch (row.reason) {
+        case window.REASON.MILITARY:
+          reasonStrong.innerHTML = "Military obligations";
+          break;
+        case window.REASON.DEAD:
+          reasonStrong.innerHTML = "Death";
+          break;
+        case window.REASON.OFFICIAL:
+          reasonStrong.innerHTML = "Official convocation";
+          break;
+        case window.REASON.DRIVER:
+          reasonStrong.innerHTML = "Driver liscence appointement";
+          break;
+        case window.REASON.SICKW:
+          reasonStrong.innerHTML = "Sick with certificate";
+          break;
+        case window.REASON.SICKWO:
+          reasonStrong.innerHTML = "Sick without certificate";
+          break;
+        case window.REASON.TREATEMENT:
+          reasonStrong.innerHTML = "Treatement";
+          break;
+        case window.REASON.OTHER:
+          reasonStrong.innerHTML = "Other";
+          break;
+        default:
+          reasonStrong.innerHTML = "Other";
+          break;
+      }
+      var proof = document.createElement("h3");
+      proof.innerHTML = "Proof : ";
+      var proofStrong = document.createElement("strong");
+      switch (row.proof) {
+        case window.PROOF.NONE:
+          proofStrong.innerHTML = "None";
+          break;
+        case window.PROOF.MEDICAL:
+          proofStrong.innerHTML = "Medical certificate";
+          break;
+        case window.PROOF.CERTIFICATE:
+          proofStrong.innerHTML = "Certificate";
+          break;
+        case window.PROOF.CONVOCATION:
+          proofStrong.innerHTML = "Convocation";
+          break;
+        default:
+          proofStrong.innerHTML = "None";
+      }
+      proof.appendChild(proofStrong);
+
+      var description = document.createElement("h3");
+      description.innerHTML = "Description : ";
+      var descriptionStrong = document.createElement("strong");
+      descriptionStrong.innerHTML = row.reasonDesc;
+      description.appendChild(descriptionStrong);
+      reason.appendChild(reasonStrong);
+      missedTestText.appendChild(missedTest);
+      container.appendChild(title);
+      container.appendChild(missedTestText);
+      container.appendChild(reason);
+      container.appendChild(description);
+      container.appendChild(proof);
+      return container.outerHTML;
     }
+
+    function preDeleteLR(id) {
+      $("#delLeaveReqModal").modal("show");
+      document.getElementById("comfirmDeleteLR").setAttribute("onclick", "deleteLR(" + id + ");")
+    }
+
     function actionFormatter(val, row) {
-      console.log(JSON.stringify(row));
+      var res;
       if (row.acpt)
-        return "<button data-toggle='tooltip' data-placement='left' title='Set denied' href='#' onclick='toggleAcpt(" + row.id + "," + "false);' class='btn btn-success'><i class='glyphicon glyphicon-remove'></i></button>";
+        res = "<button data-toggle='tooltip' data-placement='left' title='Set denied' href='#' onclick='toggleAcpt(" + row.id + "," + "false);' class='btn btn-success'><i class='glyphicon glyphicon-remove'></i></button>";
       else
-        return "<button data-toggle='tooltip' data-placement='left' title='Set accepted' href='#' onclick='toggleAcpt(" + row.id + "," + "true);' class='btn btn-danger btn-circle'><i class='glyphicon glyphicon-ok'></i></button>";
+        res = "<button data-toggle='tooltip' data-placement='left' title='Set accepted' href='#' onclick='toggleAcpt(" + row.id + "," + "true);' class='btn btn-danger btn-circle'><i class='glyphicon glyphicon-ok'></i></button>";
+      res += "<button data-toggle='tooltip' data-placement='right' title='Delete' href='#' onclick='preDeleteLR(" + row.id + ");' class='btn btn-danger btn-circle'><i class='fa fa-bomb'></i></button>"
+      return res;
     }
 
     function acptFormatter(val, row) {
@@ -122,6 +215,19 @@
 
     });
   </script>
+  <div class="modal fade" id="delLeaveReqModal" tabindex="-1" role="dialog" aria-labelledby="delLeaveReqModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="delLeaveReqModalTitle">Are you sure to delete this leave application ?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" id="comfirmDeleteLR"  data-dismiss="modal" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade" id="addLeaveRequest" tabindex="-1" role="dialog" aria-labelledby="addLeaveRequest" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">

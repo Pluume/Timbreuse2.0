@@ -27,7 +27,7 @@
 
 <body>
   <div class="container" id="pageContainer" style="width: 100%;height:100px;margin: 0;margin-right: 10px;">
-    <table id="LRTable" data-details-view="true" data-unique-id="id"  data-detail-formatter="detailsFormatter" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
+    <table id="LRTable" data-detail-view="true" data-detail-formatter="detailsFormatter" data-unique-id="id" style="width: 100%;height:100%;" data-toggle="table" data-height="800" data-click-to-select="false" data-sort-name="dateFrom" data-pagination="false" data-sort-order="desc">
       <thead>
         <tr>
           <th data-field="id" style="text-align: center; vertical-align: middle; width: 36px; " data-visible="false" data-sortable="true"></th>
@@ -74,9 +74,84 @@
     function timeFormatter(val) {
       return require("electron").remote.require("moment")(val).format("DD MMMM YYYY <br /> H:mm");
     }
-    function detailsFormatter()
-    {
+    function detailsFormatter(index, row) {
+      var container = document.createElement("div");
+      container.setAttribute("style", "text-align: center;");
+      var missedTest = document.createElement("span");
+      var missedTestText = document.createElement("h3");
+      missedTestText.innerHTML = "Missed test ? ";
+      if (row.missedTest) {
+        missedTest.setAttribute("style", "color:red");
+        missedTest.setAttribute("class", "glyphicon glyphicon-ok");
+      } else {
+        missedTest.setAttribute("style", "color:green");
+        missedTest.setAttribute("class", "glyphicon glyphicon-remove");
+      }
+      var reason = document.createElement("h3");
+      var reasonStrong = document.createElement("strong");
+      reason.innerHTML = "Reason : ";
+      switch (row.reason) {
+        case window.REASON.MILITARY:
+          reasonStrong.innerHTML = "Military obligations";
+          break;
+        case window.REASON.DEAD:
+          reasonStrong.innerHTML = "Death";
+          break;
+        case window.REASON.OFFICIAL:
+          reasonStrong.innerHTML = "Official convocation";
+          break;
+        case window.REASON.DRIVER:
+          reasonStrong.innerHTML = "Driver liscence appointement";
+          break;
+        case window.REASON.SICKW:
+          reasonStrong.innerHTML = "Sick with certificate";
+          break;
+        case window.REASON.SICKWO:
+          reasonStrong.innerHTML = "Sick without certificate";
+          break;
+        case window.REASON.TREATEMENT:
+          reasonStrong.innerHTML = "Treatement";
+          break;
+        case window.REASON.OTHER:
+          reasonStrong.innerHTML = "Other";
+          break;
+        default:
+          reasonStrong.innerHTML = "Other";
+          break;
+      }
+      var proof = document.createElement("h3");
+      proof.innerHTML = "Proof : ";
+      var proofStrong = document.createElement("strong");
+      switch (row.proof) {
+        case window.PROOF.NONE:
+          proofStrong.innerHTML = "None";
+          break;
+        case window.PROOF.MEDICAL:
+          proofStrong.innerHTML = "Medical certificate";
+          break;
+        case window.PROOF.CERTIFICATE:
+          proofStrong.innerHTML = "Certificate";
+          break;
+        case window.PROOF.CONVOCATION:
+          proofStrong.innerHTML = "Convocation";
+          break;
+        default:
+          proofStrong.innerHTML = "None";
+      }
+      proof.appendChild(proofStrong);
 
+      var description = document.createElement("h3");
+      description.innerHTML = "Description : ";
+      var descriptionStrong = document.createElement("strong");
+      descriptionStrong.innerHTML = row.reasonDesc;
+      description.appendChild(descriptionStrong);
+      reason.appendChild(reasonStrong);
+      missedTestText.appendChild(missedTest);
+      container.appendChild(missedTestText);
+      container.appendChild(reason);
+      container.appendChild(description);
+      container.appendChild(proof);
+      return container.outerHTML;
     }
     $(document).ready(function() {
       $("body").tooltip({
