@@ -68,6 +68,11 @@ function displayTaggedStudent(event, std) {
   var dissmissGroup = document.createElement("div");
   dissmissGroup.setAttribute("class", "btn-group pull-right");
   footer.appendChild(statusGroup);
+  var dissmissButton = document.createElement("a");
+  dissmissButton.setAttribute("href", "#");
+  dissmissButton.setAttribute("class", "btn btn-default btn-sm bigText");
+  dissmissButton.innerHTML = "Close";
+  dissmissGroup.appendChild(dissmissButton);
   footer.appendChild(dissmissGroup);
   panel.appendChild(heading);
   panel.appendChild(body);
@@ -118,7 +123,6 @@ function displayCSV(event, val) {
   var dissmissButton = document.createElement("a");
   dissmissButton.setAttribute("href", "#");
   dissmissButton.setAttribute("class", "btn btn-default btn-sm bigText");
-  dissmissButton.setAttribute("onclick", "dissmissInfoPane();");
   dissmissButton.innerHTML = "Close";
   dissmissGroup.appendChild(dissmissButton);
   footer.appendChild(statusGroup);
@@ -158,8 +162,8 @@ function showOnline(event, val) {
     var footer = document.createElement("div");
     footer.setAttribute("class", "panel-footer clearfix");
     var statusGroup = document.createElement("div");
-    statusGroup.setAttribute("class", "btn-group pull-left");
-    statusGroup.innerHTML = "<b>Disconnected from server</b>";
+    statusGroup.setAttribute("class", "btn-group text-center");
+    statusGroup.innerHTML = "<b>Disconnected from server - You can tag anyway <p style='color: red'>BUT ALWAYS ON THE SAME TIMBREUSE</p></b>";
     footer.appendChild(statusGroup);
     panel.appendChild(heading);
     panel.appendChild(body);

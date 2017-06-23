@@ -270,6 +270,11 @@ function createWindow() {
   global.mwin.webContents.on('did-finish-load', function() {
     global.mwin.show();
   });
+  global.mwin.setAlwaysOnTop(true);
+  global.mwin.on("blur", () => {
+    global.mwin.focus();
+    global.mwin.webContents.focus();
+  });
   global.mwin.on("show", () => {
     global.mwin.maximize();
     global.mwin.setFullScreen(true);

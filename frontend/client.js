@@ -183,6 +183,7 @@ function createWindow() {
   global.mwin.on("ready-to-show", () => { //Wait for html before showing
     global.mwin.show();
   });
+
   var iconPath = path.join(__dirname, "..", "graphics", "ico.png");
   global.tray = new electron.Tray(iconPath);
   var showVisible = () => {

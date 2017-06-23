@@ -1548,7 +1548,7 @@ function editProf(conn, ireq) {
         dob: (ireq.data.dob == "") ? row.dob : ireq.data.dob,
         fname: (ireq.data.fname == "") ? row.fname : ireq.data.fname,
         lname: (ireq.data.lname == "") ? row.lname : ireq.data.lname,
-        password: (ireq.data.pass) ? global.config.defaultPass : row.password
+        password: (ireq.data.pass) ? crypto.SHA256(global.config.defaultPass).toString(crypto.enc.utf8) : row.password
       }).where({
         id: row.id
       }).toString(), callback);

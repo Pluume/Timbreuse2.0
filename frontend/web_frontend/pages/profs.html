@@ -101,35 +101,7 @@
   <script src="../dist/js/bootstrap-table.js"></script>
   <script>
     function genProfil(row) {
-
-      // Student's ID
       var profilBlock = document.createElement("div");
-      var tsid = document.createElement("code");
-      var tsidText = document.createElement("p");
-      tsidText.innerHTML = "The student's id is : ";
-      tsid.innerHTML = row.id;
-      tsidText.appendChild(tsid);
-      profilBlock.appendChild(tsidText);
-      // User's ID
-      var tuid = document.createElement("code");
-      var tuidText = document.createElement("p");
-      tuidText.innerHTML = "The user id is : ";
-      tuid.innerHTML = row.userid;
-      tuidText.appendChild(tuid);
-      profilBlock.appendChild(tuidText);
-      //Prof id
-      var prof = document.createElement("code");
-      var profText = document.createElement("p");
-      profText.innerHTML = "The prof id is : ";
-      prof.innerHTML = row.profid;
-      profText.appendChild(prof);
-      profilBlock.appendChild(profText);
-      // Date of birth
-      if (moment(row.dob, "DD-MM-YYYY").isValid()) {
-        var dobText = document.createElement("p");
-        dobText.innerHTML = "Born the " + moment(row.dob, "DD-MM-YYYY").format("Do MMMM YYYY");
-        profilBlock.appendChild(dobText);
-      }
       //Email
       if (row.email && row.email != null && row.email != "") {
         var emailLink = document.createElement("a");
@@ -139,13 +111,6 @@
         emailText.innerHTML = "Email : " + emailLink.outerHTML;
         profilBlock.appendChild(emailText);
       }
-      //Tag
-      var tag = document.createElement("code");
-      var tagText = document.createElement("p");
-      tagText.innerHTML = "The tag id is : ";
-      tag.innerHTML = row.tag;
-      tagText.appendChild(tag);
-      profilBlock.appendChild(tagText);
       //Missed pause
       var missedPause = document.createElement("strong");
       var missedPauseText = document.createElement("p");
@@ -182,6 +147,41 @@
       firstClassText.innerHTML = "First class : ";
       firstClassText.appendChild(firstClass);
       profilBlock.appendChild(firstClassText);
+      // Student's ID
+
+      var tsid = document.createElement("code");
+      var tsidText = document.createElement("p");
+      tsidText.innerHTML = "The student's id is : ";
+      tsid.innerHTML = row.id;
+      tsidText.appendChild(tsid);
+      profilBlock.appendChild(tsidText);
+      // User's ID
+      var tuid = document.createElement("code");
+      var tuidText = document.createElement("p");
+      tuidText.innerHTML = "The user id is : ";
+      tuid.innerHTML = row.userid;
+      tuidText.appendChild(tuid);
+      profilBlock.appendChild(tuidText);
+      //Prof id
+      var prof = document.createElement("code");
+      var profText = document.createElement("p");
+      profText.innerHTML = "The prof id is : ";
+      prof.innerHTML = row.profid;
+      profText.appendChild(prof);
+      profilBlock.appendChild(profText);
+      // Date of birth
+      if (moment(row.dob, "DD-MM-YYYY").isValid()) {
+        var dobText = document.createElement("p");
+        dobText.innerHTML = "Born the " + moment(row.dob, "DD-MM-YYYY").format("Do MMMM YYYY");
+        profilBlock.appendChild(dobText);
+      }
+      //Tag
+      var tag = document.createElement("code");
+      var tagText = document.createElement("p");
+      tagText.innerHTML = "The tag id is : ";
+      tag.innerHTML = row.tag;
+      tagText.appendChild(tag);
+      profilBlock.appendChild(tagText);
       return profilBlock.outerHTML;
     }
 
